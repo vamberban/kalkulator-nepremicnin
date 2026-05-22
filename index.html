@@ -130,7 +130,14 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2);}
 @keyframes spin{to{transform:rotate(360deg)}}
 @media(max-width:500px){.card{padding:1.5rem;}.summary-grid,.ref-grid{grid-template-columns:1fr;}}
 
-/* ── KOMPONENTE STAROSTI ── */
+/* ── SLIDER Z ROČNIM VNOSOM ── */
+.slider-input-row{display:flex;align-items:center;gap:.5rem;margin-bottom:.3rem;}
+.slider-manual{width:72px;padding:.35rem .5rem;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.9rem;text-align:center;background:var(--paper);color:var(--ink);-moz-appearance:textfield;}
+.slider-manual::-webkit-outer-spin-button,.slider-manual::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+.slider-manual:focus{outline:none;border-color:var(--gold);}
+.slider-unit-label{font-size:.82rem;color:var(--muted);}
+
+/* ── KOMPONENTE STAROSTI ── *//* ── KOMPONENTE STAROSTI ── */
 .comp-row{display:flex;align-items:center;gap:.75rem;padding:.7rem 0;border-bottom:1px solid var(--border);}
 .comp-row:last-child{border-bottom:none;}
 .comp-label{font-size:.85rem;font-weight:500;flex:1;min-width:0;}
@@ -161,6 +168,28 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2);}
 .trend-legend{display:flex;gap:1.2rem;margin-top:.75rem;flex-wrap:wrap;}
 .trend-leg-item{display:flex;align-items:center;gap:.35rem;font-size:.72rem;color:var(--muted);}
 .trend-leg-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+
+/* ── ETN TRANSAKCIJE ── */
+.etn-section{margin-bottom:1.8rem;}
+.etn-table{width:100%;border-collapse:collapse;font-size:.78rem;}
+.etn-table th{text-align:left;padding:.4rem .6rem;color:var(--muted);font-weight:500;border-bottom:1.5px solid var(--border);font-size:.72rem;letter-spacing:.05em;}
+.etn-table td{padding:.5rem .6rem;border-bottom:1px solid var(--border);color:var(--ink);}
+.etn-table tr:last-child td{border-bottom:none;}
+.etn-table tr:hover td{background:rgba(192,154,74,.04);}
+.etn-ppm2{font-weight:600;color:var(--ink);}
+.etn-datum{color:var(--muted);}
+.etn-note{font-size:.7rem;color:var(--muted);margin-top:.5rem;font-style:italic;}
+/* Mobilna ETN kartica */
+.etn-card{padding:.6rem 0;border-bottom:1px solid var(--border);display:none;}
+.etn-card:last-child{border-bottom:none;}
+.etn-card-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:.2rem;}
+.etn-card-addr{font-size:.82rem;font-weight:500;color:var(--ink);}
+.etn-card-price{font-size:.88rem;font-weight:700;color:var(--ink);}
+.etn-card-meta{font-size:.72rem;color:var(--muted);}
+@media(max-width:500px){
+  .etn-table{display:none;}
+  .etn-card{display:block;}
+}
 </style>
 </head>
 <body>
@@ -197,17 +226,14 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2);}
       <span class="ls-pin">📌</span>
       <div class="ls-body"><div class="ls-kraj" id="pillKraj"></div><div class="ls-tao" id="pillTao"></div></div>
       <span class="ls-price" id="pillPrice"></span>
-      <button class="ls-change" onclick="resetSearch()">Spremeni</button>
     </div>
-    <div class="search-wrap" id="searchWrap">
-      <div class="search-input-row">
-        <span class="search-icon">🔍</span>
-        <input class="loc-input" id="locInput" type="text" placeholder="npr. Domžale, LJ – Šiška, Velenje…" autocomplete="off">
-        <button class="clear-btn" id="clearBtn" onclick="clearInput()">×</button>
-      </div>
-      <div class="dropdown" id="dropdown"></div>
+    <div id="searchWrap">
+      <input type="text" id="locInput" placeholder="npr. Ljubljana – Bežigrad" autocomplete="off"
+        oninput="renderDD(this.value)"
+        style="width:100%;padding:.85rem 1rem;border:1.5px solid var(--border);border-radius:12px;font-family:'DM Sans',sans-serif;font-size:.95rem;background:var(--paper);color:var(--ink);outline:none;box-sizing:border-box">
+      <div id="locDD" style="background:var(--paper);border:1.5px solid var(--border);border-radius:12px;margin-top:.4rem;overflow:hidden;display:none;max-height:260px;overflow-y:auto"></div>
     </div>
-    <div class="btn-row">
+    <div class="btn-row" style="margin-top:1.2rem">
       <button class="btn-back" onclick="go(1)">← Nazaj</button>
       <button class="btn-next" id="btn2" onclick="go(3)" disabled>Naprej →</button>
     </div>
@@ -217,28 +243,91 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2);}
     <div class="step-title" id="s3title">Površina</div>
     <div class="step-sub" id="s3sub">Vnesite uporabno površino v kvadratnih metrih.</div>
     <div class="slider-section">
-      <div class="slider-display"><span class="slider-num" id="sizeNum">70</span><span class="slider-unit">m²</span></div>
-      <input type="range" id="sizeSlider" min="20" max="300" value="70" step="5" oninput="onSize(this.value)">
+      <div class="slider-input-row">
+        <input type="number" class="slider-manual" id="sizeManual" value="70" min="20" max="600" oninput="onSizeManual(this.value)">
+        <span class="slider-unit-label">m²</span>
+      </div>
+      <input type="range" id="sizeSlider" min="20" max="300" value="70" step="1" oninput="onSize(this.value)">
       <div class="slider-range"><span id="sizeMin">20 m²</span><span id="sizeMax">300 m²</span></div>
     </div>
     <!-- Garaža/parkirno mesto — samo za stanovanja -->
     <div id="garazaWrap" style="display:none;margin-bottom:1.4rem">
       <span class="field-label">🚗 Parkirno mesto / garaža</span>
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;margin-top:.6rem">
-        <button class="cond-btn" id="garaza-0" onclick="selGaraza(0)"><span class="cond-icon">🚫</span><span class="cond-name">Brez</span></button>
-        <button class="cond-btn" id="garaza-1" onclick="selGaraza(1)"><span class="cond-icon">🚗</span><span class="cond-name">1 mesto</span></button>
-        <button class="cond-btn" id="garaza-2" onclick="selGaraza(2)"><span class="cond-icon">🚗🚗</span><span class="cond-name">2 mesti</span></button>
-        <button class="cond-btn" id="garaza-3" onclick="selGaraza(3)"><span class="cond-icon">🚗🚗🚗</span><span class="cond-name">3 mesta</span></button>
+      <!-- Garažna mesta -->
+      <div style="margin-bottom:.6rem">
+        <div style="font-size:.78rem;font-weight:500;margin-bottom:.4rem">🏠 Garažno mesto (zaprto):</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem">
+          <button class="cond-btn sel" id="garaza-0" onclick="selGaraza(0)"><span class="cond-icon">🚫</span><span class="cond-name">Brez</span></button>
+          <button class="cond-btn" id="garaza-1" onclick="selGaraza(1)"><span class="cond-icon">1×</span><span class="cond-name">1 mesto</span></button>
+          <button class="cond-btn" id="garaza-2" onclick="selGaraza(2)"><span class="cond-icon">2×</span><span class="cond-name">2 mesti</span></button>
+          <button class="cond-btn" id="garaza-3" onclick="selGaraza(3)"><span class="cond-icon">3×</span><span class="cond-name">3 mesta</span></button>
+        </div>
+      </div>
+      <!-- Zunanja mesta -->
+      <div>
+        <div style="font-size:.78rem;font-weight:500;margin-bottom:.4rem">🅿️ Zunanje parkirno (lastniško):</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem">
+          <button class="cond-btn sel" id="zunanje-0" onclick="selZunanje(0)"><span class="cond-icon">🚫</span><span class="cond-name">Brez</span></button>
+          <button class="cond-btn" id="vanjske-1" onclick="selZunanje(1)"><span class="cond-icon">1×</span><span class="cond-name">1 mesto</span></button>
+          <button class="cond-btn" id="zunanje-2" onclick="selZunanje(2)"><span class="cond-icon">2×</span><span class="cond-name">2 mesti</span></button>
+          <button class="cond-btn" id="zunanje-3" onclick="selZunanje(3)"><span class="cond-icon">3×</span><span class="cond-name">3 mesta</span></button>
+        </div>
+      </div>div>
+    </div>
+    <!-- Atrij — samo za stanovanja -->
+    <div id="atrijWrap" style="display:none;margin-bottom:1.4rem">
+      <span class="field-label">🌿 Atrij / vrtna terasa</span>
+      <div style="margin-top:.5rem">
+        <button class="type-card" id="atrijToggleBtn" onclick="toggleAtrij(this)"
+          style="padding:.75rem 1.25rem;text-align:left;width:100%;margin-bottom:.75rem">
+          <div style="display:flex;align-items:center;gap:.75rem">
+            <span style="font-size:1.4rem">🌿</span>
+            <div>
+              <div class="tc-name">Vključen atrij / zasebni vrt</div>
+              <div class="tc-desc">Klikni za označitev — doda vrednost zemljišča</div>
+            </div>
+          </div>
+        </button>
+      </div>
+      <div id="atrijSliderWrap" style="display:none">
+        <span class="field-label">Površina atrija</span>
+        <div class="slider-section">
+          <div class="slider-input-row">
+            <input type="number" class="slider-manual" id="atrijManual" value="30" min="1" max="1000" oninput="onAtrijManual(this.value)">
+            <span class="slider-unit-label">m²</span>
+          </div>
+          <input type="range" id="atrijSlider" min="10" max="500" value="30" step="1" oninput="onAtrij(this.value)">
+          <div class="slider-range"><span>10 m²</span><span>500 m²</span></div>
+        </div>
       </div>
     </div>
     <!-- Parcela — samo za hiše -->
     <div id="parcelaWrap" style="display:none">
       <span class="field-label" style="margin-top:.5rem">Površina parcele</span>
       <div class="slider-section">
-        <div class="slider-display"><span class="slider-num" id="parcelaNum">500</span><span class="slider-unit">m²</span></div>
-        <input type="range" id="parcelaSlider" min="100" max="5000" value="500" step="50" oninput="onParcela(this.value)">
+        <div class="slider-input-row">
+          <input type="number" class="slider-manual" id="parcelaManual" value="500" min="100" max="10000" oninput="onParcelaManual(this.value)">
+          <span class="slider-unit-label">m²</span>
+        </div>
+        <input type="range" id="parcelaSlider" min="100" max="5000" value="500" step="1" oninput="onParcela(this.value)">
         <div class="slider-range"><span>100 m²</span><span>5.000 m²</span></div>
       </div>
+    </div>
+    <!-- Kakovost izvedbe -->
+    <span class="field-label" style="margin-top:.5rem">Kakovost izvedbe</span>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-bottom:1.4rem;margin-top:.6rem">
+      <button class="cond-btn" id="kval-standard" onclick="selKakovost('standard',1.0)">
+        <span class="cond-icon">🏠</span>
+        <span class="cond-name">Standard</span>
+      </button>
+      <button class="cond-btn" id="kval-nadstandard" onclick="selKakovost('nadstandard',1.12)">
+        <span class="cond-icon">⭐</span>
+        <span class="cond-name">Nadstandard</span>
+      </button>
+      <button class="cond-btn" id="kval-luksuz" onclick="selKakovost('luksuz',1.25)">
+        <span class="cond-icon">💎</span>
+        <span class="cond-name">Luksuz</span>
+      </button>
     </div>
     <div class="btn-row">
       <button class="btn-back" onclick="go(2)">← Nazaj</button>
@@ -253,7 +342,9 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2);}
     <!-- Leto gradnje -->
     <span class="field-label">Leto izgradnje</span>
     <div class="slider-section" style="margin-bottom:1.4rem">
-      <div class="slider-display"><span class="slider-num" id="yearNum">1980</span></div>
+      <div class="slider-input-row">
+        <input type="number" class="slider-manual" id="yearManual" value="1980" min="1945" max="2026" oninput="onYearManual(this.value)">
+      </div>
       <input type="range" id="yearSlider" min="1945" max="2025" value="1980" step="1" oninput="onYear(this.value)">
       <div class="slider-range"><span>1945</span><span>2025</span></div>
     </div>
@@ -268,7 +359,9 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2);}
         <button class="comp-toggle" id="tog-fasada" onclick="toggleComp('fasada')">Ni obnovljeno</button>
       </div>
       <div class="comp-slider-wrap" id="wrap-fasada">
-        <div class="comp-year-display" id="disp-fasada">2000</div>
+        <div class="slider-input-row">
+          <input type="number" class="slider-manual" id="manual-fasada" value="2000" min="1945" max="2026" oninput="onCompManual('fasada',this.value)">
+        </div>
         <div class="comp-slider-inner">
           <input type="range" id="sl-fasada" min="1945" max="2025" value="2000" step="1" oninput="onComp('fasada',this.value)">
         </div>
@@ -281,7 +374,9 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2);}
         <button class="comp-toggle" id="tog-okna" onclick="toggleComp('okna')">Ni obnovljeno</button>
       </div>
       <div class="comp-slider-wrap" id="wrap-okna">
-        <div class="comp-year-display" id="disp-okna">2000</div>
+        <div class="slider-input-row">
+          <input type="number" class="slider-manual" id="manual-okna" value="2000" min="1945" max="2026" oninput="onCompManual('okna',this.value)">
+        </div>
         <div class="comp-slider-inner">
           <input type="range" id="sl-okna" min="1945" max="2025" value="2000" step="1" oninput="onComp('okna',this.value)">
         </div>
@@ -294,7 +389,9 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2);}
         <button class="comp-toggle" id="tog-streha" onclick="toggleComp('streha')">Ni obnovljeno</button>
       </div>
       <div class="comp-slider-wrap" id="wrap-streha">
-        <div class="comp-year-display" id="disp-streha">2000</div>
+        <div class="slider-input-row">
+          <input type="number" class="slider-manual" id="manual-streha" value="2000" min="1945" max="2026" oninput="onCompManual('streha',this.value)">
+        </div>
         <div class="comp-slider-inner">
           <input type="range" id="sl-streha" min="1945" max="2025" value="2000" step="1" oninput="onComp('streha',this.value)">
         </div>
@@ -307,7 +404,9 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2);}
         <button class="comp-toggle" id="tog-inst" onclick="toggleComp('inst')">Ni obnovljeno</button>
       </div>
       <div class="comp-slider-wrap" id="wrap-inst">
-        <div class="comp-year-display" id="disp-inst">2000</div>
+        <div class="slider-input-row">
+          <input type="number" class="slider-manual" id="manual-inst" value="2000" min="1945" max="2026" oninput="onCompManual('inst',this.value)">
+        </div>
         <div class="comp-slider-inner">
           <input type="range" id="sl-inst" min="1945" max="2025" value="2000" step="1" oninput="onComp('inst',this.value)">
         </div>
@@ -360,6 +459,7 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2);}
         <span id="rHigh">—</span>
       </div>
       <div class="result-confidence" id="rConfidence">—</div>
+      <div id="rContext" style="font-size:.8rem;color:var(--muted);margin-top:.5rem;font-style:italic;min-height:1.2em"></div>
       <div class="result-note" id="rNote">—</div>
       <span class="result-source">◆ Vir: GURS 2025 · +3% korekcija 2026</span>
     </div>
@@ -381,6 +481,7 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2);}
         <div id="refZemRow" style="display:none"><div class="ref-item-label">Mediana površine parcele</div><div class="ref-item-val" id="refZemVal">—</div></div>
       </div>
     </div>
+    <div id="etnSection" style="display:none" class="etn-section"></div>
     <div class="trend-section">
       <div class="ref-title">Gibanje cen 2020–2025 (verižni indeks)</div>
       <div class="trend-chart"><svg class="trend-svg" id="trendSvg" viewBox="0 0 560 185" preserveAspectRatio="none"></svg></div>
@@ -399,6 +500,13 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2);}
       <div class="sent-box" id="sentBox">✓ Hvala! Kontaktirali vas bomo v naslednjih 24 urah.</div>
       <p class="privacy">Vaši podatki so varni in ne bodo posredovani tretjim osebam.</p>
     </div>
+    <div id="editMenu" style="display:none;background:var(--paper);border:1.5px solid var(--border);border-radius:12px;padding:.75rem;margin-bottom:.75rem">
+      <div style="font-size:.78rem;font-weight:600;color:var(--muted);margin-bottom:.6rem;letter-spacing:.05em">KAJ HOČEŠ POPRAVITI?</div>
+      <button onclick="goBackStep(1)" style="display:block;width:100%;text-align:left;padding:.55rem .75rem;margin-bottom:.3rem;background:none;border:1px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.85rem;cursor:pointer;color:var(--ink)" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--border)'">🏠 Vrsta nepremičnine</button>
+      <button onclick="goBackStep(2)" style="display:block;width:100%;text-align:left;padding:.55rem .75rem;margin-bottom:.3rem;background:none;border:1px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.85rem;cursor:pointer;color:var(--ink)" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--border)'">📍 Lokacija</button>
+      <button onclick="goBackStep(3)" style="display:block;width:100%;text-align:left;padding:.55rem .75rem;margin-bottom:.3rem;background:none;border:1px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.85rem;cursor:pointer;color:var(--ink)" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--border)'">📐 Površina in dodatki</button>
+      <button onclick="goBackStep(4)" style="display:block;width:100%;text-align:left;padding:.55rem .75rem;background:none;border:1px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.85rem;cursor:pointer;color:var(--ink)" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--border)'">🏗️ Starost in stanje</button>
+    </div>
     <button class="btn-back-edit" onclick="goBackToEdit()">✏️ Popravi podatke</button>
     <button class="btn-restart" onclick="location.reload()">↩ Začni znova</button>
   </div>
@@ -406,299 +514,299 @@ input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2);}
 </div>
 
 <script>
-// ════════════════════════════════════════════════════════════════
-//  GURS 2025 — KOMPLETNI PODATKI
+
+//  GURS 2025 \u2014 KOMPLETNI PODATKI
 //  Vir: GURS Letno poročilo za leto 2025
 //  TAO = Tržno analitično območje (Preglednica 9)
-//  LAO = Lokalno analitično območje (Preglednice 14–163)
-//  cena_m2 = mediana €/m² (stanovanja)
-//  cena_h  = mediana € (hiše)
+//  LAO = Lokalno analitično območje (Preglednice 14\u2013163)
+//  cena_m2 = mediana \u20AC/m\u00B2 (stanovanja)
+//  cena_h  = mediana \u20AC (hiše)
 //  ref_leto = mediana leta zgraditve prodanih enot
 //  ref_m2   = mediana površine (stanovanje = uporabna, hiša = neto)
 //  n        = število transakcij v vzorcu
-// ════════════════════════════════════════════════════════════════
+
 
 // Vsaka lokacija: { label, cena_m2 ali cena_h, ref_leto, ref_m2, n }
 // Ključ: "tao_id|lao_id" ali samo "tao_id" za TAO raven
 
 const PODATKI = {
 stanovanje: {
-  // ── LJUBLJANA (TAO + 12 LAO)
+  
   'lj':          {label:'TAO Ljubljana',                                      cena_m2:5050, ref_leto:1973, ref_m2:53, n:1365},
-  'lj|viško':    {label:'LJ – Viško polje, Brdo, Vrhovci',                   cena_m2:5320, ref_leto:1976, ref_m2:49, n:38},
-  'lj|črnuče':   {label:'LJ – Črnuče, Nadgorica',                            cena_m2:5230, ref_leto:1988, ref_m2:54, n:35},
-  'lj|koseze':   {label:'LJ – Koseze, Šiška',                                cena_m2:5210, ref_leto:1970, ref_m2:53, n:205},
-  'lj|center':   {label:'LJ – Ljubljana Center',                             cena_m2:5110, ref_leto:1956, ref_m2:65, n:157},
-  'lj|rožna':    {label:'LJ – Rožna dolina, Trnovo, Bežigrajski dvor, Sp. Šiška', cena_m2:5060, ref_leto:1966, ref_m2:48, n:218},
-  'lj|rudnik':   {label:'LJ – Rudnik',                                       cena_m2:5040, ref_leto:1979, ref_m2:55, n:25},
-  'lj|fužine':   {label:'LJ – Fužine, Kašelj, Polje',                        cena_m2:5010, ref_leto:1980, ref_m2:47, n:83},
-  'lj|bežigrad': {label:'LJ – Bežigrad, Moste, Kodeljevo, Golovec',          cena_m2:4970, ref_leto:1965, ref_m2:51, n:215},
-  'lj|šentvid':  {label:'LJ – Brod, Šentvid, Podutik, Bokalci, Dolgi most', cena_m2:4960, ref_leto:1981, ref_m2:50, n:147},
-  'lj|ježica':   {label:'LJ – Ježica, Bežigrad, Nove Jarše',                 cena_m2:4930, ref_leto:1978, ref_m2:53, n:159},
-  'lj|štepanj':  {label:'LJ – Štepanjsko, Bizovik, Sostro',                  cena_m2:4780, ref_leto:1976, ref_m2:55, n:52},
-  'lj|tomačevo': {label:'LJ – Tomačevo, Šmartno, Sneberje, Zalog',           cena_m2:4430, ref_leto:1975, ref_m2:45, n:22},
-  // ── SEVERNA OKOLICA LJUBLJANE (TAO + 5 LAO)
+  'lj|viško':    {label:'LJ \u2013 Viško polje, Brdo, Vrhovci',                   cena_m2:5320, ref_leto:1976, ref_m2:49, n:38},
+  'lj|črnuče':   {label:'LJ \u2013 Črnuče, Nadgorica',                            cena_m2:5230, ref_leto:1988, ref_m2:54, n:35},
+  'lj|koseze':   {label:'LJ \u2013 Koseze, Šiška',                                cena_m2:5210, ref_leto:1970, ref_m2:53, n:205},
+  'lj|center':   {label:'LJ \u2013 Ljubljana Center',                             cena_m2:5110, ref_leto:1956, ref_m2:65, n:157},
+  'lj|rožna':    {label:'LJ \u2013 Rožna dolina, Trnovo, Bežigrajski dvor, Sp. Šiška', cena_m2:5060, ref_leto:1966, ref_m2:48, n:218},
+  'lj|rudnik':   {label:'LJ \u2013 Rudnik',                                       cena_m2:5040, ref_leto:1979, ref_m2:55, n:25},
+  'lj|fužine':   {label:'LJ \u2013 Fužine, Kašelj, Polje',                        cena_m2:5010, ref_leto:1980, ref_m2:47, n:83},
+  'lj|bežigrad': {label:'LJ \u2013 Bežigrad, Moste, Kodeljevo, Golovec',          cena_m2:4970, ref_leto:1965, ref_m2:51, n:215},
+  'lj|šentvid':  {label:'LJ \u2013 Brod, Šentvid, Podutik, Bokalci, Dolgi most', cena_m2:4960, ref_leto:1981, ref_m2:50, n:147},
+  'lj|ježica':   {label:'LJ \u2013 Ježica, Bežigrad, Nove Jarše',                 cena_m2:4930, ref_leto:1978, ref_m2:53, n:159},
+  'lj|štepanj':  {label:'LJ \u2013 Štepanjsko, Bizovik, Sostro',                  cena_m2:4780, ref_leto:1976, ref_m2:55, n:52},
+  'lj|tomačevo': {label:'LJ \u2013 Tomačevo, Šmartno, Sneberje, Zalog',           cena_m2:4430, ref_leto:1975, ref_m2:45, n:22},
+  
   'se':          {label:'TAO Severna okolica Ljubljane',                      cena_m2:4060, ref_leto:1982, ref_m2:52, n:288},
   'se|domžale':  {label:'Domžale, Trzin, Mengeš',                            cena_m2:4190, ref_leto:1983, ref_m2:47, n:97},
   'se|komenda':  {label:'Komenda, Radomlje, Dob, Krtina, Lukovica',          cena_m2:4390, ref_leto:2007, ref_m2:53, n:31},
   'se|medvode':  {label:'Medvode, Stanežiče, Pirniče',                       cena_m2:4190, ref_leto:1978, ref_m2:58, n:25},
   'se|kamnik':   {label:'Kamnik',                                             cena_m2:3910, ref_leto:1979, ref_m2:54, n:103},
   'se|šentjakob':{label:'Šentjakob, Dragomelj, Ihan, Dol, Dolsko',          cena_m2:4060, ref_leto:2004, ref_m2:57, n:15},
-  // ── JUŽNA OKOLICA LJUBLJANE (TAO + 2 LAO)
+  
   'ju':          {label:'TAO Južna okolica Ljubljane',                        cena_m2:4000, ref_leto:null, ref_m2:null, n:178},
   'ju|grosuplje':{label:'Grosuplje, Šmarje Sap',                             cena_m2:4240, ref_leto:2005, ref_m2:55, n:44},
   'ju|vrhnika':  {label:'Vrhnika',                                            cena_m2:3890, ref_leto:1990, ref_m2:53, n:25},
-  // ── VZHODNA OKOLICA LJUBLJANE (TAO + 1 LAO)
+  
   've':          {label:'TAO Vzhodna okolica Ljubljane',                      cena_m2:2920, ref_leto:null, ref_m2:null, n:52},
   've|litija':   {label:'Litija, Šmartno pri Litiji',                        cena_m2:2880, ref_leto:1975, ref_m2:48, n:50},
-  // ── OBALA (TAO + 4 LAO)
+  
   'ob':          {label:'TAO Obala',                                          cena_m2:4810, ref_leto:1976, ref_m2:50, n:365},
   'ob|ankaran':  {label:'Ankaran',                                            cena_m2:5480, ref_leto:1989, ref_m2:37, n:15},
   'ob|piran':    {label:'Piran, Portorož',                                    cena_m2:5090, ref_leto:1975, ref_m2:47, n:85},
   'ob|koper':    {label:'Koper',                                              cena_m2:4760, ref_leto:1972, ref_m2:51, n:152},
   'ob|izola':    {label:'Izola',                                              cena_m2:4710, ref_leto:1979, ref_m2:51, n:95},
-  // ── ALPSKO TURISTIČNO OBMOČJE (TAO + 3 LAO)
+  
   'al':          {label:'TAO Alpsko turistično območje',                      cena_m2:4530, ref_leto:1981, ref_m2:50, n:69},
   'al|kranjska': {label:'Kranjska Gora z okolico',                           cena_m2:5420, ref_leto:1987, ref_m2:50, n:32},
   'al|bled':     {label:'Bled in okolica',                                    cena_m2:4000, ref_leto:1973, ref_m2:67, n:21},
   'al|bohinj':   {label:'Bohinj',                                             cena_m2:4430, ref_leto:1991, ref_m2:40, n:13},
-  // ── KRANJ Z OKOLICO (TAO + 3 LAO)
+  
   'kr':          {label:'TAO Kranj z okolico',                                cena_m2:3620, ref_leto:1974, ref_m2:51, n:231},
   'kr|center':   {label:'Kranj Center',                                       cena_m2:3650, ref_leto:1975, ref_m2:50, n:185},
   'kr|stražišče':{label:'Stražišče, Hrastje',                                cena_m2:3050, ref_leto:1965, ref_m2:54, n:22},
   'kr|okolica':  {label:'Južna in vzhodna okolica Kranja',                   cena_m2:3360, ref_leto:1981, ref_m2:54, n:15},
-  // ── KRAS (TAO + 2 LAO)
+  
   'ks':          {label:'TAO Kras',                                           cena_m2:3210, ref_leto:1980, ref_m2:57, n:50},
   'ks|sežana':   {label:'Sežana',                                             cena_m2:2950, ref_leto:1976, ref_m2:51, n:26},
   'ks|kozina':   {label:'Kozina, Divača',                                     cena_m2:3470, ref_leto:2008, ref_m2:59, n:21},
-  // ── GORENJSKO OBMOČJE (TAO + 3 LAO)
+  
   'go':          {label:'TAO Gorenjsko območje',                              cena_m2:3050, ref_leto:null, ref_m2:null, n:333},
   'go|škofja':   {label:'Škofja Loka',                                        cena_m2:3690, ref_leto:1974, ref_m2:48, n:80},
   'go|radovljica':{label:'Radovljica, Lesce',                                 cena_m2:3830, ref_leto:1980, ref_m2:54, n:36},
   'go|jesenice': {label:'Jesenice, Hrušica',                                  cena_m2:2740, ref_leto:1966, ref_m2:50, n:133},
-  // ── NOVA GORICA (TAO + 2 LAO)
+  
   'ng':          {label:'TAO Nova Gorica, Vipavska dolina, Brda',             cena_m2:2870, ref_leto:null, ref_m2:null, n:138},
   'ng|nova gor': {label:'Nova Gorica, Šempeter',                              cena_m2:2960, ref_leto:1975, ref_m2:56, n:92},
   'ng|ajdovšč':  {label:'Ajdovščina',                                         cena_m2:2750, ref_leto:1978, ref_m2:61, n:23},
-  // ── POSOČJE / IDRIJSKO (TAO + 3 LAO)
+  
   'pi':          {label:'TAO Posočje in Idrijsko območje',                    cena_m2:2100, ref_leto:1968, ref_m2:53, n:60},
   'pi|idrija':   {label:'Idrija',                                             cena_m2:2100, ref_leto:1965, ref_m2:53, n:24},
   'pi|tolmin':   {label:'Tolmin, Kobarid',                                    cena_m2:2310, ref_leto:1975, ref_m2:50, n:17},
-  'pi|podeželje':{label:'Posočje – podeželje',                               cena_m2:1790, ref_leto:1960, ref_m2:52, n:15},
-  // ── NOTRANJSKO (TAO + 3 LAO)
+  'pi|podeželje':{label:'Posočje \u2013 podeželje',                               cena_m2:1790, ref_leto:1960, ref_m2:52, n:15},
+  
   'ni':          {label:'TAO Notranjsko območje',                             cena_m2:2650, ref_leto:1966, ref_m2:54, n:91},
   'ni|postojna': {label:'Postojna',                                           cena_m2:2830, ref_leto:1973, ref_m2:54, n:54},
   'ni|cerknica': {label:'Cerknica, Rakek',                                    cena_m2:2790, ref_leto:1965, ref_m2:49, n:11},
   'ni|pivka':    {label:'Prestranek, Pivka',                                  cena_m2:1910, ref_leto:1929, ref_m2:187, ref_zem:1080, n:10},
-  // ── KOČEVSKO (TAO + 2 LAO)
+  
   'ko':          {label:'TAO Kočevsko območje',                               cena_m2:2090, ref_leto:1967, ref_m2:52, n:60},
   'ko|kočevje':  {label:'Kočevje',                                            cena_m2:2060, ref_leto:1965, ref_m2:50, n:38},
   'ko|ribnica':  {label:'Ribnica',                                            cena_m2:2320, ref_leto:1978, ref_m2:56, n:19},
-  // ── NOVO MESTO (TAO + 3 LAO)
+  
   'nm':          {label:'TAO Novo mesto in okolica',                          cena_m2:2930, ref_leto:null, ref_m2:null, n:144},
   'nm|novo m':   {label:'Novo mesto',                                         cena_m2:3070, ref_leto:1979, ref_m2:54, n:99},
   'nm|trebnje':  {label:'Trebnje',                                            cena_m2:2930, ref_leto:2007, ref_m2:55, n:13},
   'nm|dolenj':   {label:'Osrednja Dolenjska',                                 cena_m2:2380, ref_leto:1998, ref_m2:48, n:30},
-  // ── KRŠKO-BREŽIŠKO POLJE (TAO + 2 LAO)
+  
   'kp':          {label:'TAO Krško-Brežiško polje',                           cena_m2:2330, ref_leto:null, ref_m2:null, n:40},
   'kp|brežice':  {label:'Brežice',                                            cena_m2:2410, ref_leto:1975, ref_m2:50, n:21},
   'kp|krško':    {label:'Krško',                                              cena_m2:2310, ref_leto:1974, ref_m2:49, n:19},
-  // ── POSAVJE (TAO + 1 LAO)
+  
   'pv':          {label:'TAO Posavje',                                        cena_m2:1410, ref_leto:null, ref_m2:null, n:29},
   'pv|podeželje':{label:'Posavje brez Sevnice',                               cena_m2:1250, ref_leto:1962, ref_m2:52, n:22},
-  // ── ZASAVJE (TAO + 4 LAO)
+  
   'za':          {label:'TAO Zasavje',                                        cena_m2:1810, ref_leto:null, ref_m2:null, n:154},
   'za|zagorje':  {label:'Zagorje, Kisovec',                                   cena_m2:2240, ref_leto:1968, ref_m2:49, n:42},
   'za|trbovlje': {label:'Trbovlje',                                           cena_m2:1880, ref_leto:1963, ref_m2:51, n:58},
   'za|hrastnik': {label:'Hrastnik',                                           cena_m2:1510, ref_leto:1961, ref_m2:44, n:36},
   'za|trbovlje_j':{label:'Trbovlje Jug',                                      cena_m2:860,  ref_leto:1887, ref_m2:44, n:12},
-  // ── SAVINJSKO HRIBOVJE (TAO + 3 LAO)
+  
   'sh':          {label:'TAO Savinjsko hribovje',                             cena_m2:2140, ref_leto:null, ref_m2:null, n:64},
   'sh|laško':    {label:'Laško',                                              cena_m2:2650, ref_leto:1982, ref_m2:50, n:14},
   'sh|šentjur':  {label:'Štore, Šentjur',                                     cena_m2:2150, ref_leto:1963, ref_m2:38, n:19},
   'sh|hrib':     {label:'Savinjske Alpe in hribovje',                         cena_m2:1820, ref_leto:1965, ref_m2:48, n:31},
-  // ── SAVINJSKA DOLINA (TAO + 3 LAO)
+  
   'sa':          {label:'TAO Savinjska dolina',                               cena_m2:2560, ref_leto:null, ref_m2:null, n:81},
   'sa|žalec':    {label:'Žalec',                                              cena_m2:2750, ref_leto:1975, ref_m2:54, n:27},
   'sa|polzela':  {label:'Polzela, Šempeter v Savinjski dolini',               cena_m2:2570, ref_leto:1967, ref_m2:44, n:12},
-  'sa|podeželje':{label:'Savinjska dolina – podeželje',                       cena_m2:2350, ref_leto:1977, ref_m2:53, n:42},
-  // ── ŠALEŠKA DOLINA (TAO + 2 LAO)
+  'sa|podeželje':{label:'Savinjska dolina \u2013 podeželje',                       cena_m2:2350, ref_leto:1977, ref_m2:53, n:42},
+  
   'sd':          {label:'TAO Šaleška dolina',                                 cena_m2:2530, ref_leto:null, ref_m2:null, n:144},
   'sd|velenje':  {label:'Velenje',                                            cena_m2:2610, ref_leto:1975, ref_m2:59, n:122},
   'sd|šoštanj':  {label:'Šoštanj',                                            cena_m2:2210, ref_leto:1963, ref_m2:49, n:20},
-  // ── KOROŠKA (TAO + 5 LAO)
+  
   'ko2':         {label:'TAO Koroška, Pohorje, Kozjak',                       cena_m2:1730, ref_leto:null, ref_m2:null, n:180},
   'ko2|slovenj': {label:'Slovenj Gradec',                                     cena_m2:2280, ref_leto:1980, ref_m2:56, n:28},
   'ko2|ravne':   {label:'Ravne na Koroškem, Prevalje',                        cena_m2:1860, ref_leto:1975, ref_m2:53, n:69},
   'ko2|dravograd':{label:'Dravograd',                                          cena_m2:1620, ref_leto:1961, ref_m2:55, n:20},
   'ko2|muta':    {label:'Muta, Vuzenica, Radlje ob Dravi',                    cena_m2:1450, ref_leto:1968, ref_m2:48, n:24},
   'ko2|mežica':  {label:'Mežica',                                             cena_m2:1680, ref_leto:1978, ref_m2:57, n:20},
-  // ── MARIBOR (TAO + 5 LAO)
+  
   'mb':          {label:'TAO Maribor',                                        cena_m2:2670, ref_leto:1968, ref_m2:51, n:785},
   'mb|center':   {label:'Maribor Center',                                     cena_m2:2710, ref_leto:1961, ref_m2:55, n:189},
   'mb|tabor':    {label:'Tabor, Nova vas',                                    cena_m2:2690, ref_leto:1974, ref_m2:152, ref_zem:270, n:382},
   'mb|tezno':    {label:'Tezno, Pobrežje, Brezje, Zrkovci',                  cena_m2:2570, ref_leto:1969, ref_m2:173, ref_zem:530, n:162},
   'mb|košaki':   {label:'Košaki, Melje',                                      cena_m2:2580, ref_leto:1895, ref_m2:46, n:27},
   'mb|studenci': {label:'Studenci, Limbuš, Pekre',                            cena_m2:2630, ref_leto:1989, ref_m2:171, ref_zem:490, n:25},
-  // ── JUŽNA OKOLICA MARIBORA (TAO + 5 LAO)
+  
   'jm':          {label:'TAO Južna okolica Maribora',                         cena_m2:2210, ref_leto:null, ref_m2:null, n:156},
   'jm|hoče':     {label:'Hoče, Duplek, Miklavž, Rače, Polskava',              cena_m2:2320, ref_leto:2007, ref_m2:57, n:37},
   'jm|ruše':     {label:'Ruše, Selnica, Bistrica, Bresternica, Kamnica',      cena_m2:2280, ref_leto:1977, ref_m2:54, n:35},
   'jm|konjice':  {label:'Slovenske Konjice, Zreče',                           cena_m2:2260, ref_leto:1980, ref_m2:54, n:30},
   'jm|sl.bis':   {label:'Slovenska Bistrica',                                  cena_m2:1960, ref_leto:1969, ref_m2:57, n:37},
-  'jm|podeželje':{label:'Južna okolica Maribora – podeželje',                 cena_m2:2190, ref_leto:2006, ref_m2:74, n:17},
-  // ── CELJE (TAO + 2 LAO)
+  'jm|podeželje':{label:'Južna okolica Maribora \u2013 podeželje',                 cena_m2:2190, ref_leto:2006, ref_m2:74, n:17},
+  
   'ce':          {label:'TAO Celje',                                           cena_m2:2660, ref_leto:1967, ref_m2:50, n:299},
   'ce|center':   {label:'Celje Center',                                        cena_m2:2730, ref_leto:1969, ref_m2:50, n:277},
   'ce|okolica':  {label:'Okolica Celja',                                       cena_m2:1770, ref_leto:1925, ref_m2:50, n:22},
-  // ── PTUJSKO POLJE (TAO + 4 LAO)
+  
   'pt':          {label:'TAO Ptujsko polje',                                   cena_m2:2070, ref_leto:null, ref_m2:null, n:89},
   'pt|ptuj':     {label:'Ptuj',                                                cena_m2:2410, ref_leto:1980, ref_m2:55, n:55},
   'pt|ormož':    {label:'Ormož',                                               cena_m2:1530, ref_leto:1978, ref_m2:55, n:13},
   'pt|kidričevo':{label:'Kidričevo',                                           cena_m2:1920, ref_leto:1952, ref_m2:73, n:10},
-  'pt|podeželje':{label:'Ptujsko polje – podeželje',                          cena_m2:1720, ref_leto:1983, ref_m2:57, n:11},
-  // ── SLOVENSKE GORICE (TAO + 3 LAO)
+  'pt|podeželje':{label:'Ptujsko polje \u2013 podeželje',                          cena_m2:1720, ref_leto:1983, ref_m2:57, n:11},
+  
   'sg':          {label:'TAO Slovenske gorice',                                cena_m2:1830, ref_leto:null, ref_m2:null, n:118},
   'sg|gornja r': {label:'Gornja Radgona, Radenci',                             cena_m2:1680, ref_leto:1974, ref_m2:57, n:41},
   'sg|lenart':   {label:'Lenart',                                              cena_m2:2230, ref_leto:1989, ref_m2:53, n:17},
   'sg|ljutomer': {label:'Ljutomer',                                            cena_m2:1860, ref_leto:1978, ref_m2:58, n:11},
-  // ── PREKMURJE (TAO + 3 LAO)
+  
   'pk':          {label:'TAO Prekmurje',                                       cena_m2:1820, ref_leto:null, ref_m2:null, n:99},
   'pk|murska':   {label:'Murska Sobota',                                       cena_m2:1970, ref_leto:1976, ref_m2:49, n:59},
   'pk|lendava':  {label:'Lendava',                                             cena_m2:1420, ref_leto:1970, ref_m2:50, n:25},
-  'pk|podeželje':{label:'Prekmurje – podeželje',                               cena_m2:1030, ref_leto:1979, ref_m2:51, n:15},
-  // ── OSTALE TAO (brez dovolj LAO podatkov)
+  'pk|podeželje':{label:'Prekmurje \u2013 podeželje',                               cena_m2:1030, ref_leto:1979, ref_m2:51, n:15},
+  
   'ha':          {label:'TAO Haloze, Boč',                                     cena_m2:1640, ref_leto:null, ref_m2:null, n:50},
   'bk':          {label:'TAO Bela krajina',                                    cena_m2:1450, ref_leto:null, ref_m2:null, n:33},
 },
 
 hisa: {
-  // ── LJUBLJANA
+  
   'lj':          {label:'TAO Ljubljana',                                      cena_h:460000, ref_leto:1970, ref_m2:169, ref_zem:380, n:181, p25:390000, p75:580000},
-  'lj|šiška_h':  {label:'LJ – Koseze, Šiška',                                cena_h:636000, ref_leto:1967, ref_m2:195, ref_zem:390, n:14},
-  'lj|ježica_h': {label:'LJ – Ježica, Bežigrad, Nove Jarše',                 cena_h:462000, ref_leto:1965, ref_m2:170, ref_zem:350, n:10},
-  'lj|bežigrad_h':{label:'LJ – Bežigrad, Moste, Kodeljevo, Golovec',         cena_h:460000, ref_leto:1960, ref_m2:162, ref_zem:200, n:21},
-  'lj|fužine_h': {label:'LJ – Fužine, Kašelj, Polje',                        cena_h:425000, ref_leto:1973, ref_m2:166, ref_zem:440, n:20},
-  'lj|viško_h':  {label:'LJ – Viško polje, Brdo, Vrhovci',                   cena_h:400000, ref_leto:1973, ref_m2:169, ref_zem:380, n:10},
-  // ── ALPSKO
+  'lj|šiška_h':  {label:'LJ \u2013 Koseze, Šiška',                                cena_h:636000, ref_leto:1967, ref_m2:195, ref_zem:390, n:14},
+  'lj|ježica_h': {label:'LJ \u2013 Ježica, Bežigrad, Nove Jarše',                 cena_h:462000, ref_leto:1965, ref_m2:170, ref_zem:350, n:10},
+  'lj|bežigrad_h':{label:'LJ \u2013 Bežigrad, Moste, Kodeljevo, Golovec',         cena_h:460000, ref_leto:1960, ref_m2:162, ref_zem:200, n:21},
+  'lj|fužine_h': {label:'LJ \u2013 Fužine, Kašelj, Polje',                        cena_h:425000, ref_leto:1973, ref_m2:166, ref_zem:440, n:20},
+  'lj|viško_h':  {label:'LJ \u2013 Viško polje, Brdo, Vrhovci',                   cena_h:400000, ref_leto:1973, ref_m2:169, ref_zem:380, n:10},
+  
   'al':          {label:'TAO Alpsko turistično območje',                      cena_h:413000, ref_leto:1969, ref_m2:182, ref_zem:650, n:34, p25:279000, p75:500000},
   'al|bled_h':   {label:'Bled in okolica',                                    cena_h:390000, ref_leto:1971, ref_m2:185, ref_zem:590, n:10},
-  // ── SEVERNA OK. LJ
+  
   'se':          {label:'TAO Severna okolica Ljubljane',                      cena_h:350000, ref_leto:1975, ref_m2:198, ref_zem:560, n:152, p25:263000, p75:440000},
   'se|domžale_h':{label:'Domžale, Trzin, Mengeš',                            cena_h:350000, ref_leto:1973, ref_m2:201, ref_zem:540, n:33},
   'se|kamnik_h': {label:'Kamnik',                                             cena_h:347000, ref_leto:1975, ref_m2:252, ref_zem:530, n:18},
   'se|komenda_h':{label:'Komenda, Radomlje, Dob, Krtina, Lukovica',          cena_h:340000, ref_leto:1981, ref_m2:163, ref_zem:470, n:34},
   'se|medvode_h':{label:'Medvode, Stanežiče, Pirniče',                       cena_h:309000, ref_leto:1967, ref_m2:169, ref_zem:740, n:22},
-  // ── OBALA
+  
   'ob':          {label:'TAO Obala',                                          cena_h:329000, ref_leto:1975, ref_m2:130, ref_zem:300, n:105, p25:250000, p75:470000},
   'ob|piran_h':  {label:'Piran, Portorož',                                    cena_h:425000, ref_leto:1975, ref_m2:151, ref_zem:370, n:11},
   'ob|vanganel': {label:'Vanganel, Marezige',                                 cena_h:329000, ref_leto:1999, ref_m2:161, ref_zem:440, n:13},
   'ob|škofije_h':{label:'Hrvatini, Škofije, Prade',                          cena_h:328000, ref_leto:1981, ref_m2:134, ref_zem:410, n:34},
   'ob|koper_h':  {label:'Koper',                                              cena_h:298000, ref_leto:1966, ref_m2:99, ref_zem:150, n:28},
   'ob|sečovlje': {label:'Sečovlje, Strunjan, Gažon',                         cena_h:263000, ref_leto:1955, ref_m2:106, ref_zem:450, n:10},
-  // ── KRANJ
+  
   'kr':          {label:'TAO Kranj z okolico',                                cena_h:320000, ref_leto:1969, ref_m2:190, ref_zem:540, n:75, p25:262000, p75:366000},
   'kr|stražišče_h':{label:'Stražišče, Hrastje',                              cena_h:350000, ref_leto:1980, ref_m2:242, ref_zem:440, n:15},
   'kr|okolica_h':{label:'Južna in vzhodna okolica Kranja',                   cena_h:340000, ref_leto:1964, ref_m2:171, ref_zem:790, n:21},
   'kr|naklo':    {label:'Naklo, Kokrica, Šenčur',                             cena_h:293000, ref_leto:1970, ref_m2:186, ref_zem:590, n:26},
   'kr|center_h': {label:'Kranj Center',                                       cena_h:295000, ref_leto:1967, ref_m2:208, ref_zem:350, n:13},
-  // ── JUŽNA OK. LJ
+  
   'ju':          {label:'TAO Južna okolica Ljubljane',                        cena_h:304000, ref_leto:1985, ref_m2:171, ref_zem:670, n:143, p25:249000, p75:400000},
   'ju|grosuplje_h':{label:'Grosuplje, Šmarje Sap',                           cena_h:350000, ref_leto:1993, ref_m2:220, ref_zem:580, n:11},
   'ju|vrhnika_h':{label:'Vrhnika',                                            cena_h:320000, ref_leto:1974, ref_m2:180, ref_zem:350, n:11},
-  // ── KRAS
+  
   'ks':          {label:'TAO Kras',                                           cena_h:225000, ref_leto:1933, ref_m2:175, ref_zem:640, n:43, p25:159000, p75:301000},
   'ks|kozina_h': {label:'Kozina, Divača',                                     cena_h:278000, ref_leto:2005, ref_m2:158, ref_zem:830, n:13},
-  'ks|podeželje_h':{label:'Kras – podeželje',                                cena_h:205000, ref_leto:1916, ref_m2:200, ref_zem:540, n:24},
-  // ── GORENJSKO
+  'ks|podeželje_h':{label:'Kras \u2013 podeželje',                                cena_h:205000, ref_leto:1916, ref_m2:200, ref_zem:540, n:24},
+  
     'go|szo_h':     {label:'Severozahodna okolica Kranja',                         cena_h:300000, ref_leto:1973, ref_m2:208, ref_zem:710, n:33},
     'go|sl_loka_h': {label:'Škofjeloško hribovje',                                 cena_h:180000, ref_leto:1975, ref_m2:202, ref_zem:550, n:25},
   'go':          {label:'TAO Gorenjsko območje',                              cena_h:226000, ref_leto:1971, ref_m2:188, ref_zem:590, n:108, p25:169000, p75:326000},
   'go|jesenice_h':{label:'Jesenice, Hrušica',                                 cena_h:168000, ref_leto:1957, ref_m2:157, ref_zem:590, n:16},
-  // ── VZHODNA OK. LJ
+  
   've':          {label:'TAO Vzhodna okolica Ljubljane',                      cena_h:218000, ref_leto:1984, ref_m2:174, ref_zem:720, n:48, p25:150000, p75:304000},
-  // ── SLOVENSKA ISTRA
+  
   'si':          {label:'TAO Slovenska Istra brez Obale',                     cena_h:230000, ref_leto:1900, ref_m2:119, ref_zem:190, n:21, p25:160000, p75:260000},
-  // ── ŠALEŠKA DOLINA
+  
   'sd':          {label:'TAO Šaleška dolina',                                 cena_h:215000, ref_leto:1970, ref_m2:169, ref_zem:560, n:29, p25:145000, p75:236000},
   'sd|velenje_h':{label:'Velenje',                                            cena_h:255000, ref_leto:1972, ref_m2:169, ref_zem:480, n:12},
-  'sd|podeželje_h':{label:'Šaleška dolina – podeželje',                      cena_h:150000, ref_leto:1975, ref_m2:160, ref_zem:830, n:13},
-  // ── CELJE
+  'sd|podeželje_h':{label:'Šaleška dolina \u2013 podeželje',                      cena_h:150000, ref_leto:1975, ref_m2:160, ref_zem:830, n:13},
+  
   'ce':          {label:'TAO Celje',                                          cena_h:220000, ref_leto:1968, ref_m2:191, ref_zem:490, n:49, p25:161000, p75:283000},
   'ce|center_h': {label:'Celje Center',                                       cena_h:238000, ref_leto:1972, ref_m2:209, ref_zem:550, n:20},
   'ce|okolica_h':{label:'Okolica Celja',                                      cena_h:199000, ref_leto:1968, ref_m2:168, ref_zem:450, n:29},
-  // ── SAVINJSKA DOLINA
+  
     'sa|polzela_h': {label:'Polzela, Šempeter',                                    cena_h:225000, ref_leto:1979, ref_m2:188, ref_zem:650, n:17},
   'sa':          {label:'TAO Savinjska dolina',                               cena_h:201000, ref_leto:1971, ref_m2:179, ref_zem:670, n:93, p25:157000, p75:260000},
-  'sa|podeželje_h':{label:'Savinjska dolina – podeželje',                    cena_h:193000, ref_leto:1970, ref_m2:177, ref_zem:710, n:68},
-  // ── MARIBOR
+  'sa|podeželje_h':{label:'Savinjska dolina \u2013 podeželje',                    cena_h:193000, ref_leto:1970, ref_m2:177, ref_zem:710, n:68},
+  
   'mb':          {label:'TAO Maribor',                                        cena_h:204000, ref_leto:1969, ref_m2:170, ref_zem:500, n:104, p25:155000, p75:266000},
-  // ── NOVA GORICA
+  
     'ng|vipava_h':  {label:'Vipavska dolina',                                      cena_h:126000, ref_leto:1920, ref_m2:139, ref_zem:330, n:58},
   'ng':          {label:'TAO Nova Gorica, Vipavska dolina, Brda',             cena_h:175000, ref_leto:1930, ref_m2:147, ref_zem:380, n:115, p25:99000, p75:258000},
   'ng|nova gor_h':{label:'Nova Gorica, Šempeter',                             cena_h:250000, ref_leto:1962, ref_m2:135, ref_zem:450, n:34},
-  // ── JUŽNA OK. MARIBORA
+  
   'jm':          {label:'TAO Južna okolica Maribora',                        cena_h:174000, ref_leto:1974, ref_m2:175, ref_zem:710, n:201, p25:120000, p75:230000},
   'jm|hoče_h':   {label:'Hoče, Duplek, Miklavž, Rače, Polskava',             cena_h:194000, ref_leto:1977, ref_m2:180, ref_zem:670, n:92},
   'jm|ruše_h':   {label:'Ruše, Selnica, Bistrica, Bresternica, Kamnica',     cena_h:225000, ref_leto:1974, ref_m2:201, ref_zem:600, n:27},
   'jm|konjice_h':{label:'Slovenske Konjice, Zreče',                          cena_h:175000, ref_leto:1966, ref_m2:200, ref_zem:560, n:17},
   'jm|sl.bis_h': {label:'Slovenska Bistrica',                                 cena_h:186000, ref_leto:1972, ref_m2:141, ref_zem:700, n:12},
-  'jm|podeželje_h':{label:'Južna ok. MB – podeželje',                        cena_h:130000, ref_leto:1971, ref_m2:142, ref_zem:910, n:53},
-  // ── KOROŠKA
+  'jm|podeželje_h':{label:'Južna ok. MB \u2013 podeželje',                        cena_h:130000, ref_leto:1971, ref_m2:142, ref_zem:910, n:53},
+  
   'ko2':         {label:'TAO Koroška, Pohorje, Kozjak',                      cena_h:170000, ref_leto:1976, ref_m2:209, ref_zem:650, n:112, p25:120000, p75:230000},
   'ko2|ravne_h': {label:'Ravne na Koroškem, Prevalje',                       cena_h:229000, ref_leto:1978, ref_m2:237, ref_zem:560, n:25},
   'ko2|slovenj_h':{label:'Slovenj Gradec',                                    cena_h:170000, ref_leto:1963, ref_m2:192, ref_zem:660, n:19},
-  'ko2|podeželje_h':{label:'Koroška, Pohorje, Kozjak – podeželje',           cena_h:140000, ref_leto:1978, ref_m2:194, ref_zem:910, n:45},
-  // ── NOVO MESTO
+  'ko2|podeželje_h':{label:'Koroška, Pohorje, Kozjak \u2013 podeželje',           cena_h:140000, ref_leto:1978, ref_m2:194, ref_zem:910, n:45},
+  
   'nm':          {label:'TAO Novo mesto in okolica',                          cena_h:155000, ref_leto:1977, ref_m2:162, ref_zem:840, n:129, p25:110000, p75:247000},
   'nm|novo m_h': {label:'Novo mesto',                                         cena_h:264000, ref_leto:1968, ref_m2:199, ref_zem:550, n:33},
   'nm|dolenj_h': {label:'Osrednja Dolenjska',                                 cena_h:140000, ref_leto:1979, ref_m2:153, ref_zem:1100, n:61},
   'nm|gorjanci': {label:'Dobrnič, Gorjanci',                                  cena_h:110000, ref_leto:1987, ref_m2:112, ref_zem:1500, n:27},
-  // ── NOTRANJSKO
+  
     'ni|podezelj_h':{label:'Notranjsko brez večjih krajev',                       cena_h:93000,  ref_leto:1900, ref_m2:145, ref_zem:740, n:36},
   'ni':          {label:'TAO Notranjsko območje',                             cena_h:155000, ref_leto:1939, ref_m2:155, ref_zem:830, n:68, p25:72000, p75:206000},
-  // ── POSOČJE
+  
   'pi':          {label:'TAO Posočje in Idrijsko območje',                    cena_h:110000, ref_leto:1948, ref_m2:155, ref_zem:470, n:65, p25:70000, p75:145000},
   'pi|tolmin_h': {label:'Tolmin, Kobarid',                                    cena_h:89000,  ref_leto:1928, ref_m2:166, ref_zem:300, n:13},
-  'pi|podeželje_h':{label:'Posočje – podeželje',                              cena_h:100000, ref_leto:1924, ref_m2:149, ref_zem:640, n:45},
-  // ── KOČEVSKO
+  'pi|podeželje_h':{label:'Posočje \u2013 podeželje',                              cena_h:100000, ref_leto:1924, ref_m2:149, ref_zem:640, n:45},
+  
   'ko':          {label:'TAO Kočevsko območje',                               cena_h:116000, ref_leto:1960, ref_m2:163, ref_zem:780, n:80, p25:75000, p75:176000},
   'ko|kočevje_h':{label:'Kočevje',                                            cena_h:130000, ref_leto:1958, ref_m2:172, ref_zem:710, n:27},
   'ko|ribnica_h':{label:'Ribnica',                                            cena_h:136000, ref_leto:1955, ref_m2:172, ref_zem:650, n:12},
-  'ko|podeželje_h':{label:'Kočevsko – podeželje',                            cena_h:95000,  ref_leto:1970, ref_m2:144, ref_zem:940, n:41},
-  // ── KRŠKO-BREŽIŠKO
+  'ko|podeželje_h':{label:'Kočevsko \u2013 podeželje',                            cena_h:95000,  ref_leto:1970, ref_m2:144, ref_zem:940, n:41},
+  
   'kp':          {label:'TAO Krško-Brežiško polje',                           cena_h:124000, ref_leto:1967, ref_m2:159, ref_zem:1030, n:58, p25:80000, p75:163000},
   'kp|krško_h':  {label:'Krško',                                              cena_h:180000, ref_leto:1965, ref_m2:215, ref_zem:870, n:11},
   'kp|brežice_h':{label:'Brežice',                                            cena_h:159000, ref_leto:1971, ref_m2:207, ref_zem:550, n:14},
-  'kp|podeželje_h':{label:'Krško-Brežiško polje – podeželje',                cena_h:100000, ref_leto:1963, ref_m2:131, ref_zem:1250, n:33},
-  // ── POSAVJE
+  'kp|podeželje_h':{label:'Krško-Brežiško polje \u2013 podeželje',                cena_h:100000, ref_leto:1963, ref_m2:131, ref_zem:1250, n:33},
+  
   'pv':          {label:'TAO Posavje',                                        cena_h:100000, ref_leto:1978, ref_m2:145, ref_zem:1380, n:130, p25:75000, p75:130000},
   'pv|sevnica':  {label:'Sevnica',                                            cena_h:141000, ref_leto:1962, ref_m2:190, ref_zem:730, n:11},
-  'pv|podeželje_h':{label:'Posavje – podeželje',                              cena_h:96000,  ref_leto:1980, ref_m2:140, ref_zem:1480, n:119},
-  // ── ZASAVJE
+  'pv|podeželje_h':{label:'Posavje \u2013 podeželje',                              cena_h:96000,  ref_leto:1980, ref_m2:140, ref_zem:1480, n:119},
+  
   'za':          {label:'TAO Zasavje',                                        cena_h:123000, ref_leto:1956, ref_m2:147, ref_zem:690, n:47, p25:76000, p75:165000},
   'za|zagorje_h':{label:'Zagorje, Kisovec',                                   cena_h:163000, ref_leto:1966, ref_m2:158, ref_zem:500, n:12},
   'za|trbovlje_h':{label:'Trbovlje',                                          cena_h:150000, ref_leto:1972, ref_m2:149, ref_zem:470, n:10},
-  'za|podeželje_h':{label:'Zasavje – podeželje',                              cena_h:105000, ref_leto:1938, ref_m2:157, ref_zem:1060, n:19},
-  // ── SAVINJSKO HRIBOVJE
+  'za|podeželje_h':{label:'Zasavje \u2013 podeželje',                              cena_h:105000, ref_leto:1938, ref_m2:157, ref_zem:1060, n:19},
+  
     'sh|šentjur_h': {label:'Štore, Šentjur',                                       cena_h:188000, ref_leto:1968, ref_m2:204, ref_zem:1050, n:16},
   'sh':          {label:'TAO Savinjsko hribovje',                             cena_h:140000, ref_leto:1979, ref_m2:157, ref_zem:1010, n:131, p25:88000, p75:194000},
   'sh|podeželje_h':{label:'Savinjske Alpe in hribovje',                      cena_h:129000, ref_leto:1980, ref_m2:143, n:108},
-  // ── PTUJSKO POLJE
+  
   'pt':          {label:'TAO Ptujsko polje',                                  cena_h:120000, ref_leto:1976, ref_m2:148, ref_zem:970, n:99, p25:71000, p75:183000},
   'pt|ptuj_h':   {label:'Ptuj',                                               cena_h:160000, ref_leto:1968, ref_m2:183, ref_zem:670, n:23},
-  'pt|podeželje_h':{label:'Ptujsko polje – podeželje',                        cena_h:109000, ref_leto:1976, ref_m2:132, ref_zem:1010, n:71},
-  // ── SLOVENSKE GORICE
+  'pt|podeželje_h':{label:'Ptujsko polje \u2013 podeželje',                        cena_h:109000, ref_leto:1976, ref_m2:132, ref_zem:1010, n:71},
+  
   'sg':          {label:'TAO Slovenske gorice',                               cena_h:140000, ref_leto:1980, ref_m2:163, ref_zem:1000, n:202, p25:85000, p75:200000},
   'sg|pesnica':  {label:'Pesnica, Šentilj',                                   cena_h:225000, ref_leto:2005, ref_m2:132, ref_zem:640, n:28},
   'sg|gornja r_h':{label:'Gornja Radgona, Radenci',                           cena_h:154000, ref_leto:1964, ref_m2:177, ref_zem:930, n:14},
-  'sg|podeželje_h':{label:'Slovenske gorice – podeželje',                     cena_h:133000, ref_leto:1979, ref_m2:163, ref_zem:1310, n:144},
-  // ── PREKMURJE
+  'sg|podeželje_h':{label:'Slovenske gorice \u2013 podeželje',                     cena_h:133000, ref_leto:1979, ref_m2:163, ref_zem:1310, n:144},
+  
   'pk':          {label:'TAO Prekmurje',                                      cena_h:95000,  ref_leto:1969, ref_m2:141, ref_zem:960, n:134, p25:60000, p75:135000},
   'pk|murska_h': {label:'Murska Sobota',                                      cena_h:138000, ref_leto:1975, ref_m2:201, ref_zem:440, n:27},
   'pk|lendava_h':{label:'Lendava',                                            cena_h:84000,  ref_leto:1972, ref_m2:105, ref_zem:730, n:12},
-  'pk|podeželje_h':{label:'Prekmurje – podeželje',                            cena_h:85000,  ref_leto:1967, ref_m2:138, ref_zem:1290, n:95},
-  // ── BELA KRAJINA & HALOZE
+  'pk|podeželje_h':{label:'Prekmurje \u2013 podeželje',                            cena_h:85000,  ref_leto:1967, ref_m2:138, ref_zem:1290, n:95},
+  
     'bk|podezelj_h':{label:'Bela krajina brez Metlike in Črnomlja',               cena_h:90000,  ref_leto:1980, ref_m2:150, ref_zem:1530, n:36},
   'bk':          {label:'TAO Bela krajina',                                   cena_h:90000,  ref_leto:1980, ref_m2:155, ref_zem:1240, n:48, p25:64000, p75:129000},
     'ha|podezelj_h':{label:'Haloze, Boč brez večjih krajev',                      cena_h:63000,  ref_leto:1975, ref_m2:113, ref_zem:1430, n:72},
@@ -706,45 +814,45 @@ hisa: {
 }
 };
 
-// ── KRAJ → PODATKI KEY ─────────────────────────────────────────
+
 // Vsak kraj ima: k=ime, sk=ključ za stanovanje, hk=ključ za hišo
 // Če LAO ključ ni na voljo za en tip, se vzame TAO
 const KRAJI=[
-  // ── LJUBLJANA — mesto + vse četrti ─────────────────────────
+  
   {k:'Ljubljana',                    sk:'lj',          hk:'lj',          tags:'lj'},
-  {k:'Ljubljana – Center',           sk:'lj|center',   hk:'lj',          tags:'lj center staro mestno jedro'},
-  {k:'Ljubljana – Šiška',            sk:'lj|koseze',   hk:'lj|šiška_h',  tags:'lj siška koseze'},
-  {k:'Ljubljana – Koseze',           sk:'lj|koseze',   hk:'lj|šiška_h',  tags:'lj siška'},
-  {k:'Ljubljana – Bežigrad',         sk:'lj|bežigrad', hk:'lj|bežigrad_h',tags:'lj bezigrad'},
-  {k:'Ljubljana – Moste',            sk:'lj|bežigrad', hk:'lj|bežigrad_h',tags:'lj'},
-  {k:'Ljubljana – Kodeljevo',        sk:'lj|bežigrad', hk:'lj|bežigrad_h',tags:'lj'},
-  {k:'Ljubljana – Golovec',          sk:'lj|bežigrad', hk:'lj|bežigrad_h',tags:'lj'},
-  {k:'Ljubljana – Rožna dolina',     sk:'lj|rožna',    hk:'lj',          tags:'lj rozna'},
-  {k:'Ljubljana – Trnovo',           sk:'lj|rožna',    hk:'lj',          tags:'lj'},
-  {k:'Ljubljana – Spodnja Šiška',    sk:'lj|rožna',    hk:'lj',          tags:'lj siška'},
-  {k:'Ljubljana – Bežigrajski dvor', sk:'lj|rožna',    hk:'lj',          tags:'lj bezigrad'},
-  {k:'Ljubljana – Ježica',           sk:'lj|ježica',   hk:'lj|ježica_h', tags:'lj jezica'},
-  {k:'Ljubljana – Nove Jarše',       sk:'lj|ježica',   hk:'lj|ježica_h', tags:'lj jarše'},
-  {k:'Ljubljana – Fužine',           sk:'lj|fužine',   hk:'lj|fužine_h', tags:'lj fuzine'},
-  {k:'Ljubljana – Kašelj',           sk:'lj|fužine',   hk:'lj|fužine_h', tags:'lj kaselj'},
-  {k:'Ljubljana – Polje',            sk:'lj|fužine',   hk:'lj|fužine_h', tags:'lj'},
-  {k:'Ljubljana – Viško polje',      sk:'lj|viško',    hk:'lj|viško_h',  tags:'lj visko'},
-  {k:'Ljubljana – Brdo',             sk:'lj|viško',    hk:'lj|viško_h',  tags:'lj'},
-  {k:'Ljubljana – Vrhovci',          sk:'lj|viško',    hk:'lj|viško_h',  tags:'lj'},
-  {k:'Ljubljana – Šentvid',          sk:'lj|šentvid',  hk:'lj',          tags:'lj sentvid'},
-  {k:'Ljubljana – Brod',             sk:'lj|šentvid',  hk:'lj',          tags:'lj'},
-  {k:'Ljubljana – Podutik',          sk:'lj|šentvid',  hk:'lj',          tags:'lj'},
-  {k:'Ljubljana – Dolgi most',       sk:'lj|šentvid',  hk:'lj',          tags:'lj'},
-  {k:'Ljubljana – Črnuče',           sk:'lj|črnuče',   hk:'lj',          tags:'lj crnuce'},
-  {k:'Ljubljana – Nadgorica',        sk:'lj|črnuče',   hk:'lj',          tags:'lj'},
-  {k:'Ljubljana – Rudnik',           sk:'lj|rudnik',   hk:'lj',          tags:'lj'},
-  {k:'Ljubljana – Štepanjsko',       sk:'lj|štepanj',  hk:'lj',          tags:'lj stepanjsko'},
-  {k:'Ljubljana – Bizovik',          sk:'lj|štepanj',  hk:'lj',          tags:'lj'},
-  {k:'Ljubljana – Sostro',           sk:'lj|štepanj',  hk:'lj',          tags:'lj'},
-  {k:'Ljubljana – Tomačevo',         sk:'lj|tomačevo', hk:'lj',          tags:'lj tomacevo'},
-  {k:'Ljubljana – Sneberje',         sk:'lj|tomačevo', hk:'lj',          tags:'lj'},
-  {k:'Ljubljana – Zalog',            sk:'lj|tomačevo', hk:'lj',          tags:'lj'},
-  // ── SEVERNA OKOLICA LJUBLJANE ──────────────────────────────
+  {k:'Ljubljana \u2013 Center',           sk:'lj|center',   hk:'lj',          tags:'lj center staro mestno jedro'},
+  {k:'Ljubljana \u2013 Šiška',            sk:'lj|koseze',   hk:'lj|šiška_h',  tags:'lj siška koseze'},
+  {k:'Ljubljana \u2013 Koseze',           sk:'lj|koseze',   hk:'lj|šiška_h',  tags:'lj siška'},
+  {k:'Ljubljana \u2013 Bežigrad',         sk:'lj|bežigrad', hk:'lj|bežigrad_h',tags:'lj bezigrad'},
+  {k:'Ljubljana \u2013 Moste',            sk:'lj|bežigrad', hk:'lj|bežigrad_h',tags:'lj'},
+  {k:'Ljubljana \u2013 Kodeljevo',        sk:'lj|bežigrad', hk:'lj|bežigrad_h',tags:'lj'},
+  {k:'Ljubljana \u2013 Golovec',          sk:'lj|bežigrad', hk:'lj|bežigrad_h',tags:'lj'},
+  {k:'Ljubljana \u2013 Rožna dolina',     sk:'lj|rožna',    hk:'lj',          tags:'lj rozna'},
+  {k:'Ljubljana \u2013 Trnovo',           sk:'lj|rožna',    hk:'lj',          tags:'lj'},
+  {k:'Ljubljana \u2013 Spodnja Šiška',    sk:'lj|rožna',    hk:'lj',          tags:'lj siška'},
+  {k:'Ljubljana \u2013 Bežigrajski dvor', sk:'lj|rožna',    hk:'lj',          tags:'lj bezigrad'},
+  {k:'Ljubljana \u2013 Ježica',           sk:'lj|ježica',   hk:'lj|ježica_h', tags:'lj jezica'},
+  {k:'Ljubljana \u2013 Nove Jarše',       sk:'lj|ježica',   hk:'lj|ježica_h', tags:'lj jarše'},
+  {k:'Ljubljana \u2013 Fužine',           sk:'lj|fužine',   hk:'lj|fužine_h', tags:'lj fuzine'},
+  {k:'Ljubljana \u2013 Kašelj',           sk:'lj|fužine',   hk:'lj|fužine_h', tags:'lj kaselj'},
+  {k:'Ljubljana \u2013 Polje',            sk:'lj|fužine',   hk:'lj|fužine_h', tags:'lj'},
+  {k:'Ljubljana \u2013 Viško polje',      sk:'lj|viško',    hk:'lj|viško_h',  tags:'lj visko'},
+  {k:'Ljubljana \u2013 Brdo',             sk:'lj|viško',    hk:'lj|viško_h',  tags:'lj'},
+  {k:'Ljubljana \u2013 Vrhovci',          sk:'lj|viško',    hk:'lj|viško_h',  tags:'lj'},
+  {k:'Ljubljana \u2013 Šentvid',          sk:'lj|šentvid',  hk:'lj',          tags:'lj sentvid'},
+  {k:'Ljubljana \u2013 Brod',             sk:'lj|šentvid',  hk:'lj',          tags:'lj'},
+  {k:'Ljubljana \u2013 Podutik',          sk:'lj|šentvid',  hk:'lj',          tags:'lj'},
+  {k:'Ljubljana \u2013 Dolgi most',       sk:'lj|šentvid',  hk:'lj',          tags:'lj'},
+  {k:'Ljubljana \u2013 Črnuče',           sk:'lj|črnuče',   hk:'lj',          tags:'lj crnuce'},
+  {k:'Ljubljana \u2013 Nadgorica',        sk:'lj|črnuče',   hk:'lj',          tags:'lj'},
+  {k:'Ljubljana \u2013 Rudnik',           sk:'lj|rudnik',   hk:'lj',          tags:'lj'},
+  {k:'Ljubljana \u2013 Štepanjsko',       sk:'lj|štepanj',  hk:'lj',          tags:'lj stepanjsko'},
+  {k:'Ljubljana \u2013 Bizovik',          sk:'lj|štepanj',  hk:'lj',          tags:'lj'},
+  {k:'Ljubljana \u2013 Sostro',           sk:'lj|štepanj',  hk:'lj',          tags:'lj'},
+  {k:'Ljubljana \u2013 Tomačevo',         sk:'lj|tomačevo', hk:'lj',          tags:'lj tomacevo'},
+  {k:'Ljubljana \u2013 Sneberje',         sk:'lj|tomačevo', hk:'lj',          tags:'lj'},
+  {k:'Ljubljana \u2013 Zalog',            sk:'lj|tomačevo', hk:'lj',          tags:'lj'},
+  
   {k:'Domžale',                      sk:'se|domžale',  hk:'se|domžale_h',tags:'domzale'},
   {k:'Trzin',                        sk:'se|domžale',  hk:'se|domžale_h',tags:''},
   {k:'Mengeš',                       sk:'se|domžale',  hk:'se|domžale_h',tags:'menges'},
@@ -757,7 +865,7 @@ const KRAJI=[
   {k:'Vodice',                       sk:'se|šentjakob',hk:'se',          tags:''},
   {k:'Šentjakob ob Savi',            sk:'se|šentjakob',hk:'se',          tags:'sentjakob'},
   {k:'Dol pri Ljubljani',            sk:'se|šentjakob',hk:'se',          tags:''},
-  // ── JUŽNA OKOLICA LJUBLJANE ────────────────────────────────
+  
   {k:'Grosuplje',                    sk:'ju|grosuplje',hk:'ju|grosuplje_h',tags:''},
   {k:'Šmarje Sap',                   sk:'ju|grosuplje',hk:'ju|grosuplje_h',tags:'smarje'},
   {k:'Škofljica',                    sk:'ju|grosuplje',hk:'ju',          tags:'skofljica'},
@@ -767,10 +875,10 @@ const KRAJI=[
   {k:'Borovnica',                    sk:'ju',          hk:'ju',          tags:''},
   {k:'Brezovica',                    sk:'ju',          hk:'ju',          tags:''},
   {k:'Ivančna Gorica',               sk:'ju',          hk:'ju',          tags:'ivancna'},
-  // ── VZHODNA OKOLICA LJUBLJANE ──────────────────────────────
+  
   {k:'Litija',                       sk:'ve|litija',   hk:'ve',          tags:''},
   {k:'Šmartno pri Litiji',           sk:'ve|litija',   hk:'ve',          tags:'smartno litija'},
-  // ── OBALA ─────────────────────────────────────────────────
+  
   {k:'Koper',                        sk:'ob|koper',    hk:'ob|koper_h',  tags:'capodistria'},
   {k:'Piran',                        sk:'ob|piran',    hk:'ob|piran_h',  tags:''},
   {k:'Portorož',                     sk:'ob|piran',    hk:'ob|piran_h',  tags:'portorose'},
@@ -784,13 +892,13 @@ const KRAJI=[
   {k:'Marezige',                     sk:'si',          hk:'ob|vanganel', tags:''},
   {k:'Vanganel',                     sk:'si',          hk:'ob|vanganel', tags:''},
   {k:'Dekani',                       sk:'si',          hk:'si',          tags:''},
-  // ── ALPSKO TURISTIČNO OBMOČJE ─────────────────────────────
+  
   {k:'Kranjska Gora',                sk:'al|kranjska', hk:'al',          tags:''},
   {k:'Bled',                         sk:'al|bled',     hk:'al|bled_h',   tags:''},
   {k:'Bohinj',                       sk:'al|bohinj',   hk:'al',          tags:''},
   {k:'Bohinjska Bistrica',           sk:'al|bohinj',   hk:'al',          tags:''},
   {k:'Mojstrana',                    sk:'al|kranjska', hk:'al',          tags:''},
-  // ── KRANJ Z OKOLICO ───────────────────────────────────────
+  
   {k:'Kranj',                        sk:'kr|center',   hk:'kr|center_h', tags:''},
   {k:'Stražišče',                    sk:'kr|stražišče',hk:'kr|stražišče_h',tags:'strazisce'},
   {k:'Hrastje',                      sk:'kr|stražišče',hk:'kr|stražišče_h',tags:''},
@@ -798,7 +906,7 @@ const KRAJI=[
   {k:'Šenčur',                       sk:'kr|okolica',  hk:'kr|naklo',    tags:'sencur'},
   {k:'Kokrica',                      sk:'kr|okolica',  hk:'kr|naklo',    tags:''},
   {k:'Trboje',                       sk:'kr|okolica',  hk:'kr|okolica_h',tags:''},
-  // ── GORENJSKO OBMOČJE ─────────────────────────────────────
+  
   {k:'Škofja Loka',                  sk:'go|škofja',   hk:'go|sl_loka_h',          tags:'skofja'},
   {k:'Radovljica',                   sk:'go|radovljica',hk:'go',         tags:''},
   {k:'Lesce',                        sk:'go|radovljica',hk:'go',         tags:''},
@@ -806,66 +914,66 @@ const KRAJI=[
   {k:'Hrušica',                      sk:'go|jesenice', hk:'go|jesenice_h',tags:'hrusica'},
   {k:'Tržič',                        sk:'go',          hk:'go',          tags:'trzic'},
   {k:'Železniki',                    sk:'go',          hk:'go',          tags:'zelezniki'},
-  // ── KRAS ──────────────────────────────────────────────────
+  
   {k:'Sežana',                       sk:'ks|sežana',   hk:'ks',          tags:'sezana'},
   {k:'Kozina',                       sk:'ks|kozina',   hk:'ks|kozina_h', tags:''},
   {k:'Divača',                       sk:'ks|kozina',   hk:'ks|kozina_h', tags:'divaca'},
   {k:'Komen',                        sk:'ks',          hk:'ks|podeželje_h',tags:''},
   {k:'Dutovlje',                     sk:'ks',          hk:'ks|podeželje_h',tags:''},
-  // ── NOVA GORICA ───────────────────────────────────────────
+  
   {k:'Nova Gorica',                  sk:'ng|nova gor', hk:'ng|nova gor_h',tags:''},
   {k:'Šempeter pri Gorici',          sk:'ng|nova gor', hk:'ng|nova gor_h',tags:'sempeter'},
   {k:'Ajdovščina',                   sk:'ng|ajdovšč',  hk:'ng|vipava_h',          tags:'ajdovscina'},
   {k:'Vipava',                       sk:'ng',          hk:'ng|vipava_h',          tags:''},
   {k:'Dobrovo',                      sk:'ng',          hk:'ng',          tags:''},
-  // ── POSOČJE / IDRIJSKO ────────────────────────────────────
+  
   {k:'Idrija',                       sk:'pi|idrija',   hk:'pi',          tags:''},
   {k:'Tolmin',                       sk:'pi|tolmin',   hk:'pi|tolmin_h', tags:''},
   {k:'Kobarid',                      sk:'pi|tolmin',   hk:'pi|tolmin_h', tags:''},
   {k:'Bovec',                        sk:'pi|podeželje',hk:'pi|podeželje_h',tags:''},
-  // ── NOTRANJSKO ────────────────────────────────────────────
+  
   {k:'Postojna',                     sk:'ni|postojna', hk:'ni',          tags:''},
   {k:'Cerknica',                     sk:'ni|cerknica', hk:'ni',          tags:''},
   {k:'Rakek',                        sk:'ni|cerknica', hk:'ni',          tags:''},
   {k:'Pivka',                        sk:'ni|pivka',    hk:'ni',          tags:''},
   {k:'Ilirska Bistrica',             sk:'ni',          hk:'ni',          tags:'ilirska'},
-  // ── KOČEVSKO ──────────────────────────────────────────────
+  
   {k:'Kočevje',                      sk:'ko|kočevje',  hk:'ko|kočevje_h',tags:'kocevje'},
   {k:'Ribnica',                      sk:'ko|ribnica',  hk:'ko|ribnica_h',tags:''},
-  // ── NOVO MESTO ────────────────────────────────────────────
+  
   {k:'Novo mesto',                   sk:'nm|novo m',   hk:'nm|novo m_h', tags:''},
   {k:'Trebnje',                      sk:'nm|trebnje',  hk:'nm',          tags:''},
   {k:'Šentjernej',                   sk:'nm|dolenj',   hk:'nm|dolenj_h', tags:'sentjernej'},
   {k:'Mirna',                        sk:'nm|dolenj',   hk:'nm|dolenj_h', tags:''},
-  // ── KRŠKO-BREŽIŠKO POLJE ─────────────────────────────────
+  
   {k:'Krško',                        sk:'kp|krško',    hk:'kp|krško_h',  tags:'krsko'},
   {k:'Brežice',                      sk:'kp|brežice',  hk:'kp|brežice_h',tags:'brezice'},
   {k:'Sevnica',                      sk:'kp',          hk:'pv|sevnica',  tags:''},
   {k:'Brestanica',                   sk:'kp',          hk:'kp|podeželje_h',tags:''},
-  // ── POSAVJE ───────────────────────────────────────────────
+  
   {k:'Radeče',                       sk:'pv|podeželje',hk:'pv|podeželje_h',tags:'radece'},
   {k:'Kostanjevica na Krki',         sk:'pv',          hk:'pv|podeželje_h',tags:'kostanjevica'},
-  // ── ZASAVJE ───────────────────────────────────────────────
+  
   {k:'Trbovlje',                     sk:'za|trbovlje', hk:'za|trbovlje_h',tags:''},
   {k:'Hrastnik',                     sk:'za|hrastnik', hk:'za',          tags:''},
   {k:'Zagorje ob Savi',              sk:'za|zagorje',  hk:'za|zagorje_h',tags:'zagorje'},
   {k:'Kisovec',                      sk:'za|zagorje',  hk:'za|zagorje_h',tags:''},
-  // ── SAVINJSKO HRIBOVJE ────────────────────────────────────
+  
   {k:'Laško',                        sk:'sh|laško',    hk:'sh',          tags:'lasko'},
   {k:'Šentjur',                      sk:'sh|šentjur',  hk:'sh|šentjur_h',          tags:'sentjur'},
   {k:'Štore',                        sk:'sh|šentjur',  hk:'sh|šentjur_h',          tags:'store'},
   {k:'Rogaška Slatina',              sk:'sh',          hk:'sh',          tags:'rogaska'},
   {k:'Rogatec',                      sk:'sh',          hk:'sh',          tags:''},
   {k:'Podčetrtek',                   sk:'sh',          hk:'sh',          tags:'podcetrek'},
-  // ── SAVINJSKA DOLINA ──────────────────────────────────────
+  
   {k:'Žalec',                        sk:'sa|žalec',    hk:'sa',          tags:'zalec'},
   {k:'Polzela',                      sk:'sa|polzela',  hk:'sa|polzela_h',          tags:''},
   {k:'Mozirje',                      sk:'sa|podeželje',hk:'sa|podeželje_h',tags:''},
   {k:'Nazarje',                      sk:'sa|podeželje',hk:'sa|podeželje_h',tags:''},
-  // ── ŠALEŠKA DOLINA ────────────────────────────────────────
+  
   {k:'Velenje',                      sk:'sd|velenje',  hk:'sd|velenje_h',tags:''},
   {k:'Šoštanj',                      sk:'sd|šoštanj',  hk:'sd',          tags:'sostanj'},
-  // ── KOROŠKA ───────────────────────────────────────────────
+  
   {k:'Slovenj Gradec',               sk:'ko2|slovenj', hk:'ko2|slovenj_h',tags:''},
   {k:'Ravne na Koroškem',            sk:'ko2|ravne',   hk:'ko2|ravne_h', tags:'ravne koroskem'},
   {k:'Prevalje',                     sk:'ko2|ravne',   hk:'ko2|ravne_h', tags:''},
@@ -873,19 +981,19 @@ const KRAJI=[
   {k:'Muta',                         sk:'ko2|muta',    hk:'ko2|podeželje_h',tags:''},
   {k:'Radlje ob Dravi',              sk:'ko2|muta',    hk:'ko2|podeželje_h',tags:'radlje'},
   {k:'Mežica',                       sk:'ko2|mežica',  hk:'ko2',         tags:'mezica'},
-  // ── MARIBOR — mesto + vse četrti ───────────────────────────
+  
   {k:'Maribor',                      sk:'mb',          hk:'mb',          tags:'mb'},
-  {k:'Maribor – Center',             sk:'mb|center',   hk:'mb',          tags:'mb center'},
-  {k:'Maribor – Tabor',              sk:'mb|tabor',    hk:'mb',          tags:'mb tabor'},
-  {k:'Maribor – Nova vas',           sk:'mb|tabor',    hk:'mb',          tags:'mb nova vas'},
-  {k:'Maribor – Tezno',              sk:'mb|tezno',    hk:'mb',          tags:'mb tezno'},
-  {k:'Maribor – Pobrežje',           sk:'mb|tezno',    hk:'mb',          tags:'mb pobrezje'},
-  {k:'Maribor – Košaki',             sk:'mb|košaki',   hk:'mb',          tags:'mb kosaki'},
-  {k:'Maribor – Melje',              sk:'mb|košaki',   hk:'mb',          tags:'mb melje'},
-  {k:'Maribor – Studenci',           sk:'mb|studenci', hk:'mb',          tags:'mb studenci'},
+  {k:'Maribor \u2013 Center',             sk:'mb|center',   hk:'mb',          tags:'mb center'},
+  {k:'Maribor \u2013 Tabor',              sk:'mb|tabor',    hk:'mb',          tags:'mb tabor'},
+  {k:'Maribor \u2013 Nova vas',           sk:'mb|tabor',    hk:'mb',          tags:'mb nova vas'},
+  {k:'Maribor \u2013 Tezno',              sk:'mb|tezno',    hk:'mb',          tags:'mb tezno'},
+  {k:'Maribor \u2013 Pobrežje',           sk:'mb|tezno',    hk:'mb',          tags:'mb pobrezje'},
+  {k:'Maribor \u2013 Košaki',             sk:'mb|košaki',   hk:'mb',          tags:'mb kosaki'},
+  {k:'Maribor \u2013 Melje',              sk:'mb|košaki',   hk:'mb',          tags:'mb melje'},
+  {k:'Maribor \u2013 Studenci',           sk:'mb|studenci', hk:'mb',          tags:'mb studenci'},
   {k:'Limbuš',                       sk:'mb|studenci', hk:'mb',          tags:'limbus'},
   {k:'Pekre',                        sk:'mb|studenci', hk:'mb',          tags:''},
-  // ── JUŽNA OKOLICA MARIBORA ─────────────────────────────────
+  
   {k:'Hoče',                         sk:'jm|hoče',     hk:'jm|hoče_h',   tags:'hoce'},
   {k:'Miklavž na Dravskem polju',    sk:'jm|hoče',     hk:'jm|hoče_h',   tags:'miklavz'},
   {k:'Duplek',                       sk:'jm|hoče',     hk:'jm|hoče_h',   tags:''},
@@ -894,38 +1002,38 @@ const KRAJI=[
   {k:'Slovenske Konjice',            sk:'jm|konjice',  hk:'jm|konjice_h',tags:'konjice'},
   {k:'Zreče',                        sk:'jm|konjice',  hk:'jm|konjice_h',tags:'zrece'},
   {k:'Slovenska Bistrica',           sk:'jm|sl.bis',   hk:'jm|sl.bis_h', tags:'bistrica'},
-  // ── CELJE ─────────────────────────────────────────────────
+  
   {k:'Celje',                        sk:'ce|center',   hk:'ce|center_h', tags:''},
   {k:'Vojnik',                       sk:'ce|okolica',  hk:'ce|okolica_h',tags:''},
   {k:'Štore',                        sk:'ce|okolica',  hk:'ce|okolica_h',tags:'store'},
-  // ── PTUJSKO POLJE ─────────────────────────────────────────
+  
   {k:'Ptuj',                         sk:'pt|ptuj',     hk:'pt|ptuj_h',   tags:''},
   {k:'Ormož',                        sk:'pt|ormož',    hk:'pt',          tags:'ormoz'},
   {k:'Kidričevo',                    sk:'pt|kidričevo',hk:'pt',          tags:'kidricevo'},
   {k:'Hajdina',                      sk:'pt|podeželje',hk:'pt|podeželje_h',tags:''},
-  // ── SLOVENSKE GORICE ──────────────────────────────────────
+  
   {k:'Lenart',                       sk:'sg|lenart',   hk:'sg',          tags:''},
   {k:'Ljutomer',                     sk:'sg|ljutomer', hk:'sg',          tags:''},
   {k:'Gornja Radgona',               sk:'sg|gornja r', hk:'sg|gornja r_h',tags:'radgona'},
   {k:'Radenci',                      sk:'sg|gornja r', hk:'sg|gornja r_h',tags:''},
   {k:'Pesnica',                      sk:'sg',          hk:'sg|pesnica',  tags:''},
   {k:'Šentilj',                      sk:'sg',          hk:'sg|pesnica',  tags:'sentilj'},
-  // ── PREKMURJE ─────────────────────────────────────────────
+  
   {k:'Murska Sobota',                sk:'pk|murska',   hk:'pk|murska_h', tags:''},
   {k:'Lendava',                      sk:'pk|lendava',  hk:'pk|lendava_h',tags:''},
   {k:'Beltinci',                     sk:'pk|podeželje',hk:'pk|podeželje_h',tags:''},
   {k:'Turnišče',                     sk:'pk|podeželje',hk:'pk|podeželje_h',tags:'turnisce'},
-  // ── BELA KRAJINA ──────────────────────────────────────────
+  
   {k:'Črnomelj',                     sk:'bk',          hk:'bk',          tags:'crnomelj'},
   {k:'Metlika',                      sk:'bk',          hk:'bk',          tags:''},
   {k:'Semič',                        sk:'bk',          hk:'bk',          tags:'semic'},
-  // ── HALOZE / BOČ ──────────────────────────────────────────
+  
   {k:'Videm',                        sk:'ha',          hk:'ha',          tags:''},
   {k:'Cirkulane',                    sk:'ha',          hk:'ha',          tags:''},
   {k:'Podlehnik',                    sk:'ha',          hk:'ha',          tags:''},
 ];
 
-// GURS vrednostna tabela: GURS_V[m2] = vrednost stanovanja v €
+// GURS vrednostna tabela: GURS_V[m2] = vrednost stanovanja v \u20AC
 // Vir: GURS tabela vrednosti (Pravilnik o metodologiji), stolpec 1975-1979
 // sizeRatio(userM2, refM2) vrne razmerje cene/m2 glede na ref. velikost
 const GURS_V=[0,6115,12231,18347,24462,30578,36694,42810,48925,55041,61157,67272,73388,79504,85620,91612,96390,101169,105948,110726,115505,120284,125062,129841,134620,139398,144177,148956,153734,158513,163416,167625,171834,176043,180252,184462,188671,192880,197089,201298,205508,209717,213926,218135,222344,226554,230763,234972,239181,243390,247600,251165,254730,258296,261861,265427,268992,272558,276123,279688,283254,286819,290385,293950,297516,301081,304647,308212,311777,315343,318908,322474,326039,329605,333170,336736,339806,342876,345946,349016,352087,355157,358227,361297,364368,367438,370508,373578,376649,379719,382789,385859,388930,392000,395070,398140,401211,404281,407351,410421,413492,416289,419087,421885,424683,427481,430279,433077,435875,438672,441470,444268,447066,449864,452662,455460,458258,461055,463853,466651,469449,472247,475045,477843,480641,483439,486236,489034,491832,494630,497676,499953,502231,504509,506787,509065,511343,513621,515899,518177,520455,522733,525011,527288,529566,531844,534122,536400,538678,540956,543234,545512,547790,550068,552346,554624,556901,559179,561457,563735,566013,568291,570569,572847,575125,577403,579681,581959,584236,586514,588792,591070,593348,595626,597904,600182,602460,604738,607016,609294,611572,613849,616127,618405,620683,622961,625239,627517,629795,632073,634351,636629,638907,641184,643462,645740,648018,650296,652574,654852,657130,659408,661686,663964,666242,668520,670797,673075,675353,677631,679909,682187,684465,686743,689021,691299,693577,695855,698132,700410,702688,704966,707244,709522,711800,714078,716356,718634,720912,723190,725468,727745,730023,732301,734579,736857,739135,741413,743691,745969,748247,750525,752803,755080,757358,759636,761914,764192,766470,768748,771026,773304,775582,777860,780138,782416,784693,786971,789249,791527,793805,796083,798361,800639,802917,805195,807473,809751,812028,814306,816584,818862,821140,823418,825696,827974,830252,832530,834808,837086,839364,841641,843919,846197,848475,850753,853031,855309,857587,859865,862143,864421,866699,868976,871254,873532,875810,878088,880366,882644,884922];
@@ -936,7 +1044,7 @@ function sizeRatio(userM2,refM2){
 }
 
 
-// GURS vrednostna tabela za HIŠE: GURS_VH[m2] = vrednost hiše v €
+// GURS vrednostna tabela za HIŠE: GURS_VH[m2] = vrednost hiše v \u20AC
 // Vir: GURS tabela vrednosti hiš (Pravilnik o metodologiji), stolpec 1975-1979
 const GURS_VH=[0,1414,2828,4242,5656,7070,8483,9897,11311,12725,14139,15553,16967,18381,19795,21208,22622,24036,25450,26864,28278,29692,31106,32520,33934,35348,36761,38175,39589,41003,42417,43831,45245,46659,48073,49486,50900,52314,53728,55142,56556,57970,59384,60798,62212,63626,65039,66453,67867,69281,70695,71638,72580,73523,74465,75408,76351,77293,78236,79178,80121,81064,82006,82949,83891,84834,85777,86719,87662,88604,89547,90490,91432,92375,93317,94260,95203,96145,97088,98030,98973,99916,100858,101801,102743,103686,104629,105571,106514,107456,108399,109342,110284,111227,112169,113112,114055,114997,115940,116882,117825,118610,119396,120182,120967,121752,122538,123324,124109,124894,125680,126466,127251,128036,128822,129608,130393,131178,131964,132750,133535,134320,135106,135892,136677,137462,138248,139034,139819,140604,141390,142176,142961,143746,144532,145318,146103,146888,147674,148460,149245,150030,150816,151602,152387,153172,153958,154744,155529,156314,157100,157414,157728,158043,158357,158671,158985,159299,159614,159928,160242,160556,160870,161185,161499,161813,162127,162441,162756,163070,163384,163698,164012,164327,164641,164955,165269,165583,165898,166212,166526,166840,167154,167469,167783,168097,168411,168725,169040,169354,169668,169982,170296,170611,170925,171239,171553,171867,172182,172496,172810,173093,173376,173658,173941,174224,174507,174789,175072,175355,175638,175921,176203,176486,176769,177052,177334,177617,177900,178183,178466,178748,179031,179314,179597,179880,180162,180445,180728,181011,181293,181576,181859,182142,182425,182707,182990,183273,183556,183838,184121,184404,184687,184970,185252,185535,185818,186101,186383,186666,186949,187200,187452,187703,187954,188206,188457,188709,188960,189211,189463,189714,189965,190217,190468,190719,190971,191222,191473,191725,191976,192228,192479,192730,192982,193233,193484,193736,193987,194238,194490,194741,194993,195244,195495,195747,195998,196249,196501,196752,197003,197255,197506,197757,198009,198260,198512,198763,199014,199266,199517,199737,199957,200177,200397,200617,200837,201057,201277,201496,201716,201936,202156,202376,202596,202816,203036,203256,203476,203696,203916,204136,204356,204576,204796,205016,205235,205455,205675,205895,206115,206335,206555,206775,206995,207215,207435,207655,207875,208095,208315,208535,208754,208974,209194,209414,209634,209854,210074,210294,210514,210671,210828,210985,211142,211300,211457,211614,211771,211928,212085,212242,212399,212556,212713,212870,213028,213185,213342,213499,213656,213813,213970,214127,214284,214442,214599,214756,214913,215070,215227,215384,215541,215698,215855,216012,216170,216327,216484,216641,216798,216955,217112,217269,217426,217584,217741,217898,218055,218212,218369,218526,218683,218840,218997,219154,219312,219469,219626,219783,219940,220097,220254,220411,220568,220726,220883,221040,221197,221354,221511,221668,221825,221982,222139,222296,222454,222611,222768,222925,223082,223239,223396,223553,223710,223868,224025,224182,224339,224496,224653,224810,224967,225124,225281,225438,225596,225753,225910,226067,226224,226381,226538,226695,226852,227010,227167,227324,227481,227638,227795,227952,228109,228266,228423,228580,228738,228895,229052,229209,229366,229523,229680,229837,229994,230152,230309,230466,230623,230780,230937,231094,231251,231408,231565,231722,231880,232037,232194,232351,232508,232665,232822,232979,233136,233294,233451,233608,233765,233922,234079,234236,234393,234550,234707,234864,235022,235179,235336,235493,235650,235807,235964,236121,236278,236436,236593,236750,236907,237064,237221,237378,237535,237692,237849,238006,238163,238321,238478,238635,238792,238949,239106,239263,239420,239578,239735,239892,240049,240206,240363,240520,240677,240834,240991,241148,241306,241463,241620,241777,241934,242091,242248,242405,242562,242720,242877,243034,243191,243348,243505,243662,243819,243976,244133,244290,244448,244605,244762,244919,245076,245233,245390,245547,245704,245862,246019,246176,246333,246490,246647,246804,246961,247118,247275,247432,247590,247747,247904,248061,248218,248375,248532,248689,248846,249004,249161,249318,249475,249632,249789];
 function hisaSizeRatio(userM2,refM2){
@@ -945,28 +1053,95 @@ function hisaSizeRatio(userM2,refM2){
   return (GURS_VH[u]/u)/(GURS_VH[r]/r);
 }
 
-// ── STATE ────────────────────────────────────────────────────────
+
+
+
+
+
+
+
+const ETN_TRANS={"mb": [{"n": "Goriška Ulica 2, Maribor", "m": 69, "l": 1972, "p": 2371, "v": -12, "d": "mar 26"}, {"n": "Ulica Staneta Severja 9, Maribor", "m": 40, "l": 1981, "p": 2803, "v": 4, "d": "mar 26"}, {"n": "Ulica Heroja Vojka 17, Maribor", "m": 54, "l": 1917, "p": 2136, "v": -21, "d": "mar 26"}, {"n": "Ferkova Ulica 15, Maribor", "m": 58, "l": 1970, "p": 2829, "v": 5, "d": "mar 26"}, {"n": "Ulica Kneza Koclja 26, Maribor", "m": 53, "l": 1899, "p": 2660, "v": -1, "d": "mar 26"}, {"n": "Štrekljeva Ulica 38, Maribor", "m": 59, "l": 1964, "p": 3057, "v": 14, "d": "mar 26"}], "nm|novo m": [{"n": "Mestne Njive 11, Novo Mesto", "m": 26, "l": 1967, "p": 3977, "v": 30, "d": "mar 26"}, {"n": "Kočevarjeva Ulica 14, Novo Mesto", "m": 73, "l": 1955, "p": 1989, "v": -35, "d": "feb 26"}, {"n": "Ulica Slavka Gruma 32, Novo Mesto", "m": 23, "l": 1984, "p": 4465, "v": 46, "d": "feb 26"}, {"n": "Ulica Slavka Gruma 58, Novo Mesto", "m": 54, "l": 1987, "p": 3337, "v": 9, "d": "feb 26"}, {"n": "Seidlova Cesta 32, Novo Mesto", "m": 47, "l": 1980, "p": 3228, "v": 6, "d": "feb 26"}, {"n": "Mušičeva Ulica 15, Novo Mesto", "m": 43, "l": 1999, "p": 3348, "v": 10, "d": "feb 26"}], "pk": [{"n": "Kocljeva Ulica 6A, Murska Sobota", "m": 62, "l": 1972, "p": 2098, "v": 14, "d": "mar 26"}, {"n": "Ulica Štefana Kovača 13, Murska Sobota", "m": 58, "l": 1960, "p": 2573, "v": 40, "d": "mar 26"}, {"n": "Lendavska Ulica 45B, Murska Sobota", "m": 58, "l": 1986, "p": 1950, "v": 6, "d": "mar 26"}, {"n": "Kranjčeva Ulica 2, Lendava", "m": 102, "l": 1961, "p": 1111, "v": -40, "d": "mar 26"}, {"n": "Lendavska Ulica 15, Murska Sobota", "m": 55, "l": 1950, "p": 1712, "v": -7, "d": "mar 26"}, {"n": "Zvezna Ulica 4, Murska Sobota", "m": 40, "l": 1969, "p": 1784, "v": -3, "d": "feb 26"}], "ob|izola": [{"n": "Ulica Emilia Driolia 3, Izola", "m": 48, "l": 1987, "p": 6125, "v": 33, "d": "mar 26"}, {"n": "Sončno Nabrežje 4, Izola", "m": 34, "l": 1930, "p": 6214, "v": 35, "d": "mar 26"}, {"n": "Prečna Ulica 6, Izola", "m": 52, "l": 1890, "p": 5934, "v": 28, "d": "mar 26"}, {"n": "Kajuhova Ulica 28, Izola", "m": 44, "l": 1998, "p": 5194, "v": 12, "d": "mar 26"}, {"n": "Veliki Trg 14, Izola", "m": 69, "l": 1900, "p": 4196, "v": -9, "d": "feb 26"}, {"n": "Smrekarjeva Ulica 45, Izola", "m": 60, "l": 1850, "p": 3566, "v": -23, "d": "feb 26"}], "kr|center": [{"n": "Jurčičeva Ulica 3, Kranj", "m": 70, "l": 1950, "p": 3519, "v": -1, "d": "mar 26"}, {"n": "Kališka Ulica 22, Kranj", "m": 70, "l": 1989, "p": 4676, "v": 31, "d": "mar 26"}, {"n": "Kidričeva Cesta 20, Kranj", "m": 57, "l": 1954, "p": 2976, "v": -17, "d": "mar 26"}, {"n": "Ulica Franca Rozmana-Staneta 9, Kranj", "m": 53, "l": 1961, "p": 3901, "v": 9, "d": "mar 26"}, {"n": "Tavčarjeva Ulica 31A, Kranj", "m": 29, "l": 1967, "p": 3163, "v": -11, "d": "mar 26"}, {"n": "Tominčeva Cesta 23, Kranj", "m": 99, "l": 1927, "p": 2456, "v": -31, "d": "mar 26"}], "al": [{"n": "Ledine 9, Kranjska Gora", "m": 53, "l": 1967, "p": 5606, "v": 22, "d": "mar 26"}, {"n": "Borovška Cesta 12, Kranjska Gora", "m": 54, "l": 2020, "p": 7332, "v": 60, "d": "feb 26"}, {"n": "Vitranška Ulica 10, Kranjska Gora", "m": 68, "l": 2001, "p": 4000, "v": -13, "d": "feb 26"}, {"n": "Ravne V Bohinju 23", "m": 42, "l": 1991, "p": 4042, "v": -12, "d": "jan 26"}, {"n": "Cesta Svobode 8A, Bled", "m": 26, "l": 1900, "p": 8815, "v": 92, "d": "jan 26"}, {"n": "Alpska Cesta 3, Bled", "m": 53, "l": 1975, "p": 4411, "v": -4, "d": "jan 26"}], "ce|center": [{"n": "Kocbekova Ulica 5, Celje", "m": 31, "l": 1952, "p": 2301, "v": -16, "d": "mar 26"}, {"n": "Brodarjeva Ulica 2, Celje", "m": 35, "l": 1960, "p": 3990, "v": 46, "d": "mar 26"}, {"n": "Malgajeva Ulica 18, Celje", "m": 23, "l": 1962, "p": 3686, "v": 35, "d": "mar 26"}, {"n": "Kraigherjeva Ulica 30, Celje", "m": 57, "l": 1976, "p": 3739, "v": 37, "d": "mar 26"}, {"n": "Drapšinova Ulica 15, Celje", "m": 58, "l": 1962, "p": 2069, "v": -24, "d": "feb 26"}, {"n": "Kraigherjeva Ulica 24, Celje", "m": 41, "l": 1976, "p": 1925, "v": -30, "d": "feb 26"}], "ko2|slovenj": [{"n": "Glavni Trg 4, Slovenj Gradec", "m": 51, "l": 0, "p": 3276, "v": 39, "d": "mar 26"}, {"n": "Glavni Trg 42, Slovenj Gradec", "m": 42, "l": 1880, "p": 1883, "v": -20, "d": "mar 26"}, {"n": "Gubčeva Ulica 5, Slovenj Gradec", "m": 44, "l": 1970, "p": 2487, "v": 6, "d": "feb 26"}, {"n": "Gubčeva Ulica 8, Slovenj Gradec", "m": 33, "l": 1972, "p": 2513, "v": 7, "d": "feb 26"}, {"n": "Tomšičeva Ulica 9, Slovenj Gradec", "m": 77, "l": 1976, "p": 2008, "v": -15, "d": "jan 26"}, {"n": "Celjska Cesta 12, Slovenj Gradec", "m": 56, "l": 2022, "p": 2567, "v": 9, "d": "jan 26"}], "lj|bežigrad": [{"n": "Trubarjeva Cesta 74, Ljubljana", "m": 45, "l": 1863, "p": 5199, "v": 5, "d": "mar 26"}, {"n": "Neubergerjeva Ulica 15, Ljubljana", "m": 78, "l": 2018, "p": 7762, "v": 57, "d": "mar 26"}, {"n": "Herbersteinova Ulica 19, Ljubljana", "m": 66, "l": 1945, "p": 4840, "v": -2, "d": "mar 26"}, {"n": "Prisojna Ulica 5, Ljubljana", "m": 85, "l": 1908, "p": 6847, "v": 39, "d": "mar 26"}, {"n": "Linhartova Cesta 7, Ljubljana", "m": 45, "l": 1974, "p": 4810, "v": -3, "d": "mar 26"}, {"n": "Dunajska Cesta 87, Ljubljana", "m": 44, "l": 1930, "p": 5838, "v": 18, "d": "mar 26"}], "se|domžale": [{"n": "Ulica 7. Avgusta 13, Dob", "m": 28, "l": 1947, "p": 5300, "v": 30, "d": "mar 26"}, {"n": "Slovenska Cesta 87, Mengeš", "m": 64, "l": 1998, "p": 3743, "v": -8, "d": "mar 26"}, {"n": "Kamniška Cesta 11, Domžale", "m": 74, "l": 1966, "p": 3971, "v": -2, "d": "mar 26"}, {"n": "Krtina 114", "m": 41, "l": 2004, "p": 4843, "v": 19, "d": "mar 26"}, {"n": "Šaranovičeva Cesta 34, Vir", "m": 84, "l": 2024, "p": 4626, "v": 14, "d": "mar 26"}, {"n": "Župančičeva Ulica 6, Domžale", "m": 45, "l": 1968, "p": 4503, "v": 11, "d": "mar 26"}], "lj|rožna": [{"n": "Jesenkova Ulica 3, Ljubljana", "m": 77, "l": 1946, "p": 5707, "v": 9, "d": "mar 26"}, {"n": "Dolenjska Cesta 40, Ljubljana", "m": 58, "l": 1967, "p": 5188, "v": -1, "d": "mar 26"}, {"n": "Dolenjska Cesta 40, Ljubljana", "m": 58, "l": 1967, "p": 5439, "v": 4, "d": "mar 26"}, {"n": "Frankopanska Ulica 23, Ljubljana", "m": 39, "l": 1889, "p": 7322, "v": 40, "d": "mar 26"}, {"n": "Poljanska Cesta 17, Ljubljana", "m": 81, "l": 1978, "p": 5382, "v": 3, "d": "mar 26"}, {"n": "Ziherlova Ulica 4, Ljubljana", "m": 34, "l": 1980, "p": 7814, "v": 49, "d": "mar 26"}], "ko2|ravne": [{"n": "Javornik 63, Ravne Na Koroškem", "m": 65, "l": 1987, "p": 2236, "v": 18, "d": "mar 26"}, {"n": "Trg 66, Prevalje", "m": 37, "l": 1976, "p": 1892, "v": 0, "d": "mar 26"}, {"n": "Trg 5, Prevalje", "m": 76, "l": 1968, "p": 2523, "v": 33, "d": "mar 26"}, {"n": "Partizanska Cesta 7, Ravne Na Koroškem", "m": 29, "l": 0, "p": 1787, "v": -6, "d": "mar 26"}, {"n": "Čečovje 11A, Ravne Na Koroškem", "m": 58, "l": 1949, "p": 2083, "v": 10, "d": "feb 26"}, {"n": "Javornik 58, Ravne Na Koroškem", "m": 44, "l": 1981, "p": 1973, "v": 4, "d": "feb 26"}], "ng": [{"n": "Cesta Ix. Korpusa 73, Solkan", "m": 94, "l": 1930, "p": 1553, "v": -46, "d": "mar 26"}, {"n": "Na Livadi 3, Ajdovščina", "m": 75, "l": 1955, "p": 3430, "v": 19, "d": "mar 26"}, {"n": "Beblerjeva Ulica 38, Vipava", "m": 128, "l": 2018, "p": 3313, "v": 15, "d": "mar 26"}, {"n": "Trg Jožeta Srebrniča 6, Solkan", "m": 32, "l": 1924, "p": 2264, "v": -21, "d": "mar 26"}, {"n": "Cesta Iv. Prekomorske 6, Ajdovščina", "m": 51, "l": 1958, "p": 3880, "v": 35, "d": "mar 26"}, {"n": "Gregorčičeva Ulica 13C, Nova Gorica", "m": 58, "l": 1967, "p": 3649, "v": 27, "d": "mar 26"}], "lj|ježica": [{"n": "Ulica Hermana Potočnika 27, Ljubljana", "m": 54, "l": 1975, "p": 4187, "v": -12, "d": "mar 26"}, {"n": "Bratovševa Ploščad 38, Ljubljana", "m": 34, "l": 1978, "p": 7019, "v": 47, "d": "mar 26"}, {"n": "Glinškova Ploščad 3, Ljubljana", "m": 85, "l": 1978, "p": 5104, "v": 7, "d": "mar 26"}, {"n": "Glinškova Ploščad 25, Ljubljana", "m": 42, "l": 1981, "p": 4784, "v": 0, "d": "mar 26"}, {"n": "Kvedrova Cesta 11, Ljubljana", "m": 47, "l": 1972, "p": 4154, "v": -13, "d": "mar 26"}, {"n": "Kvedrova Cesta 15, Ljubljana", "m": 50, "l": 1972, "p": 5438, "v": 14, "d": "mar 26"}], "sd|velenje": [{"n": "Bračičeva Cesta 2, Velenje", "m": 62, "l": 1961, "p": 2311, "v": -8, "d": "mar 26"}, {"n": "Šlandrova Cesta 10, Velenje", "m": 60, "l": 1961, "p": 2788, "v": 11, "d": "mar 26"}, {"n": "Kersnikova Cesta 17, Velenje", "m": 38, "l": 1956, "p": 2365, "v": -6, "d": "mar 26"}, {"n": "Goriška Cesta 42, Velenje", "m": 92, "l": 1980, "p": 2976, "v": 19, "d": "mar 26"}, {"n": "Šaleška Cesta 2A, Velenje", "m": 152, "l": 1973, "p": 1557, "v": -38, "d": "mar 26"}, {"n": "Cesta Talcev 18, Velenje", "m": 60, "l": 1975, "p": 2999, "v": 19, "d": "mar 26"}], "lj|koseze": [{"n": "Brilejeva Ulica 12, Ljubljana", "m": 28, "l": 1983, "p": 5104, "v": 4, "d": "mar 26"}, {"n": "Trg Komandanta Staneta 5, Ljubljana", "m": 29, "l": 1970, "p": 7329, "v": 49, "d": "mar 26"}, {"n": "Zofke Kvedrove Ulica 6, Ljubljana", "m": 75, "l": 1948, "p": 4792, "v": -3, "d": "mar 26"}, {"n": "Smrtnikova Ulica 4, Ljubljana", "m": 72, "l": 1986, "p": 6114, "v": 24, "d": "mar 26"}, {"n": "Vodnikova Cesta 64, Ljubljana", "m": 52, "l": 1890, "p": 4991, "v": 1, "d": "mar 26"}, {"n": "Zofke Kvedrove Ulica 4, Ljubljana", "m": 75, "l": 1948, "p": 4623, "v": -6, "d": "mar 26"}], "ju|grosuplje": [{"n": "Bevkova Cesta 1, Grosuplje", "m": 41, "l": 1990, "p": 4106, "v": 1, "d": "mar 26"}, {"n": "Levstikova Cesta 8, Grosuplje", "m": 52, "l": 1960, "p": 4361, "v": 7, "d": "mar 26"}, {"n": "Kersnikova Cesta 5, Grosuplje", "m": 60, "l": 1980, "p": 3685, "v": -9, "d": "mar 26"}, {"n": "Kamnikarjeva Ulica 19, Lavrica", "m": 60, "l": 1999, "p": 5029, "v": 24, "d": "mar 26"}, {"n": "Partizanska Cesta 2, Grosuplje", "m": 125, "l": 2025, "p": 3956, "v": -3, "d": "feb 26"}, {"n": "Babnogoriška Cesta 31, Lavrica", "m": 95, "l": 1975, "p": 4245, "v": 5, "d": "feb 26"}], "za": [{"n": "Partizanska Ulica 1, Zagorje Ob Savi", "m": 49, "l": 1963, "p": 2286, "v": 22, "d": "mar 26"}, {"n": "Log 28C, Hrastnik", "m": 63, "l": 1977, "p": 2167, "v": 16, "d": "mar 26"}, {"n": "Podkraj 80", "m": 45, "l": 1958, "p": 1991, "v": 6, "d": "mar 26"}, {"n": "Novi Log 7A, Hrastnik", "m": 67, "l": 1981, "p": 1891, "v": 1, "d": "mar 26"}, {"n": "Podkraj 91", "m": 53, "l": 1963, "p": 1654, "v": -12, "d": "mar 26"}, {"n": "Ulica Talcev 38, Zagorje Ob Savi", "m": 41, "l": 1965, "p": 2457, "v": 31, "d": "feb 26"}], "ob|koper": [{"n": "Pristaniška Ulica 5, Koper", "m": 70, "l": 1960, "p": 6622, "v": 45, "d": "mar 26"}, {"n": "Jenkova Ulica 7, Koper", "m": 90, "l": 1956, "p": 3772, "v": -18, "d": "mar 26"}, {"n": "Zlatičeva Ulica 11, Koper", "m": 41, "l": 1900, "p": 3893, "v": -15, "d": "mar 26"}, {"n": "Ulica Osvobodilne Fronte 5, Koper", "m": 34, "l": 0, "p": 5378, "v": 18, "d": "mar 26"}, {"n": "Hrvatini 208D", "m": 181, "l": 1991, "p": 3429, "v": -25, "d": "mar 26"}, {"n": "Rozmanova Ulica 13, Koper", "m": 54, "l": 1956, "p": 4570, "v": 0, "d": "mar 26"}], "go|škofja": [{"n": "Podlubnik 162, Škofja Loka", "m": 62, "l": 1976, "p": 3943, "v": 7, "d": "mar 26"}, {"n": "Frankovo Naselje 160, Škofja Loka", "m": 42, "l": 1986, "p": 4153, "v": 13, "d": "mar 26"}, {"n": "Novi Svet 6, Škofja Loka", "m": 73, "l": 1963, "p": 4357, "v": 19, "d": "mar 26"}, {"n": "Frankovo Naselje 66A, Škofja Loka", "m": 46, "l": 1988, "p": 3581, "v": -2, "d": "feb 26"}, {"n": "Podlubnik 158, Škofja Loka", "m": 53, "l": 1978, "p": 4525, "v": 23, "d": "feb 26"}, {"n": "Frankovo Naselje 53, Škofja Loka", "m": 53, "l": 1959, "p": 4980, "v": 36, "d": "feb 26"}], "sd|šoštanj": [{"n": "Glavni Trg 3, Šoštanj", "m": 77, "l": 2002, "p": 1237, "v": -44, "d": "mar 26"}, {"n": "Topolšica 67", "m": 80, "l": 1919, "p": 1304, "v": -41, "d": "jan 26"}, {"n": "Aškerčeva Cesta 3B, Šoštanj", "m": 18, "l": 1963, "p": 2857, "v": 29, "d": "dec 25"}, {"n": "Glavni Trg 2, Šoštanj", "m": 43, "l": 0, "p": 1740, "v": -22, "d": "nov 25"}, {"n": "Prešernov Trg 10, Šoštanj", "m": 60, "l": 1976, "p": 1735, "v": -22, "d": "nov 25"}, {"n": "Primorska Cesta 3, Šoštanj", "m": 57, "l": 1855, "p": 1880, "v": -15, "d": "nov 25"}], "sh": [{"n": "Na Lipico 1, Šentjur", "m": 40, "l": 1976, "p": 3672, "v": 100, "d": "mar 26"}, {"n": "Ulica Xiv. Divizije 56, Rogaška Slatina", "m": 28, "l": 1965, "p": 1815, "v": -1, "d": "mar 26"}, {"n": "Hotunje 46", "m": 49, "l": 1965, "p": 1602, "v": -13, "d": "mar 26"}, {"n": "Mestna Ulica 8, Laško", "m": 104, "l": 1850, "p": 3048, "v": 66, "d": "feb 26"}, {"n": "Na Lipico 4, Šentjur", "m": 51, "l": 1976, "p": 2801, "v": 53, "d": "feb 26"}, {"n": "Na Lipico 1, Šentjur", "m": 65, "l": 1976, "p": 2671, "v": 46, "d": "jan 26"}], "sa": [{"n": "Stritarjeva Ulica 7A, Žalec", "m": 155, "l": 1982, "p": 1835, "v": -28, "d": "mar 26"}, {"n": "Praprotnikova Ulica 2, Mozirje", "m": 59, "l": 1964, "p": 2532, "v": -1, "d": "mar 26"}, {"n": "Tomšičeva Ulica 1, Žalec", "m": 77, "l": 1983, "p": 3012, "v": 18, "d": "mar 26"}, {"n": "Glavni Trg 49, Polzela", "m": 49, "l": 1966, "p": 2824, "v": 11, "d": "mar 26"}, {"n": "Praprotnikova Ulica 8, Mozirje", "m": 65, "l": 1963, "p": 2738, "v": 7, "d": "feb 26"}, {"n": "Glavni Trg 45, Polzela", "m": 52, "l": 1964, "p": 1300, "v": -49, "d": "feb 26"}], "ce|okolica": [{"n": "Globoče 18", "m": 71, "l": 2001, "p": 1931, "v": -8, "d": "feb 26"}, {"n": "Keršova Ulica 7, Vojnik", "m": 62, "l": 1976, "p": 2805, "v": 33, "d": "feb 26"}, {"n": "Globoče 19", "m": 71, "l": 2002, "p": 2557, "v": 22, "d": "jan 26"}, {"n": "Kovinarska Ulica 2, Štore", "m": 80, "l": 1948, "p": 2203, "v": 5, "d": "jan 26"}, {"n": "Cesta Na Pečovje 4, Štore", "m": 38, "l": 1880, "p": 2125, "v": 1, "d": "sep 25"}, {"n": "Cesta Na Pečovje 4, Štore", "m": 39, "l": 1880, "p": 1514, "v": -28, "d": "jul 25"}], "bk": [{"n": "Ulica Moša Pijade 8, Črnomelj", "m": 60, "l": 1989, "p": 2206, "v": 64, "d": "mar 26"}, {"n": "Naselje Borisa Kidriča 5A, Metlika", "m": 75, "l": 1997, "p": 1360, "v": 1, "d": "mar 26"}, {"n": "Ulica 21. Oktobra 15A, Črnomelj", "m": 36, "l": 1970, "p": 1136, "v": -16, "d": "feb 26"}, {"n": "Taborska Ulica 11, Semič", "m": 29, "l": 1971, "p": 1284, "v": -5, "d": "jan 26"}, {"n": "Ulica Pod Smreko 4, Črnomelj", "m": 54, "l": 1961, "p": 2161, "v": 61, "d": "dec 25"}, {"n": "Župančičeva Cesta 8, Metlika", "m": 66, "l": 1963, "p": 1246, "v": -7, "d": "dec 25"}], "ob|ankaran": [{"n": "Jadranska Cesta 14F, Ankaran", "m": 34, "l": 1989, "p": 6514, "v": 0, "d": "mar 26"}, {"n": "Regentova Ulica 4A, Ankaran", "m": 37, "l": 2000, "p": 7288, "v": 12, "d": "mar 26"}, {"n": "Rožnik 10A, Ankaran", "m": 28, "l": 1991, "p": 6767, "v": 4, "d": "mar 26"}, {"n": "Vlahovičeva Ulica 1, Ankaran", "m": 98, "l": 1976, "p": 4150, "v": -36, "d": "dec 25"}, {"n": "Jadranska Cesta 16C, Ankaran", "m": 28, "l": 1994, "p": 4182, "v": -36, "d": "dec 25"}, {"n": "Jadranska Cesta 14F, Ankaran", "m": 34, "l": 1989, "p": 6680, "v": 3, "d": "nov 25"}], "go|jesenice": [{"n": "Hrušica 71D", "m": 49, "l": 1988, "p": 3345, "v": 20, "d": "mar 26"}, {"n": "Cesta 1. Maja 26B, Jesenice", "m": 69, "l": 1989, "p": 2778, "v": -1, "d": "mar 26"}, {"n": "Cesta Maršala Tita 87, Jesenice", "m": 65, "l": 1959, "p": 3064, "v": 10, "d": "mar 26"}, {"n": "Cesta Maršala Tita 100, Jesenice", "m": 48, "l": 1941, "p": 3330, "v": 19, "d": "mar 26"}, {"n": "Kurirska Pot 2C, Slovenski Javornik", "m": 34, "l": 1962, "p": 2914, "v": 4, "d": "mar 26"}, {"n": "Cesta Cirila Tavčarja 10, Jesenice", "m": 60, "l": 1977, "p": 2588, "v": -7, "d": "mar 26"}], "pi": [{"n": "Rožna Ulica 7A, Idrija", "m": 67, "l": 1958, "p": 1667, "v": -19, "d": "mar 26"}, {"n": "Triglavska Ulica 18, Idrija", "m": 73, "l": 1968, "p": 1783, "v": -13, "d": "mar 26"}, {"n": "Arkova Ulica 16, Idrija", "m": 51, "l": 1967, "p": 1802, "v": -12, "d": "mar 26"}, {"n": "Brunov Drevored 19, Tolmin", "m": 86, "l": 1959, "p": 2280, "v": 11, "d": "mar 26"}, {"n": "Beblerjeva Ulica 10, Idrija", "m": 30, "l": 1974, "p": 1926, "v": -6, "d": "mar 26"}, {"n": "Šolska Ulica 8, Spodnja Idrija", "m": 48, "l": 1966, "p": 1833, "v": -10, "d": "feb 26"}], "lj|štepanj": [{"n": "Bilečanska Ulica 5, Ljubljana", "m": 42, "l": 1978, "p": 5995, "v": 24, "d": "mar 26"}, {"n": "Jakčeva Ulica 43, Ljubljana", "m": 62, "l": 1976, "p": 5743, "v": 18, "d": "mar 26"}, {"n": "Steletova Ulica 6, Ljubljana", "m": 22, "l": 1977, "p": 7517, "v": 55, "d": "mar 26"}, {"n": "Nusdorferjeva Ulica 3, Ljubljana", "m": 83, "l": 1976, "p": 4092, "v": -16, "d": "mar 26"}, {"n": "Jakčeva Ulica 43, Ljubljana", "m": 38, "l": 1976, "p": 4900, "v": 1, "d": "feb 26"}, {"n": "Bilečanska Ulica 5, Ljubljana", "m": 29, "l": 1978, "p": 3313, "v": -32, "d": "feb 26"}], "ni": [{"n": "Zeleni Biser 6, Postojna", "m": 104, "l": 2007, "p": 2540, "v": -7, "d": "mar 26"}, {"n": "Zeleni Biser 4, Postojna", "m": 90, "l": 2007, "p": 2820, "v": 4, "d": "mar 26"}, {"n": "Prešernova Ulica 38, Ilirska Bistrica", "m": 26, "l": 1964, "p": 2541, "v": -7, "d": "mar 26"}, {"n": "Volaričeva Ulica 26, Postojna", "m": 33, "l": 1985, "p": 3233, "v": 19, "d": "mar 26"}, {"n": "Prečna Ulica 4, Pivka", "m": 92, "l": 1946, "p": 1247, "v": -54, "d": "mar 26"}, {"n": "Kidričevo Naselje 14, Postojna", "m": 26, "l": 1961, "p": 3497, "v": 28, "d": "mar 26"}], "nm|trebnje": [{"n": "Cankarjeva Ulica 25, Trebnje", "m": 46, "l": 1977, "p": 2514, "v": -10, "d": "feb 26"}, {"n": "Klemenčičeva Ulica 7, Trebnje", "m": 60, "l": 2009, "p": 3940, "v": 41, "d": "jan 26"}, {"n": "Klemenčičeva Ulica 7, Trebnje", "m": 70, "l": 2009, "p": 3976, "v": 42, "d": "dec 25"}, {"n": "Režunova Ulica 10, Trebnje", "m": 41, "l": 2007, "p": 4160, "v": 49, "d": "sep 25"}, {"n": "", "m": 150, "l": 2024, "p": 1536, "v": -45, "d": "sep 25"}, {"n": "Rimska Cesta 3, Trebnje", "m": 65, "l": 1971, "p": 3258, "v": 16, "d": "jul 25"}], "se|kamnik": [{"n": "Tunjiška Cesta 2C, Kamnik", "m": 40, "l": 1971, "p": 3002, "v": -21, "d": "mar 26"}, {"n": "Ljubljanska Cesta 33, Kamnik", "m": 76, "l": 2000, "p": 5203, "v": 37, "d": "mar 26"}, {"n": "Zikova Ulica 5, Kamnik", "m": 41, "l": 1985, "p": 4072, "v": 7, "d": "feb 26"}, {"n": "Ulica Matije Blejca 6, Kamnik", "m": 56, "l": 1977, "p": 4705, "v": 23, "d": "feb 26"}, {"n": "Jakopičeva Ulica 25, Kamnik", "m": 38, "l": 1963, "p": 5434, "v": 43, "d": "jan 26"}, {"n": "Kranjska Cesta 4B, Kamnik", "m": 85, "l": 1962, "p": 4340, "v": 14, "d": "jan 26"}], "ju|vrhnika": [{"n": "Tržaška Cesta 126, Logatec", "m": 138, "l": 2006, "p": 3227, "v": -13, "d": "mar 26"}, {"n": "Na Zelenici 5C, Vrhnika", "m": 71, "l": 1981, "p": 3564, "v": -4, "d": "mar 26"}, {"n": "Vrtnarija 2A, Vrhnika", "m": 42, "l": 2000, "p": 4196, "v": 13, "d": "mar 26"}, {"n": "Poštna Ulica 3A, Vrhnika", "m": 72, "l": 1976, "p": 3711, "v": 0, "d": "feb 26"}, {"n": "Vrtnarija 8B, Vrhnika", "m": 56, "l": 2003, "p": 4528, "v": 22, "d": "feb 26"}, {"n": "Kopališka Ulica 3B, Vrhnika", "m": 99, "l": 1948, "p": 3646, "v": -2, "d": "feb 26"}], "lj|fužine": [{"n": "Agrokombinatska Cesta 13B, Ljubljana", "m": 83, "l": 1956, "p": 3519, "v": -17, "d": "jan 26"}, {"n": "Agrokombinatska Cesta 5, Ljubljana", "m": 76, "l": 1968, "p": 4897, "v": 15, "d": "jan 26"}, {"n": "Vevška Cesta 50, Ljubljana", "m": 80, "l": 1900, "p": 3516, "v": -17, "d": "jan 26"}, {"n": "Zaloška Cesta 269, Ljubljana", "m": 60, "l": 1995, "p": 3200, "v": -25, "d": "jan 26"}, {"n": "Pot V Zeleni Gaj 18C, Ljubljana", "m": 112, "l": 2024, "p": 3884, "v": -9, "d": "dec 25"}, {"n": "Hladilniška Pot 26A, Ljubljana", "m": 36, "l": 1975, "p": 5256, "v": 24, "d": "dec 25"}], "se|medvode": [{"n": "Kamniška Cesta 66, Vodice", "m": 52, "l": 1963, "p": 2885, "v": -25, "d": "mar 26"}, {"n": "Donova Cesta 2, Medvode", "m": 33, "l": 1998, "p": 4407, "v": 14, "d": "feb 26"}, {"n": "Škofjeloška Cesta 11, Medvode", "m": 76, "l": 1978, "p": 4085, "v": 6, "d": "dec 25"}, {"n": "Valburga 5A", "m": 90, "l": 1954, "p": 2533, "v": -35, "d": "dec 25"}, {"n": "Kržišnikova Ulica 4, Medvode", "m": 52, "l": 1967, "p": 4070, "v": 5, "d": "nov 25"}, {"n": "Ulica K Studencu 8, Medvode", "m": 36, "l": 1960, "p": 3976, "v": 3, "d": "nov 25"}], "lj|šentvid": [{"n": "Prušnikova Ulica 9, Ljubljana", "m": 40, "l": 1965, "p": 7481, "v": 62, "d": "mar 26"}, {"n": "Zvezda 13, Ljubljana", "m": 75, "l": 1954, "p": 3728, "v": -19, "d": "mar 26"}, {"n": "Prušnikova Ulica 5, Ljubljana", "m": 90, "l": 1965, "p": 4425, "v": -4, "d": "mar 26"}, {"n": "Tacenska Cesta 155, Ljubljana", "m": 140, "l": 2021, "p": 6820, "v": 48, "d": "mar 26"}, {"n": "Ulica Pregnancev 13, Ljubljana", "m": 77, "l": 1952, "p": 4189, "v": -9, "d": "mar 26"}, {"n": "Flandrova Ulica 10, Ljubljana", "m": 75, "l": 1951, "p": 3914, "v": -15, "d": "feb 26"}], "lj|center": [{"n": "Salendrova Ulica 6, Ljubljana", "m": 106, "l": 0, "p": 2748, "v": -45, "d": "mar 26"}, {"n": "Gradišče 6, Ljubljana", "m": 136, "l": 1908, "p": 4904, "v": -2, "d": "mar 26"}, {"n": "Bičevje 7, Ljubljana", "m": 40, "l": 1961, "p": 4867, "v": -3, "d": "mar 26"}, {"n": "Cankarjeva Cesta 11, Ljubljana", "m": 160, "l": 1875, "p": 4961, "v": -1, "d": "mar 26"}, {"n": "Štefanova Ulica 8, Ljubljana", "m": 105, "l": 1932, "p": 5794, "v": 15, "d": "mar 26"}, {"n": "Mestni Trg 18, Ljubljana", "m": 65, "l": 1815, "p": 4846, "v": -4, "d": "feb 26"}], "ko": [{"n": "Trg Zbora Odposlancev 43, Kočevje", "m": 115, "l": 1900, "p": 1185, "v": -44, "d": "mar 26"}, {"n": "Knafljev Trg 14, Ribnica", "m": 48, "l": 1979, "p": 2264, "v": 7, "d": "mar 26"}, {"n": "Ulica Heroja Marinclja 11, Kočevje", "m": 36, "l": 1988, "p": 1987, "v": -7, "d": "feb 26"}, {"n": "Kidričeva Ulica 6, Kočevje", "m": 41, "l": 1964, "p": 2541, "v": 20, "d": "feb 26"}, {"n": "Tesarska Ulica 3A, Kočevje", "m": 61, "l": 1976, "p": 2569, "v": 21, "d": "feb 26"}, {"n": "Tesarska Ulica 5B, Kočevje", "m": 79, "l": 1976, "p": 1933, "v": -9, "d": "feb 26"}], "jm": [{"n": "Kolodvorska Ulica 2, Slovenska Bistrica", "m": 129, "l": 1912, "p": 1574, "v": -25, "d": "mar 26"}, {"n": "Kidričeva Ulica 6, Ruše", "m": 46, "l": 1960, "p": 2112, "v": 1, "d": "mar 26"}, {"n": "Ulica Ruške Čete 2A, Ruše", "m": 79, "l": 1979, "p": 2349, "v": 13, "d": "mar 26"}, {"n": "Ulica Pohorskega Bataljona 9, Ruše", "m": 69, "l": 1958, "p": 2352, "v": 13, "d": "mar 26"}, {"n": "Rogla 59B", "m": 21, "l": 1989, "p": 2862, "v": 37, "d": "mar 26"}, {"n": "Ulica Pohorskega Bataljona 4, Ruše", "m": 71, "l": 1967, "p": 2335, "v": 12, "d": "feb 26"}], "lj|viško": [{"n": "Preglov Trg 6, Ljubljana", "m": 38, "l": 1985, "p": 4493, "v": -10, "d": "mar 26"}, {"n": "Tržaška Cesta 49, Ljubljana", "m": 85, "l": 1987, "p": 4250, "v": -15, "d": "mar 26"}, {"n": "Rusjanov Trg 9, Ljubljana", "m": 68, "l": 1987, "p": 5557, "v": 11, "d": "mar 26"}, {"n": "Polje, Cesta Xxii 1", "m": 34, "l": 1932, "p": 5248, "v": 5, "d": "mar 26"}, {"n": "Tržaška Cesta 121, Ljubljana", "m": 68, "l": 1979, "p": 4663, "v": -7, "d": "mar 26"}, {"n": "Jamova Cesta 50, Ljubljana", "m": 61, "l": 1986, "p": 6356, "v": 27, "d": "mar 26"}], "go": [{"n": "Deteljica 9, Bistrica Pri Tržiču", "m": 23, "l": 1975, "p": 2576, "v": -10, "d": "mar 26"}, {"n": "Zali Log 10", "m": 166, "l": 1892, "p": 1103, "v": -62, "d": "mar 26"}, {"n": "Ravne 17A, Tržič", "m": 37, "l": 1984, "p": 3689, "v": 29, "d": "feb 26"}, {"n": "Cankarjeva Cesta 21, Tržič", "m": 51, "l": 1957, "p": 3614, "v": 26, "d": "feb 26"}, {"n": "Trg Svobode 13, Tržič", "m": 56, "l": 1845, "p": 2032, "v": -29, "d": "feb 26"}, {"n": "Za Mošenikom 3, Tržič", "m": 113, "l": 2005, "p": 2129, "v": -26, "d": "feb 26"}], "kp": [{"n": "Cesta Prvih Borcev 19, Brestanica", "m": 45, "l": 1962, "p": 1448, "v": -32, "d": "mar 26"}, {"n": "Delavska Ulica 6, Senovo", "m": 46, "l": 1986, "p": 2139, "v": 0, "d": "mar 26"}, {"n": "Bračičeva Ulica 5, Senovo", "m": 99, "l": 1923, "p": 1012, "v": -53, "d": "mar 26"}, {"n": "Cesta 4. Julija 67, Krško", "m": 75, "l": 1974, "p": 2342, "v": 9, "d": "mar 26"}, {"n": "Cesta Krških Žrtev 49A, Krško", "m": 68, "l": 1988, "p": 2368, "v": 11, "d": "feb 26"}, {"n": "Zdolska Cesta 14, Krško", "m": 91, "l": 1952, "p": 2014, "v": -6, "d": "feb 26"}], "ks": [{"n": "Levstikova Ulica 6, Sežana", "m": 47, "l": 2006, "p": 3218, "v": 3, "d": "mar 26"}, {"n": "Partizanska Cesta 66, Sežana", "m": 60, "l": 1989, "p": 3179, "v": 2, "d": "mar 26"}, {"n": "Cesta Na Lenivec 24, Sežana", "m": 51, "l": 1982, "p": 3597, "v": 16, "d": "feb 26"}, {"n": "Ulica Ivana Turšiča 7, Sežana", "m": 44, "l": 1975, "p": 3284, "v": 6, "d": "jan 26"}, {"n": "Vojkova Ulica 7, Sežana", "m": 63, "l": 1959, "p": 2790, "v": -10, "d": "jan 26"}, {"n": "Partizanska Cesta 1, Sežana", "m": 19, "l": 1806, "p": 2094, "v": -33, "d": "jan 26"}], "sg": [{"n": "Podgradje 27", "m": 32, "l": 1878, "p": 718, "v": -61, "d": "mar 26"}, {"n": "Cmureška Cesta 1, Lenart V Slov. Goricah", "m": 51, "l": 1980, "p": 2571, "v": 41, "d": "mar 26"}, {"n": "Branoslavci 16", "m": 52, "l": 1999, "p": 1558, "v": -15, "d": "mar 26"}, {"n": "Sladki Vrh 8", "m": 44, "l": 1975, "p": 2464, "v": 35, "d": "mar 26"}, {"n": "Gubčeva Ulica 6, Lenart V Slov. Goricah", "m": 65, "l": 1998, "p": 2661, "v": 46, "d": "mar 26"}, {"n": "Ormoška Cesta 11A, Ljutomer", "m": 69, "l": 1968, "p": 2085, "v": 14, "d": "mar 26"}], "ve": [{"n": "Ulica Luke Svetca 7, Litija", "m": 66, "l": 2010, "p": 3288, "v": 7, "d": "mar 26"}, {"n": "Maistrova Ulica 10, Litija", "m": 61, "l": 1985, "p": 3355, "v": 9, "d": "mar 26"}, {"n": "Parmova Ulica 4, Litija", "m": 75, "l": 2025, "p": 4097, "v": 34, "d": "feb 26"}, {"n": "Staretov Trg 24A, Šmartno Pri Litiji", "m": 215, "l": 1988, "p": 2574, "v": -16, "d": "jan 26"}, {"n": "Trg Na Stavbah 2, Litija", "m": 66, "l": 1965, "p": 3163, "v": 3, "d": "jan 26"}, {"n": "Maistrova Ulica 2, Litija", "m": 39, "l": 1983, "p": 3067, "v": 0, "d": "dec 25"}], "pt|ptuj": [{"n": "Ulica 5. Prekomorske 16, Ptuj", "m": 83, "l": 1991, "p": 2250, "v": 3, "d": "mar 26"}, {"n": "Volkmerjeva Cesta 7, Ptuj", "m": 77, "l": 1971, "p": 2090, "v": -5, "d": "mar 26"}, {"n": "Potrčeva Cesta 40, Ptuj", "m": 94, "l": 1960, "p": 1890, "v": -14, "d": "mar 26"}, {"n": "Kraigherjeva Ulica 25, Ptuj", "m": 63, "l": 1980, "p": 2151, "v": -2, "d": "mar 26"}, {"n": "Žnidaričevo Nabrežje 8, Ptuj", "m": 58, "l": 1880, "p": 1478, "v": -32, "d": "feb 26"}, {"n": "Kvedrova Ulica 4, Ptuj", "m": 40, "l": 1974, "p": 3136, "v": 43, "d": "feb 26"}], "ob|piran": [{"n": "Prešernovo Nabrežje 24, Piran", "m": 60, "l": 1970, "p": 7750, "v": 55, "d": "mar 26"}, {"n": "Prvomajski Trg 3, Piran", "m": 102, "l": 0, "p": 5796, "v": 16, "d": "mar 26"}, {"n": "Tomšičeva Ulica 39, Piran", "m": 19, "l": 1911, "p": 4813, "v": -4, "d": "mar 26"}, {"n": "Kriva Ulica 6, Piran", "m": 33, "l": 1900, "p": 5657, "v": 13, "d": "mar 26"}, {"n": "Gregorčičeva Ulica 21, Piran", "m": 78, "l": 0, "p": 5924, "v": 18, "d": "mar 26"}, {"n": "Tomšičeva Ulica 3, Piran", "m": 24, "l": 0, "p": 6444, "v": 29, "d": "mar 26"}], "ko2|mežica": [{"n": "Trg 4. Aprila 6B, Mežica", "m": 75, "l": 1984, "p": 1821, "v": 10, "d": "mar 26"}, {"n": "Leška Cesta 1A, Mežica", "m": 62, "l": 1975, "p": 1691, "v": 2, "d": "mar 26"}, {"n": "Trg 4. Aprila 6B, Mežica", "m": 33, "l": 1984, "p": 1535, "v": -8, "d": "mar 26"}, {"n": "Prežihova Ulica 9, Mežica", "m": 105, "l": 1957, "p": 1815, "v": 9, "d": "jan 26"}, {"n": "Trg 4. Aprila 6A, Mežica", "m": 63, "l": 1984, "p": 1894, "v": 14, "d": "dec 25"}, {"n": "Prežihova Ulica 15, Mežica", "m": 59, "l": 1970, "p": 1773, "v": 7, "d": "nov 25"}], "se|šentjakob": [{"n": "Dolsko 113", "m": 64, "l": 2003, "p": 3636, "v": -2, "d": "maj 25"}, {"n": "Dolsko 113", "m": 83, "l": 2003, "p": 3726, "v": 0, "d": "mar 25"}, {"n": "Dol Pri Ljubljani 32B", "m": 66, "l": 2025, "p": 4367, "v": 17, "d": "mar 25"}], "ko2": [{"n": "Tržna Ulica 1A, Radlje Ob Dravi", "m": 103, "l": 2000, "p": 689, "v": -57, "d": "mar 26"}, {"n": "Robindvor 36, Dravograd", "m": 27, "l": 1977, "p": 1872, "v": 17, "d": "mar 26"}, {"n": "Robindvor 39, Dravograd", "m": 62, "l": 1975, "p": 2272, "v": 42, "d": "mar 26"}, {"n": "Trg 4. Julija 24, Dravograd", "m": 64, "l": 1935, "p": 1410, "v": -12, "d": "mar 26"}, {"n": "Mariborska Cesta 35B, Dravograd", "m": 69, "l": 1975, "p": 1985, "v": 24, "d": "mar 26"}, {"n": "Pod Gradom 124, Dravograd", "m": 59, "l": 1924, "p": 1765, "v": 10, "d": "jan 26"}], "ju": [{"n": "Šentvid Pri Stični 59B", "m": 65, "l": 1975, "p": 3324, "v": -17, "d": "mar 26"}, {"n": "Ljubljanska Cesta 30B, Ivančna Gorica", "m": 38, "l": 1981, "p": 4352, "v": 9, "d": "mar 26"}, {"n": "Ljubljanska Cesta 12, Ivančna Gorica", "m": 92, "l": 1895, "p": 2659, "v": -34, "d": "mar 26"}, {"n": "Ulica 6. Junija 12A, Ivančna Gorica", "m": 42, "l": 2004, "p": 5473, "v": 37, "d": "mar 26"}, {"n": "Ulica 6. Junija 12A, Ivančna Gorica", "m": 44, "l": 2004, "p": 4960, "v": 24, "d": "feb 26"}, {"n": "Gradišnikova Ulica 18, Borovnica", "m": 33, "l": 1981, "p": 4346, "v": 9, "d": "feb 26"}], "se|komenda": [{"n": "Moste 85B", "m": 80, "l": 2012, "p": 3975, "v": 14, "d": "feb 26"}, {"n": "Spodnje Prapreče 21B", "m": 160, "l": 2023, "p": 2497, "v": -28, "d": "feb 26"}, {"n": "Kvederčkova Ulica 3, Prevoje Pri Šentvidu", "m": 41, "l": 2001, "p": 5589, "v": 61, "d": "okt 25"}, {"n": "Krašnja 63", "m": 85, "l": 1980, "p": 2977, "v": -14, "d": "apr 25"}], "pv": [{"n": "Vrhovo 43A", "m": 69, "l": 1990, "p": 1305, "v": -26, "d": "feb 26"}, {"n": "Kolenov Graben 3, Radeče", "m": 60, "l": 1983, "p": 1735, "v": -2, "d": "feb 26"}, {"n": "Ulica Of 2, Radeče", "m": 59, "l": 1990, "p": 2373, "v": 34, "d": "feb 26"}, {"n": "Pod Vrtačo 18, Sevnica", "m": 80, "l": 1981, "p": 2048, "v": 16, "d": "feb 26"}, {"n": "Krmelj 70A", "m": 65, "l": 1988, "p": 1870, "v": 6, "d": "jan 26"}, {"n": "Kolenov Graben 1, Radeče", "m": 63, "l": 2010, "p": 2495, "v": 41, "d": "jan 26"}], "lj|črnuče": [{"n": "Cesta 24. Junija 74, Ljubljana", "m": 68, "l": 1985, "p": 4723, "v": -3, "d": "feb 26"}, {"n": "Suhadolčanova Ulica 38, Ljubljana", "m": 84, "l": 1992, "p": 4680, "v": -4, "d": "dec 25"}, {"n": "Cesta 24. Junija 44, Ljubljana", "m": 68, "l": 1951, "p": 4676, "v": -4, "d": "dec 25"}, {"n": "Pionirska Pot 14, Ljubljana", "m": 85, "l": 2002, "p": 5010, "v": 2, "d": "dec 25"}, {"n": "Cesta 24. Junija 80, Ljubljana", "m": 61, "l": 1987, "p": 4980, "v": 2, "d": "dec 25"}, {"n": "Polanškova Ulica 8, Ljubljana", "m": 63, "l": 1988, "p": 4961, "v": 1, "d": "nov 25"}], "kr|okolica": [{"n": "Trboje 35", "m": 86, "l": 2025, "p": 3952, "v": 5, "d": "mar 26"}, {"n": "Šmartno 75A", "m": 68, "l": 2023, "p": 4570, "v": 22, "d": "mar 26"}, {"n": "Sajovčevo Naselje 1, Šenčur", "m": 77, "l": 2003, "p": 3504, "v": -7, "d": "feb 26"}, {"n": "Pipanova Cesta 45, Šenčur", "m": 69, "l": 1965, "p": 4467, "v": 19, "d": "jan 26"}, {"n": "Kranjska Cesta 4, Šenčur", "m": 80, "l": 1991, "p": 2928, "v": -22, "d": "jan 26"}, {"n": "Trboje 35", "m": 66, "l": 2025, "p": 4447, "v": 19, "d": "jan 26"}], "pt|ormož": [{"n": "Ptujska Cesta 2, Ormož", "m": 62, "l": 1976, "p": 2050, "v": 29, "d": "mar 26"}, {"n": "Kolodvorska Cesta 2, Ormož", "m": 54, "l": 1972, "p": 1252, "v": -21, "d": "feb 26"}, {"n": "Mihovci Pri Vel. Nedelji 10B", "m": 59, "l": 1983, "p": 1837, "v": 16, "d": "feb 26"}, {"n": "Ptujska Cesta 13, Ormož", "m": 59, "l": 1991, "p": 1952, "v": 23, "d": "nov 25"}, {"n": "Mihovci Pri Vel. Nedelji 10B", "m": 72, "l": 1983, "p": 1694, "v": 7, "d": "okt 25"}, {"n": "Skolibrova Ulica 8, Ormož", "m": 36, "l": 1978, "p": 1634, "v": 3, "d": "sep 25"}], "go|radovljica": [{"n": "Finžgarjeva Ulica 8A, Lesce", "m": 27, "l": 1975, "p": 5847, "v": 63, "d": "feb 26"}, {"n": "Cankarjeva Ulica 31A, Radovljica", "m": 39, "l": 1981, "p": 4926, "v": 37, "d": "feb 26"}, {"n": "Gradnikova Cesta 111, Radovljica", "m": 30, "l": 1974, "p": 4486, "v": 25, "d": "feb 26"}, {"n": "Alpska Cesta 42A, Lesce", "m": 76, "l": 1850, "p": 1755, "v": -51, "d": "jan 26"}, {"n": "Alpska Cesta 42A, Lesce", "m": 39, "l": 1850, "p": 2538, "v": -29, "d": "jan 26"}, {"n": "Alpska Cesta 42A, Lesce", "m": 83, "l": 1850, "p": 1806, "v": -50, "d": "jan 26"}], "lj": [{"n": "Sneberska Cesta 99, Ljubljana", "m": 117, "l": 1960, "p": 2512, "v": -30, "d": "feb 26"}, {"n": "Ulica Borca Petra 16, Ljubljana", "m": 94, "l": 1990, "p": 2905, "v": -19, "d": "feb 26"}, {"n": "Ulica Borca Petra 16, Ljubljana", "m": 94, "l": 1990, "p": 3437, "v": -5, "d": "nov 25"}, {"n": "Ulica Borca Petra 16, Ljubljana", "m": 94, "l": 1990, "p": 3437, "v": -5, "d": "nov 25"}, {"n": "Tržaška Cesta 278, Ljubljana", "m": 66, "l": 2022, "p": 4733, "v": 31, "d": "okt 25"}, {"n": "Cesta V Prod 53A, Ljubljana", "m": 31, "l": 1965, "p": 3774, "v": 5, "d": "avg 25"}], "pt|kidričevo": [{"n": "Kajuhova Ulica 11, Kidričevo", "m": 45, "l": 1953, "p": 1700, "v": -2, "d": "jan 26"}, {"n": "Lackova Ulica 3, Kidričevo", "m": 105, "l": 1953, "p": 1623, "v": -6, "d": "dec 25"}, {"n": "Tovarniška Cesta 2, Kidričevo", "m": 92, "l": 1948, "p": 2271, "v": 31, "d": "nov 25"}, {"n": "Lovrenc Na Dravskem Polju 8D", "m": 69, "l": 1960, "p": 1930, "v": 11, "d": "avg 25"}, {"n": "Ulica Borisa Kraigherja 16, Kidričevo", "m": 100, "l": 1949, "p": 2026, "v": 17, "d": "jun 25"}, {"n": "Ulica Borisa Kraigherja 16, Kidričevo", "m": 100, "l": 1949, "p": 1974, "v": 14, "d": "jun 25"}], "lj|rudnik": [{"n": "Krivec 8, Ljubljana", "m": 43, "l": 1991, "p": 6454, "v": 31, "d": "mar 26"}, {"n": "Gornji Rudnik Iv 2, Ljubljana", "m": 72, "l": 1996, "p": 4796, "v": -3, "d": "feb 26"}, {"n": "Dolenjska Cesta 135, Ljubljana", "m": 44, "l": 1939, "p": 4938, "v": 0, "d": "nov 25"}, {"n": "Krivec 3, Ljubljana", "m": 57, "l": 1991, "p": 5274, "v": 7, "d": "nov 25"}, {"n": "Krivec 1, Ljubljana", "m": 43, "l": 1991, "p": 6617, "v": 34, "d": "jun 25"}, {"n": "Krivec 1, Ljubljana", "m": 43, "l": 1991, "p": 4358, "v": -12, "d": "jun 25"}], "ha": [{"n": "Videm Pri Ptuju 31", "m": 64, "l": 1962, "p": 1232, "v": -16, "d": "okt 25"}, {"n": "Zgornji Leskovec 10C", "m": 90, "l": 2008, "p": 1460, "v": -1, "d": "sep 25"}, {"n": "Videm Pri Ptuju 31", "m": 32, "l": 1962, "p": 2661, "v": 81, "d": "jul 25"}, {"n": "Videm Pri Ptuju 51", "m": 104, "l": 2003, "p": 1487, "v": 1, "d": "jun 25"}], "nm|dolenj": [{"n": "Kotarjeva Cesta 4, Šentjernej", "m": 38, "l": 1986, "p": 3118, "v": 24, "d": "mar 26"}, {"n": "Kotarjeva Cesta 8B, Šentjernej", "m": 85, "l": 2009, "p": 2471, "v": -1, "d": "dec 25"}, {"n": "Roje 6, Mirna", "m": 80, "l": 1964, "p": 2197, "v": -12, "d": "dec 25"}, {"n": "Sokolska Ulica 5, Mirna", "m": 85, "l": 2022, "p": 2509, "v": 0, "d": "nov 25"}, {"n": "Sokolska Ulica 5, Mirna", "m": 83, "l": 2022, "p": 2577, "v": 3, "d": "nov 25"}, {"n": "Sokolska Ulica 7, Mirna", "m": 85, "l": 2022, "p": 2317, "v": -8, "d": "okt 25"}]};
+
+function drawETN(laoKey){
+  const sec=document.getElementById('etnSection');
+  if(!sec) return;
+  
+  // Poskusi LAO, potem TAO fallback
+  let trans=ETN_TRANS[laoKey];
+  let usedKey=laoKey;
+  if(!trans||trans.length<3){
+    const tao=laoKey.split('|')[0];
+    trans=ETN_TRANS[tao];
+    usedKey=tao;
+  }
+  
+  if(!trans||!trans.length){sec.style.display='none';return;}
+  sec.style.display='block';
+  
+  const isFallback=usedKey!==laoKey;
+  const rows=trans.map(t=>{
+    const vs=t.v>=0?`<span style="color:#2D7A4F">+${t.v}%</span>`:`<span style="color:#C0392B">${t.v}%</span>`;
+    return `<tr>
+      <td>${t.n}</td>
+      <td style="text-align:right">${t.m} m\u00B2</td>
+      <td style="text-align:right">${t.l>0?t.l:'\u2014'}</td>
+      <td class="etn-ppm2" style="text-align:right">${t.p.toLocaleString('sl-SI')} \u20AC/m\u00B2</td>
+      <td style="text-align:right;font-size:.75rem">${vs}</td>
+      <td class="etn-datum" style="text-align:right">${t.d}</td>
+    </tr>`;}).join('');
+  
+  // Mobilne kartice
+  const cards=trans.map(t=>{
+    const vs=t.v>=0?`<span style="color:#2D7A4F">+${t.v}%</span>`:`<span style="color:#C0392B">${t.v}%</span>`;
+    return `<div class="etn-card">
+      <div class="etn-card-top">
+        <span class="etn-card-addr">${t.n}</span>
+        <span class="etn-card-price">${t.p.toLocaleString('sl-SI')} \u20AC/m\u00B2</span>
+      </div>
+      <div class="etn-card-meta">${t.m} m\u00B2 \u00B7 ${t.l>0?t.l:'\u2014'} \u00B7 ${vs} \u00B7 ${t.d}</div>
+    </div>`;}).join('');
+    
+  sec.innerHTML=`
+    <div class="ref-title">Zadnje prodaje${isFallback?' (regija)':' v območju'}</div>
+    <table class="etn-table">
+      <thead><tr>
+        <th>Naslov</th><th style="text-align:right">m\u00B2</th>
+        <th style="text-align:right">Leto</th>
+        <th style="text-align:right">\u20AC/m\u00B2</th>
+        <th style="text-align:right">vs. avg</th>
+        <th style="text-align:right">Datum</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div class="etn-cards">${cards}</div>
+    <div class="etn-note">Vir: ETN (Evidenca trga nepremičnin), mar 2025 \u2013 mar 2026</div>`;
+}
+
+
 const S={
   type:null, entry:null, size:70,
   year:1980,
   fasada:null, okna:null, inst:null, streha:null,
   ktAge:null,
   parcela:500,
-  garaza:0  // 0=brez, 1/2/3=število parkirnih mest
+  garaza:0,  // 0=brez, 1/2/3=število parkirnih mest
+  zunanje:0,  // 0=brez, 1/2/3=število zunanjih mest
+  atrij:0,   // 0=brez, >0=površina atrija v m\u00B2
+  kakovost:1.0  // 1.0=standard, 1.12=nadstandard, 1.25=luksuz
 };
 
-// ── UTILS ────────────────────────────────────────────────────────
-const fmt=n=>n.toLocaleString('sl-SI')+' €';
-const fmtM2=n=>n.toLocaleString('sl-SI')+' €/m²';
-const norm=s=>s.toLowerCase().replace(/[čć]/g,'c').replace(/š/g,'s').replace(/ž/g,'z').replace(/đ/g,'d').replace(/[–\-]/g,' ').trim();
+
+const fmt=n=>n.toLocaleString('sl-SI')+' \u20AC';
+const fmtM2=n=>n.toLocaleString('sl-SI')+' \u20AC/m\u00B2';
+const norm=s=>s.toLowerCase().replace(/[čć]/g,'c').replace(/š/g,'s').replace(/ž/g,'z').replace(/đ/g,'d').replace(/[\u2013\-]/g,' ').trim();
 
 function getData(type,key){return PODATKI[type][key]||null;}
 function getKey(entry){return entry?(S.type==='stanovanje'?entry.sk:entry.hk):null;}
 function dispPrice(entry){
-  if(!entry)return'—';
+  if(!entry)return'\u2014';
   const key=getKey(entry);
   const d=getData(S.type,key)||getData(S.type,key.split('|')[0]);
-  if(!d)return'—';
+  if(!d)return'\u2014';
   return S.type==='stanovanje'?fmtM2(d.cena_m2):fmt(d.cena_h);
 }
 
@@ -983,16 +1158,26 @@ function go(n){
   setProgress(n);
   if(n===3){
     const iH=S.type==='hisa';
-    document.getElementById('s3title').textContent=iH?'Površina hiše':'Površina stanovanja';
-    document.getElementById('s3sub').textContent=iH?'Vnesite neto tlorisno površino hiše v m².':'Vnesite uporabno površino v m².';
+    document.getElementById('s3title').textContent=iH?'Povr\u0161ina hiše':'Povr\u0161ina stanovanja';
+    document.getElementById('s3sub').textContent=iH?'Vnesite neto tlorisno površino hiše v m\u00B2.':'Vnesite uporabno površino v m\u00B2.';
     const sl=document.getElementById('sizeSlider');
-    if(iH){sl.min=60;sl.max=600;sl.value=Math.max(60,Math.min(600,S.size||160));document.getElementById('sizeMin').textContent='60 m²';document.getElementById('sizeMax').textContent='600 m²';}
-    else{sl.min=20;sl.max=300;sl.value=Math.max(20,Math.min(300,S.size||70));document.getElementById('sizeMin').textContent='20 m²';document.getElementById('sizeMax').textContent='300 m²';}
+    if(iH){sl.min=60;sl.max=600;sl.value=Math.max(60,Math.min(600,S.size||160));document.getElementById('sizeMin').textContent='60 m\u00B2';document.getElementById('sizeMax').textContent='600 m\u00B2';}
+    else{sl.min=20;sl.max=300;sl.value=Math.max(20,Math.min(300,S.size||70));document.getElementById('sizeMin').textContent='20 m\u00B2';document.getElementById('sizeMax').textContent='300 m\u00B2';}
     onSize(sl.value);
     // Pokaži/skrij parcela slider
     document.getElementById('parcelaWrap').style.display=iH?'block':'none';
     document.getElementById('garazaWrap').style.display=iH?'none':'block';
-    if(!iH) selGaraza(S.garaza||0);
+    if(!iH){
+      selGaraza(S.garaza||0);
+      selZunanje(S.zunanje||0);
+    }
+    document.getElementById('atrijWrap').style.display=iH?'none':'block';
+    if(!iH&&S.atrij>0){
+      document.getElementById('atrijToggleBtn').classList.add('sel');
+      document.getElementById('atrijSliderWrap').style.display='block';
+      document.getElementById('atrijSlider').value=S.atrij;
+      document.getElementById('atrijNum').textContent=S.atrij;
+    }
     if(iH){
       // Nastavi parcela slider na referenčno vrednost iz podatkov če je na voljo
       const key=S.entry?S.entry.hk:null;
@@ -1010,7 +1195,7 @@ function go(n){
       document.getElementById('disp-'+id).textContent=defYr;
       // Če je bila komponenta že aktivirana, posodobi vrednost
       if(S[id]===null){
-        // ni obnovljeno — ne naredi nič
+        // ni obnovljeno \u2014 ne naredi nič
       }
     });
   }
@@ -1022,7 +1207,7 @@ function selType(btn,t){
   document.getElementById('btn1').disabled=false;
 }
 
-// ── SEARCH ──────────────────────────────────────────────────────
+
 let _matches=[],_focus=-1;
 function highlight(text,q){
   const ni=norm(text),nq=norm(q),idx=ni.indexOf(nq);
@@ -1031,26 +1216,19 @@ function highlight(text,q){
 }
 document.addEventListener('DOMContentLoaded',()=>{
   const inp=document.getElementById('locInput');
-  const dd=document.getElementById('dropdown');
-  inp.addEventListener('input',()=>{
-    const q=inp.value.trim();
-    document.getElementById('clearBtn').style.display=q?'block':'none';
-    if(!q){dd.classList.remove('open');dd.innerHTML='';return;}
-    renderDD(q);
-  });
+  if(!inp) return;
   inp.addEventListener('keydown',e=>{
-    const items=dd.querySelectorAll('.dd-item');
-    if(e.key==='ArrowDown'){_focus=Math.min(_focus+1,items.length-1);focusDD(items);e.preventDefault();}
-    else if(e.key==='ArrowUp'){_focus=Math.max(_focus-1,0);focusDD(items);e.preventDefault();}
-    else if(e.key==='Enter'&&_focus>=0&&items[_focus])items[_focus].click();
-    else if(e.key==='Escape')dd.classList.remove('open');
+    const items=document.querySelectorAll('#locDD .dd-item');
+    if(e.key==='ArrowDown'){e.preventDefault();if(items[0])items[0].focus();}
   });
-  document.addEventListener('click',e=>{if(!e.target.closest('#searchWrap'))dd.classList.remove('open');});
+  document.getElementById('locInput').addEventListener('focus',()=>{
+    if(document.getElementById('locInput').value) renderDD(document.getElementById('locInput').value);
+  });
 });
-function focusDD(items){items.forEach((it,i)=>it.classList.toggle('focused',i===_focus));if(items[_focus])items[_focus].scrollIntoView({block:'nearest'});}
 function renderDD(q){
-  const dd=document.getElementById('dropdown');
+  const dd=document.getElementById('locDD');
   const nq=norm(q);
+  if(!nq||nq.length<2){dd.style.display='none';dd.innerHTML='';return;}
   _matches=KRAJI.filter(e=>norm(e.k).includes(nq)||norm(e.tags||'').includes(nq))
     .sort((a,b)=>{
       const ak=norm(a.k),bk=norm(b.k);
@@ -1063,20 +1241,23 @@ function renderDD(q){
     })
     .slice(0,8);
   _focus=-1;
-  if(!_matches.length){dd.innerHTML='<div class="dd-empty">Kraj ni najden — poskusite z večjim bližnjim mestom.</div>';dd.classList.add('open');return;}
+  if(!_matches.length){dd.style.display='none';return;}
   dd.innerHTML=_matches.map((e,i)=>{
     const key=S.type==='stanovanje'?e.sk:e.hk;
     const d=getData(S.type,key)||getData(S.type,key.split('|')[0]);
-    if(!d)return'';
-    const price=S.type==='stanovanje'?fmtM2(d.cena_m2):fmt(d.cena_h);
-    return`<div class="dd-item" onclick="pickKraj(${i})">
-      <div class="dd-left"><span class="dd-kraj">${highlight(e.k,q)}</span><span class="dd-tao">${d.label}</span></div>
-      <span class="dd-price">${price}</span>
+    const price=d?(S.type==='stanovanje'?fmtM2(d.cena_m2):fmt(d.cena_h)):'';
+    return `<div class="dd-item" tabindex="0" onclick="selectLoc(${i})" onkeydown="if(event.key==='Enter')selectLoc(${i})"
+      style="padding:.75rem 1rem;cursor:pointer;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:.88rem"
+      onmouseover="this.style.background='rgba(192,154,74,.06)'" onmouseout="this.style.background=''">
+      <span>${highlight(e.k,q)}</span>
+      <span style="color:var(--muted);font-size:.78rem">${price}</span>
     </div>`;
   }).join('');
-  dd.classList.add('open');
+  dd.style.display='block';
 }
-function pickKraj(i){
+
+
+function selectLoc(i){
   const e=_matches[i];if(!e)return;
   S.entry=e;
   const key=S.type==='stanovanje'?e.sk:e.hk;
@@ -1085,36 +1266,154 @@ function pickKraj(i){
   document.getElementById('pillKraj').textContent=e.k;
   document.getElementById('pillTao').textContent=d.label;
   document.getElementById('pillPrice').textContent=S.type==='stanovanje'?fmtM2(d.cena_m2):fmt(d.cena_h);
-  document.getElementById('locPill').classList.add('show');
-  document.getElementById('searchWrap').style.display='none';
-  document.getElementById('dropdown').classList.remove('open');
+  const _pill=document.getElementById('locPill');
+  const _sw=document.getElementById('searchWrap');
+  if(_pill) _pill.classList.add('show');
+  if(_sw) _sw.style.display='none';
+  const _dd=document.getElementById('locDD'); if(_dd) _dd.style.display='none';
   document.getElementById('btn2').disabled=false;
 }
 function resetSearch(){
   S.entry=null;
-  document.getElementById('locPill').classList.remove('show');
-  document.getElementById('searchWrap').style.display='block';
+  const pill=document.getElementById('locPill');
+  const sw=document.getElementById('searchWrap');
+  if(pill) pill.classList.remove('show');
+  if(sw) sw.style.display='block';
   document.getElementById('locInput').value='';
-  document.getElementById('clearBtn').style.display='none';
+  const _cb=document.getElementById('clearBtn'); if(_cb) _cb.style.display='none';
   document.getElementById('btn2').disabled=true;
 }
 function clearInput(){
   document.getElementById('locInput').value='';
-  document.getElementById('dropdown').classList.remove('open');
-  document.getElementById('clearBtn').style.display='none';
+  const _dd=document.getElementById('locDD'); if(_dd) _dd.style.display='none';
+  const _cb=document.getElementById('clearBtn'); if(_cb) _cb.style.display='none';
   document.getElementById('locInput').focus();
 }
+function selKakovost(tip, mult){
+  S.kakovost=mult;
+  ['standard','nadstandard','luksuz'].forEach(t=>{
+    const b=document.getElementById('kval-'+t);
+    if(b) b.classList.toggle('sel', t===tip);
+  });
+}
+
+function toggleAtrij(btn){
+  const hasAtrij = btn.classList.contains('sel');
+  if(hasAtrij){
+    btn.classList.remove('sel');
+    document.getElementById('atrijSliderWrap').style.display='none';
+    S.atrij=0;
+  } else {
+    btn.classList.add('sel');
+    document.getElementById('atrijSliderWrap').style.display='block';
+    const val=parseInt(document.getElementById('atrijSlider').value)||30;
+    S.atrij=val;
+    document.getElementById('atrijNum').textContent=val;
+  }
+}
+function onAtrij(v){
+  S.atrij=parseInt(v);
+  document.getElementById('atrijNum').textContent=v;
+}
+
+function selParkType(type){
+  S.parkType=type;
+  ['garaza','zunanje'].forEach(t=>{
+    const b=document.getElementById('park-type-'+t);
+    if(b) b.classList.toggle('sel', t===type);
+  });
+  // Pokaži izbiro števila mest
+  const wrap=document.getElementById('parkStNum');
+  if(wrap) wrap.style.display='block';
+  // Ohrani trenutno število
+  selGaraza(S.garaza||1);
+}
+
+function selZunanje(n){
+  S.zunanje=n;
+  [0,1,2,3].forEach(i=>{
+    const b=document.getElementById('zunanje-'+i);
+    if(b) b.classList.toggle('sel', i===n);
+  });
+}
+
 function selGaraza(n){
   S.garaza=n;
   [0,1,2,3].forEach(i=>{
     const b=document.getElementById('garaza-'+i);
     if(b) b.classList.toggle('sel', i===n);
   });
+  // Skrij število če je 0
+  const wrap=document.getElementById('parkStNum');
+  if(wrap&&n===0){
+    wrap.style.display='none';
+    S.parkType='garaza';
+    ['garaza','zunanje'].forEach(t=>{
+      const b=document.getElementById('park-type-'+t);
+      if(b) b.classList.remove('sel');
+    });
+  }
 }
 
-function onSize(v){S.size=parseInt(v);document.getElementById('sizeNum').textContent=v;}
-function onParcela(v){S.parcela=parseInt(v);S.parcelaSet=true;document.getElementById('parcelaNum').textContent=parseInt(v).toLocaleString('sl-SI');}
-function onYear(v){S.year=parseInt(v);document.getElementById('yearNum').textContent=v;}
+function onSize(v){
+  const n=Math.max(20,Math.min(600,parseInt(v)||70));
+  S.size=n;
+  const sl=document.getElementById('sizeSlider');
+  const mn=document.getElementById('sizeManual');
+  if(sl) sl.value=Math.min(n,parseInt(sl.max));
+  if(mn&&parseInt(mn.value)!==n) mn.value=n;
+}
+function onSizeManual(v){
+  const n=parseInt(v);
+  if(isNaN(n)||n<1) return;
+  S.size=n;
+  const sl=document.getElementById('sizeSlider');
+  if(sl) sl.value=Math.min(n,parseInt(sl.max));
+}
+
+function onParcela(v){
+  const n=Math.max(100,Math.min(10000,parseInt(v)||500));
+  S.parcela=n; S.parcelaSet=true;
+  const mn=document.getElementById('parcelaManual');
+  if(mn&&parseInt(mn.value)!==n) mn.value=n;
+}
+function onParcelaManual(v){
+  const n=parseInt(v);
+  if(isNaN(n)||n<1) return;
+  S.parcela=n; S.parcelaSet=true;
+  const sl=document.getElementById('parcelaSlider');
+  if(sl) sl.value=Math.min(n,parseInt(sl.max));
+}
+
+function onYear(v){
+  const n=Math.max(1900,Math.min(2026,parseInt(v)||1980));
+  S.year=n;
+  const sl=document.getElementById('yearSlider');
+  const mn=document.getElementById('yearManual');
+  if(sl) sl.value=Math.min(n,parseInt(sl.max));
+  if(mn&&parseInt(mn.value)!==n) mn.value=n;
+}
+function onYearManual(v){
+  const n=parseInt(v);
+  if(isNaN(n)||n<1900||n>2026) return;
+  S.year=n;
+  const sl=document.getElementById('yearSlider');
+  if(sl) sl.value=Math.min(n,parseInt(sl.max));
+}
+
+function onAtrij(v){
+  const n=parseInt(v);
+  S.atrij=n;
+  const mn=document.getElementById('atrijManual');
+  if(mn&&parseInt(mn.value)!==n) mn.value=n;
+}
+function onAtrijManual(v){
+  const n=parseInt(v);
+  if(isNaN(n)||n<1) return;
+  S.atrij=n;
+  const sl=document.getElementById('atrijSlider');
+  if(sl) sl.value=Math.min(n,parseInt(sl.max));
+}
 
 function toggleComp(id){
   const tog=document.getElementById('tog-'+id);
@@ -1134,15 +1433,26 @@ function toggleComp(id){
     // Set slider default to year of construction if known
     const defYr=Math.max(S.year||1980, 1945);
     document.getElementById('sl-'+id).value=defYr;
-    document.getElementById('disp-'+id).textContent=defYr;
     S[id]=defYr;
     tog.textContent=defYr+'';
+    const mn=document.getElementById('manual-'+id);
+    if(mn) mn.value=defYr;
   }
 }
 function onComp(id,v){
-  S[id]=parseInt(v);
-  document.getElementById('disp-'+id).textContent=v;
-  document.getElementById('tog-'+id).textContent=v;
+  const n=parseInt(v);
+  S[id]=n;
+  const mn=document.getElementById('manual-'+id);
+  if(mn&&parseInt(mn.value)!==n) mn.value=n;
+  document.getElementById('tog-'+id).textContent=n;
+}
+function onCompManual(id,v){
+  const n=parseInt(v);
+  if(isNaN(n)||n<1900||n>2026) return;
+  S[id]=n;
+  const sl=document.getElementById('sl-'+id);
+  if(sl) sl.value=Math.min(n,parseInt(sl.max));
+  document.getElementById('tog-'+id).textContent=n;
 }
 function selKt(btn,age){
   document.querySelectorAll('.kt-btn').forEach(b=>b.classList.remove('sel'));
@@ -1151,7 +1461,7 @@ function selKt(btn,age){
   document.getElementById('btn4').disabled=false;
 }
 
-// Efektivna starost po ponderih — ločeno za stanovanje in hišo
+// Effective age po ponderih \u2014 ločeno za stanovanje in hišo
 // Stanovanje: konstrukcija 30%, instalacije 20%, fasada 15%, streha 5%, okna 15%, kratkotrajne 15%
 // Hiša:       konstrukcija 35%, instalacije 20%, fasada 15%, streha 10%, okna 10%, kratkotrajne 10%
 function calcEffectiveAge(){
@@ -1169,7 +1479,7 @@ function calcEffectiveAge(){
   }
 }
 
-// ── RESULT ──────────────────────────────────────────────────────
+
 function showResult(){
   S.size=parseInt(document.getElementById('sizeSlider').value);
   S.year=parseInt(document.getElementById('yearSlider').value);
@@ -1184,10 +1494,10 @@ function showResult(){
     const key=isS?S.entry.sk:S.entry.hk;
     const d=getData(S.type,key)||getData(S.type,key.split('|')[0]);
     const refLeto=d.ref_leto;
-    // Efektivna starost uporabnikovega stanovanja
+    // Effective age uporabnikovega stanovanja
     const effAge=calcEffectiveAge();
-    // Efektivna starost referenčnega stanovanja (GURS mediana):
-    // Predpostavljamo povprečno obnovljeno stanovanje — komponente so bile
+    // Effective age referenčnega stanovanja (GURS mediana):
+    // Predpostavljamo povprečno obnovljeno stanovanje \u2014 komponente so bile
     // obnovljene vsaj 1x tekom življenjske dobe (kar GURS mediana odraža).
     // Konstrukcija nikoli ne obnoviš, ostalo ima max starost po tipični dobi.
     function calcRefEffAge(refL){
@@ -1195,25 +1505,25 @@ function showResult(){
       const age=2025-refL;
       if(S.type==='stanovanje'){
         // Stan: konstr 30%, inst 20%, fasada 15%, streha 5%, okna 15%, kt 15%
-        return 0.30*age              // konstrukcija — polna starost
-             + 0.20*Math.min(25,age) // inštalacije — max 25 let
-             + 0.15*Math.min(20,age) // fasada — max 20 let
-             + 0.05*Math.min(30,age) // streha — max 30 let
-             + 0.15*Math.min(15,age) // okna — max 15 let
-             + 0.15*15;              // kratkotrajne — "dobro stanje" = 15 let
+        return 0.30*age              // konstrukcija \u2014 polna starost
+             + 0.20*Math.min(25,age) // inštalacije \u2014 max 25 let
+             + 0.15*Math.min(20,age) // fasada \u2014 max 20 let
+             + 0.05*Math.min(30,age) // streha \u2014 max 30 let
+             + 0.15*Math.min(15,age) // okna \u2014 max 15 let
+             + 0.15*15;              // kratkotrajne \u2014 "dobro stanje" = 15 let
       } else {
         // Hiša: konstr 40%, inst 20%, fasada 10%, streha 10%, okna 10%, kt 10%
         // Limiti odražajo dejansko povprečje obnov v GURS vzorcu
-        return 0.40*age              // konstrukcija — polna starost
-             + 0.20*Math.min(30,age) // inštalacije — max 30 let
-             + 0.10*Math.min(35,age) // fasada — max 35 let
-             + 0.10*Math.min(40,age) // streha — max 40 let
-             + 0.10*Math.min(25,age) // okna — max 25 let
-             + 0.10*25;              // kratkotrajne — "dobro stanje" = 25 let
+        return 0.40*age              // konstrukcija \u2014 polna starost
+             + 0.20*Math.min(30,age) // inštalacije \u2014 max 30 let
+             + 0.10*Math.min(35,age) // fasada \u2014 max 35 let
+             + 0.10*Math.min(40,age) // streha \u2014 max 40 let
+             + 0.10*Math.min(25,age) // okna \u2014 max 25 let
+             + 0.10*25;              // kratkotrajne \u2014 "dobro stanje" = 25 let
       }
     }
     const refEffAge=calcRefEffAge(refLeto);
-    // ageMult — ločeni parametri za stanovanje in hišo
+    // ageMult \u2014 ločeni parametri za stanovanje in hišo
     const ageDiff=refEffAge-effAge; // pozitivno = naše je mlajše od ref
     let ageMult;
     if(isS){
@@ -1239,26 +1549,36 @@ function showResult(){
       const bm=d.cena_m2;
       const rm=d.ref_m2||51;
       const sr=sizeRatio(S.size,rm);
-      const adjM2=bm*sr*ageMult;
-      // Garaža/parkirno mesto: stanM2 × 4.95 × število mest
+      const adjM2=bm*sr*ageMult*S.kakovost;
+      // Garaža/parkirno mesto: stanM2 \u00D7 4.95 \u00D7 število mest
+      // Garaža: stanM2 \u00D7 4.95, zunanje: \u00D7 0.5
       const garazaVal=S.garaza>0?Math.round(d.cena_m2*4.95/500)*500*S.garaza:0;
+      const zunanjeVal=S.zunanje>0?Math.round(d.cena_m2*4.95*0.5/500)*500*S.zunanje:0;
+      // Atrij: 0.03 \u00D7 stanM2 \u00D7 površina_atrija (enako kot parcela pri hišah)
+      // Atrij: stanM2 \u00D7 0.198 \u00D7 površina^0.7
+      // Osnova: zunanje parkirno = 0.5 \u00D7 garaža (stanM2\u00D74.95), parking mesto = 12.5m\u00B2
+      // \u2192 \u20AC/m\u00B2 atrija = stanM2 \u00D7 2.475/12.5 = stanM2 \u00D7 0.198
+      const atrijVal=S.atrij>0?Math.round(d.cena_m2*0.198*Math.pow(S.atrij,0.7)/500)*500:0;
       ppm2=Math.round(adjM2*korekcija2026);
-      mid=Math.round((adjM2*S.size+garazaVal)*korekcija2026/1000)*1000;
-      low=Math.round((adjM2*S.size*(1-band)+garazaVal)*korekcija2026/1000)*1000;
-      high=Math.round((adjM2*S.size*(1+band)+garazaVal)*korekcija2026/1000)*1000;
+      mid=Math.round((adjM2*S.size+garazaVal+zunanjeVal+atrijVal)*korekcija2026/1000)*1000;
+      low=Math.round((adjM2*S.size*(1-band)+garazaVal+zunanjeVal+atrijVal)*korekcija2026/1000)*1000;
+      high=Math.round((adjM2*S.size*(1+band)+garazaVal+zunanjeVal+atrijVal)*korekcija2026/1000)*1000;
       const ss=sr>=1?'+':'';const as=ageMult>=1?'+':'';
-      const garazaStr=S.garaza>0?' · '+S.garaza+'× garaža +'+fmt(garazaVal):'';
-      noteStr=`Izhodišče: ${fmtM2(bm)} pri ${rm} m² · površina ${ss}${Math.round((sr-1)*100)} % · starost ${as}${Math.round((ageMult-1)*100)} % (ef. starost: ${Math.round(effAge)} let)${garazaStr}`;
+      const kStr=S.kakovost!==1.0?' \u00B7 kakovost +'+Math.round((S.kakovost-1)*100)+'%':'';
+      const garazaStr=S.garaza>0?' \u00B7 '+S.garaza+'\u00D7 garaža +'+fmt(garazaVal):'';
+      const zunanjeStr=S.zunanje>0?' \u00B7 '+S.zunanje+'\u00D7 zunanj. parking +'+fmt(zunanjeVal):'';
+      const atrijStr=S.atrij>0?' \u00B7 atrij '+S.atrij+'m\u00B2 +'+fmt(atrijVal):'';
+      noteStr=`Izhodišče: ${fmtM2(bm)} pri ${rm} m\u00B2 \u00B7 površina ${ss}${Math.round((sr-1)*100)} % \u00B7 starost ${as}${Math.round((ageMult-1)*100)} % (ef. starost: ${Math.round(effAge)} let)${kStr}${garazaStr}${zunanjeStr}${atrijStr}`;
     }else{
       const bh=d.cena_h;
       const rm=d.ref_m2||170;
-      // Površina hiše — blaga potečna korekcija (user/ref)^0.3
+      // Površina hiše \u2014 blaga potečna korekcija (user/ref)^0.3
       const sr=Math.pow(S.size/rm,0.3);
       const taoKey=S.entry.hk.split('|')[0];
       const taoStan=getData('stanovanje',taoKey);
       const stanM2=taoStan?taoStan.cena_m2:3000;
       const refZem=(taoDataH&&taoDataH.ref_zem)?taoDataH.ref_zem:500;
-      // Percentilna interpolacija: effAge/refEffAge → pozicija med p25/p50/p75
+      // Percentile interpolation: effAge/refEffAge \u2192 pozicija med p25/p50/p75
       const p25h=(taoDataH&&taoDataH.p25)?taoDataH.p25:bh*0.75;
       const p75h=(taoDataH&&taoDataH.p75)?taoDataH.p75:bh*1.25;
       function pctBase(eff,refEff,p25,p50,p75){
@@ -1268,13 +1588,15 @@ function showResult(){
         if(ratio<=1.0) return p50+((1.0-ratio)/0.5)*spread;
         return p50-Math.max(0,Math.min(1,(ratio-1.0)/1.0))*(p50-p25);
       }
-      // Regionalni capi za stroškovni pristop (€/m²) — odražajo realne gradbene stroške
-      const NOVO_CAP={lj:9999,se:9999,ju:2400,ob:9999,al:9999,kr:9999,
-        ks:2200,go:2200,ng:2000,ni:2000,ve:2200,si:2500,
-        ko:1700,bk:1600,nm:2000,kp:1700,pv:1600,
-        za:1700,sh:1700,sa:1800,sd:1800,ko2:1700,
-        mb:2200,jm:1900,ce:1900,pt:1800,sg:1700,
-        pk:1600,ha:1500};
+      // Regional caps za stroškovni pristop (\u20AC/m\u00B2)
+      // Spodnja meja = NV gradbeni strošek z DDV (~3.500 \u20AC/m\u00B2) + minimalna lokacijska premija
+      // Drage regije (stanM2\u00D71.05 > 3.578 NV_SS): brez capa (9999)
+      const NOVO_CAP={lj:9999,se:9999,ju:2200,ob:9999,al:9999,kr:9999,
+        ks:3370,go:3500,ng:3500,ni:3500,ve:3500,si:9999,
+        ko:3500,bk:3500,nm:3500,kp:3500,pv:3500,
+        za:3500,sh:3500,sa:3500,sd:3500,ko2:3500,
+        mb:3500,jm:3500,ce:3500,pt:3500,sg:3500,
+        pk:3500,ha:3500};
       // Za novogradnje (2013+): stroškovni pristop z regionalnim capom
       // Za starejše hiše: percentilna interpolacija
       let adjHisa;
@@ -1289,7 +1611,7 @@ function showResult(){
         }
         adjHisa=baseH*sr*(1+novogrPremium(S.year));
       }
-      // Parcela: 0.03 × stan mediana + sub-linearna (^0.6) + cap ±25%
+      // Parcela: 0.03 \u00D7 stan mediana + sub-linearna (^0.6) + cap \u00B125%
       const parcelaM2cena=0.03*stanM2;
       const parcelaDiff=Math.max(-adjHisa*0.40,Math.min(adjHisa*0.40,parcelaM2cena*refZem*(Math.pow(S.parcela/refZem,0.6)-1)));
       const adjTotal=adjHisa+parcelaDiff;
@@ -1301,35 +1623,55 @@ function showResult(){
       const ps=parcelaDiff>=0?'+':'';
       if(S.year>=2013){
         const novoM2=Math.round(stanM2*1.05);
-        noteStr=`Stroškovni pristop: ${fmtM2(novoM2)} × ${S.size} m² · površina ${ss}${Math.round((sr-1)*100)} % · parcela ${ps}${fmt(Math.round(parcelaDiff/1000)*1000)} (${Math.round(parcelaM2cena)} €/m²)`;
+        noteStr=`Stroškovni pristop: ${fmtM2(novoM2)} \u00D7 ${S.size} m\u00B2 \u00B7 površina ${ss}${Math.round((sr-1)*100)} % \u00B7 parcela ${ps}${fmt(Math.round(parcelaDiff/1000)*1000)} (${Math.round(parcelaM2cena)} \u20AC/m\u00B2)`;
       } else {
         const as=ageMult>=1?'+':'';
-        noteStr=`Izhodišče: ${fmt(bh)} pri ${rm} m² hiše · površina ${ss}${Math.round((sr-1)*100)} % · starost ${as}${Math.round((ageMult-1)*100)} % · parcela ${ps}${fmt(Math.round(parcelaDiff/1000)*1000)} (${Math.round(parcelaM2cena)} €/m²)`;
+        noteStr=`Izhodišče: ${fmt(bh)} pri ${rm} m\u00B2 hiše \u00B7 površina ${ss}${Math.round((sr-1)*100)} % \u00B7 starost ${as}${Math.round((ageMult-1)*100)} % \u00B7 parcela ${ps}${fmt(Math.round(parcelaDiff/1000)*1000)} (${Math.round(parcelaM2cena)} \u20AC/m\u00B2)`;
       }
     }
 
     // Confidence label glede na vzorec
     let confLabel;
-    if(n>=200)     confLabel=`Visoka zanesljivost · vzorec ${n} transakcij`;
-    else if(n>=80) confLabel=`Srednja zanesljivost · vzorec ${n} transakcij`;
-    else if(n>=30) confLabel=`Nižja zanesljivost · vzorec ${n} transakcij`;
-    else           confLabel=`Majhen vzorec (${n} transakcij) · ocena okvirna`;
+    if(n>=200)     confLabel=`Visoka zanesljivost \u00B7 vzorec ${n} transakcij`;
+    else if(n>=80) confLabel=`Srednja zanesljivost \u00B7 vzorec ${n} transakcij`;
+    else if(n>=30) confLabel=`Nižja zanesljivost \u00B7 vzorec ${n} transakcij`;
+    else           confLabel=`Majhen vzorec (${n} transakcij) \u00B7 ocena okvirna`;
 
     // Opozorilo za outlierje
     const isOutlier=(!isS&&(S.size>300||S.parcela>1500));
     if(isOutlier){
-      document.getElementById('rConfidence').textContent+=' · ⚠️ Velika hiša/parcela — ocena okvirna';
+      document.getElementById('rConfidence').textContent+=' \u00B7 ⚠️ Velika hiša/parcela \u2014 ocena okvirna';
     }
+    // Kontekst: kje je ocena glede na GURS percentile
+    let contextStr='';
+    if(!isS && taoDataH && taoDataH.p25 && taoDataH.p75){
+      if(mid > taoDataH.p75*1.03) contextStr='Vaša nepremičnina je v zgornjem kvartilu za to območje.';
+      else if(mid > d.cena_h*1.03) contextStr='Vaša nepremičnina je nad mediano za to območje.';
+      else if(mid < taoDataH.p25*1.03) contextStr='Vaša nepremičnina je v spodnjem kvartilu za to območje.';
+      else contextStr='Vaša nepremičnina je blizu mediane za to območje.';
+    } else if(isS){
+      const med=d.cena_m2;
+      const adjPpm2=ppm2/korekcija2026;
+      if(adjPpm2 > med*1.15) contextStr='Vaše stanovanje je v zgornjem kvartilu za to območje.';
+      else if(adjPpm2 > med*1.03) contextStr='Vaše stanovanje je nad mediano za to območje.';
+      else if(adjPpm2 < med*0.88) contextStr='Vaše stanovanje je v spodnjem kvartilu za to območje.';
+      else contextStr='Vaše stanovanje je blizu mediane za to območje.';
+    }
+    document.getElementById('rContext').textContent=contextStr;
     document.getElementById('rMainPrice').textContent=fmt(mid);
     document.getElementById('rPpm2').textContent=fmtM2(ppm2);
     document.getElementById('rLow').textContent=fmt(low);
     document.getElementById('rHigh').textContent=fmt(high);
-    document.getElementById('rConfidence').textContent=`±${Math.round(band*100)} % · ${confLabel}`;
+    document.getElementById('rConfidence').textContent=`\u00B1${Math.round(band*100)} % \u00B7 ${confLabel}`;
     document.getElementById('rNote').textContent=noteStr;
-    document.getElementById('sumType').textContent=isS?(S.garaza>0?'Stanovanje + '+S.garaza+'× parkirno':'Stanovanje'):'Hiša';
+    const extras=[];
+    if(S.garaza>0) extras.push(S.garaza+'\u00D7 garaža');
+    if(S.zunanje>0) extras.push(S.zunanje+'\u00D7 zunanj. parking');
+    if(S.atrij>0) extras.push('atrij '+S.atrij+'m\u00B2');
+    document.getElementById('sumType').textContent=isS?(extras.length?'Stanovanje + '+extras.join(', '):'Stanovanje'):'Hiša';
     document.getElementById('sumLoc').textContent=S.entry.k;
     document.getElementById('sumTao').textContent=d.label;
-    document.getElementById('sumSize').textContent=S.size+' m²'+(S.type==='hisa'?' · parcela '+S.parcela.toLocaleString('sl-SI')+' m²':'');
+    document.getElementById('sumSize').textContent=S.size+' m\u00B2'+(S.type==='hisa'?' \u00B7 parcela '+S.parcela.toLocaleString('sl-SI')+' m\u00B2':'');
     document.getElementById('sumYear').textContent=S.year;
     // Komponente za prikaz
     const ktLabels={5:'Prenovljeno',15:'Dobro stanje',30:'Rabljeno',50:'Obrabljeno'};
@@ -1338,31 +1680,34 @@ function showResult(){
     if(S.okna)compParts.push('Okna '+S.okna);
     if(S.inst)compParts.push('Inštalacije '+S.inst);
     if(S.streha)compParts.push('Streha '+S.streha);
-    compParts.push('Notranjost: '+(ktLabels[S.ktAge]||'—'));
-    document.getElementById('sumCond').textContent=compParts.join(' · ');
+    compParts.push('Notranjost: '+(ktLabels[S.ktAge]||'\u2014'));
+    if(S.kakovost>1.0) compParts.push('Kakovost: '+(S.kakovost>=1.25?'Luksuz':'Nadstandard'));
+    document.getElementById('sumCond').textContent=compParts.join(' \u00B7 ');
     if(isS){
-      document.getElementById('refPriceLabel').textContent='Mediana €/m² (2025)';
+      document.getElementById('refPriceLabel').textContent='Mediana \u20AC/m\u00B2 (2025)';
       document.getElementById('refPrice').textContent=fmtM2(d.cena_m2);
       document.getElementById('refSizeLabel').textContent='Mediana površine stanovanja';
-      document.getElementById('refSize').textContent=d.ref_m2?d.ref_m2+' m²':'ni podatka';
+      document.getElementById('refSize').textContent=d.ref_m2?d.ref_m2+' m\u00B2':'ni podatka';
       document.getElementById('refZemRow').style.display='none';
     }else{
       document.getElementById('refPriceLabel').textContent='Mediana cene hiše (2025)';
       document.getElementById('refPrice').textContent=fmt(d.cena_h);
       document.getElementById('refSizeLabel').textContent='Mediana površine hiše';
-      document.getElementById('refSize').textContent=d.ref_m2?d.ref_m2+' m²':'ni podatka';
-      // Parcela — vzamemo ref_zem iz TAO
+      document.getElementById('refSize').textContent=d.ref_m2?d.ref_m2+' m\u00B2':'ni podatka';
+      // Parcela \u2014 vzamemo ref_zem iz TAO
       const refZemDisp=taoDataH&&taoDataH.ref_zem?taoDataH.ref_zem:null;
       document.getElementById('refZemRow').style.display=refZemDisp?'block':'none';
-      document.getElementById('refZemVal').textContent=refZemDisp?refZemDisp.toLocaleString('sl-SI')+' m²':'—';
+      document.getElementById('refZemVal').textContent=refZemDisp?refZemDisp.toLocaleString('sl-SI')+' m\u00B2':'\u2014';
     }
     document.getElementById('refYear').textContent=refLeto||'ni podatka';
     document.getElementById('refN').textContent=d.n+' prodaj';
     document.getElementById('loadingWrap').style.display='none';
     document.getElementById('resultBody').classList.add('active');
-    // Nariši graf gibanja cen
+    // Nariši graf gibanja cen in ETN transakcije
     const taoId=getTaoId(S.entry);
     drawTrendChart(taoId||'SI');
+    const laoKey=S.type==='stanovanje'?S.entry.sk:S.entry.hk;
+    drawETN(laoKey||taoId||'lj');
   },1400);
 }
 function sendLead(){
@@ -1373,11 +1718,11 @@ function sendLead(){
   document.getElementById('sentBox').style.display='block';
 }
 
-// ════════════════════════════════════════════════════════════════
-//  GURS 2025 — VERIŽNI INDEKSI GIBANJA CEN (2020–2025)
+
+//  GURS 2025 \u2014 VERIŽNI INDEKSI GIBANJA CEN (2020\u20132025)
 //  Vir: GURS Letno poročilo 2025, Preglednice 10, 16, 22, 28, ...
 //  Format: [2020-21, 2021-22, 2022-23, 2023-24, 2024-25] v %
-// ════════════════════════════════════════════════════════════════
+
 const TREND = {
   // TAO id: { s: [stanovanja], h: [hiše] }
   'SI':  { s: [15,19,6,10,11],  h: [13,12,9,9,10]  }, // Slovenija skupaj
@@ -1511,7 +1856,7 @@ function drawTrendChart(taoId){
     drawBars(siVals, -barW/2, '#C8C3BC', '#999490');
   }
 
-  // X labels — periods, centered under each group
+  // X labels \u2014 periods, centered under each group
   periods.forEach((p,i)=>{
     html+=`<text x="${xCenter(i).toFixed(1)}" y="${(H-8).toFixed(1)}" text-anchor="middle" font-size="8.5" fill="#78716C">${p}</text>`;
   });
@@ -1520,7 +1865,7 @@ function drawTrendChart(taoId){
 
   // Legend
   const legItems=[];
-  if(showBoth) legItems.push({color:'#C09A4A',label:isS?'Stanovanja – vaša regija':'Hiše – vaša regija'});
+  if(showBoth) legItems.push({color:'#C09A4A',label:isS?'Stanovanja \u2013 vaša regija':'Hiše \u2013 vaša regija'});
   if(siVals)   legItems.push({color:'#C8C3BC',label:'Slovenija skupaj'});
   legend.innerHTML=legItems.map(l=>
     `<div class="trend-leg-item"><div class="trend-leg-dot" style="background:${l.color}"></div>${l.label}</div>`
@@ -1528,11 +1873,17 @@ function drawTrendChart(taoId){
 }
 
 function goBackToEdit(){
-  // Skrij result, pokaži quiz, pojdi na zadnji korak
+  document.getElementById('editMenu').style.display='block';
+}
+function goBackStep(n){
+  document.getElementById('editMenu').style.display='none';
   document.getElementById('resultCard').classList.remove('active');
   document.getElementById('quizCard').style.display='block';
-  go(4); // nazaj na korak stanje/starost
+  go(n);
 }
+
+
+
 
 setProgress(1);
 </script>
