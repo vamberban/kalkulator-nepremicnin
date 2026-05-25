@@ -6,13 +6,13 @@
 <title>Kalkulator vrednosti nepremi&#269;nine</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{--ink:#1B1B1B;--paper:#F8F5F0;--gold:#C89A4A;--gold-lt:#EBC97A;--muted:#78716C;--border:#E7E2DA;--white:#FFFFFF;--card-bg:#FDFBF8;--accent:#2D4A3E;}
+:root{--ink:#1B1B1B;--paper:#F8F5F0;--gold:#C89A4A;--gold-lt:#EBC97A;--muted:#78716C;--border:#E7E2DA;--white:#FFFFFF;--card-bg:#FDFBF8;}
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);min-height:100vh;padding:2rem 1rem 4rem;}
 .wrapper{max-width:700px;margin:0 auto;}
 .header{text-align:center;margin-bottom:2.5rem;animation:rise .7s ease both;}
 .badge{display:inline-flex;align-items:center;gap:.4rem;font-size:.68rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);border:1px solid var(--gold);padding:.35rem 1rem;border-radius:20px;margin-bottom:1rem;}
-.badge::before{content:'◆';font-size:.5rem;}
+.badge::before{content:'\25C6';font-size:.5rem;}
 .header h1{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,6vw,3rem);font-weight:600;line-height:1.15;letter-spacing:-.02em;margin-bottom:.8rem;}
 .header p{color:var(--muted);font-size:.92rem;font-weight:300;line-height:1.65;max-width:460px;margin:0 auto;}
 .progress-wrap{margin-bottom:1.8rem;animation:rise .7s .1s ease both;opacity:0;}
@@ -25,14 +25,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);m
 .step-dot-circle.done{background:var(--gold);border-color:var(--gold);}
 .step-dot-circle.done::after{content:'✓';position:absolute;font-size:.7rem;color:#1B1B1B;font-weight:700;}
 .step-dot-circle.active{border-color:var(--gold);background:var(--white);box-shadow:0 0 0 3px rgba(192,154,74,.15);}
-.step-dot-circle.active .step-dot-icon{opacity:1;}
-.step-dot-icon{font-size:.95rem;opacity:.4;transition:opacity .3s;}
+.step-dot-circle.active .step-dot-icon,.step-dot-circle.done .step-dot-icon{opacity:1;}
 .step-dot-circle.done .step-dot-icon{display:none;}
-.step-dot-label{font-size:.6rem;color:var(--muted);text-align:center;letter-spacing:.03em;font-weight:500;transition:color .3s;}
+.step-dot-icon{font-size:.95rem;opacity:.4;transition:opacity .3s;}
+.step-dot-label{font-size:.6rem;color:var(--muted);text-align:center;letter-spacing:.03em;font-weight:500;}
 .step-dot.active .step-dot-label{color:var(--gold);font-weight:600;}
 .step-connector{flex:1;height:2px;background:var(--border);margin-top:18px;transition:background .3s;}
 .step-connector.done{background:var(--gold);}
-.card{background:var(--card-bg);border:1px solid var(--border);border-radius:24px;box-shadow:0 2px 24px rgba(0,0,0,.05),0 1px 4px rgba(0,0,0,.03);animation:rise .7s .15s ease both;opacity:0;}
+.card{background:var(--card-bg);border:1px solid var(--border);border-radius:24px;box-shadow:0 2px 24px rgba(0,0,0,.05);animation:rise .7s .15s ease both;opacity:0;}
 .step{display:none;padding:1.8rem 1.5rem;}.step.active{display:block;animation:slideR .35s ease both;}
 .step-title{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:600;letter-spacing:-.02em;margin-bottom:.3rem;}
 .step-sub{font-size:.85rem;color:var(--muted);font-weight:300;margin-bottom:1.6rem;line-height:1.55;}
@@ -41,38 +41,23 @@ body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);m
 .type-card:hover{border-color:var(--gold);transform:translateY(-2px);}
 .type-card.sel{border-color:var(--gold);background:rgba(192,154,74,.06);}
 .type-card.sel .tc-name{color:var(--gold);}
-.tc-icon{font-size:1.6rem;margin-bottom:.8rem;}
-.tc-name{font-size:.92rem;font-weight:600;}
-.tc-desc{font-size:.75rem;color:var(--muted);margin-top:.15rem;}
+.tc-icon{font-size:1.6rem;margin-bottom:.8rem;}.tc-name{font-size:.92rem;font-weight:600;}.tc-desc{font-size:.75rem;color:var(--muted);margin-top:.15rem;}
 .search-wrap{position:relative;margin-bottom:1.4rem;}
 .search-input-row{position:relative;}
 .search-icon{position:absolute;left:1rem;top:50%;transform:translateY(-50%);font-size:1rem;pointer-events:none;opacity:.4;}
-.loc-input{width:100%;padding:.95rem 2.4rem .95rem 2.7rem;border:1.5px solid var(--border);border-radius:14px;font-family:'DM Sans',sans-serif;font-size:1rem;color:var(--ink);background:var(--white);box-shadow:0 0 0 3px rgba(192,154,74,.12);}
+.loc-input{width:100%;padding:.95rem 2.4rem .95rem 2.7rem;border:1.5px solid var(--border);border-radius:14px;font-family:'DM Sans',sans-serif;font-size:1rem;color:var(--ink);background:var(--white);}
 .loc-input:focus{outline:none;border-color:var(--gold);}
-.clear-btn{position:absolute;right:.75rem;top:50%;transform:translateY(-50%);background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--muted);display:none;padding:.15rem .3rem;line-height:1;}
-.clear-btn:hover{color:var(--ink);}
+.clear-btn{position:absolute;right:.75rem;top:50%;transform:translateY(-50%);background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--muted);display:none;}
 .dropdown{position:absolute;top:calc(100% + 8px);left:0;right:0;background:var(--white);border:1.5px solid var(--border);border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,.10);z-index:100;max-height:260px;overflow-y:auto;}
 .dropdown.open{animation:dropIn .18s ease both;}
-.dd-item{display:flex;justify-content:space-between;align-items:center;padding:.75rem 1rem;cursor:pointer;transition:background .15s;gap:.75rem;}
-.dd-item:last-child{border-bottom:none;}
-.dd-left{display:flex;flex-direction:column;flex:1;min-width:0;}
-.dd-kraj{font-size:.9rem;font-weight:600;}
-.dd-tao{font-size:.72rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.dd-price{font-size:.75rem;color:var(--gold);}
-.dd-item:hover,.dd-item.focused{background:rgba(192,154,74,.06);}
-.dd-item mark{background:rgba(192,154,74,.28);border-radius:3px;}
-.loc-selected{display:none;align-items:center;gap:.75rem;padding:.8rem 1rem;border:1.5px solid var(--gold);border-radius:12px;background:rgba(192,154,74,.04);margin-bottom:1rem;cursor:pointer;}
+.loc-selected{display:none;align-items:center;gap:.75rem;padding:.8rem 1rem;border:1.5px solid var(--gold);border-radius:12px;background:rgba(192,154,74,.04);margin-bottom:1rem;}
 .loc-selected.show{display:flex;}
-.ls-pin{font-size:1.2rem;}
-.ls-body{flex:1;}
-.ls-kraj{font-size:.92rem;font-weight:600;}
-.ls-tao{font-size:.72rem;color:var(--muted);}
-.ls-price{font-size:.78rem;color:var(--gold);font-weight:500;white-space:nowrap;}
+.ls-pin{font-size:1.2rem;}.ls-body{flex:1;}.ls-kraj{font-size:.92rem;font-weight:600;}.ls-tao{font-size:.72rem;color:var(--muted);}
 .field-label{display:block;font-size:.72rem;font-weight:600;letter-spacing:.08em;color:var(--muted);margin-bottom:.6rem;text-transform:uppercase;}
 .slider-section{margin-bottom:1.4rem;}
 .slider-input-row{display:flex;align-items:center;gap:.5rem;margin-bottom:.3rem;}
 .slider-manual{width:72px;padding:.35rem .5rem;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.9rem;text-align:center;background:var(--paper);color:var(--ink);-moz-appearance:textfield;}
-.slider-manual::-webkit-outer-spin-button,.slider-manual::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
+.slider-manual::-webkit-outer-spin-button,.slider-manual::-webkit-inner-spin-button{-webkit-appearance:none;}
 .slider-manual:focus{outline:none;border-color:var(--gold);}
 .slider-unit-label{font-size:.82rem;color:var(--muted);}
 input[type=range]{width:100%;-webkit-appearance:none;appearance:none;height:4px;border-radius:2px;background:var(--border);outline:none;cursor:pointer;}
@@ -80,37 +65,32 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;heigh
 input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--gold);cursor:pointer;border:none;}
 .slider-range{display:flex;justify-content:space-between;font-size:.7rem;color:var(--muted);margin-top:.4rem;}
 .btn-row{display:flex;justify-content:space-between;align-items:center;margin-top:1.5rem;}
-.btn-next{background:var(--ink);border:none;border-radius:12px;padding:.85rem 1.8rem;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:500;color:var(--white);cursor:pointer;transition:all .2s;letter-spacing:.02em;}
-.btn-next:hover:not(:disabled){background:var(--gold);transform:translateY(-1px);}
+.btn-next{background:var(--ink);border:none;border-radius:12px;padding:.85rem 1.8rem;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:500;color:var(--white);cursor:pointer;transition:all .2s;}
+.btn-next:hover:not(:disabled){background:var(--gold);}
 .btn-next:disabled{opacity:.35;cursor:not-allowed;}
 .btn-back{background:none;border:none;font-family:'DM Sans',sans-serif;font-size:.85rem;color:var(--muted);cursor:pointer;padding:.5rem;}
-.btn-back:hover{color:var(--ink);}
 .cond-btn{background:none;border:1.5px solid var(--border);border-radius:12px;padding:.85rem;font-family:'DM Sans',sans-serif;font-size:.8rem;cursor:pointer;transition:all .2s;text-align:center;display:flex;flex-direction:column;align-items:center;gap:.3rem;}
-.cond-btn:hover{border-color:var(--gold);}
-.cond-btn.sel{border-color:var(--gold);background:rgba(192,154,74,.08);}
-.cond-btn.sel .cond-name{color:var(--gold);}
-.cond-icon{font-size:1.4rem;}
-.cond-name{font-size:.82rem;font-weight:600;}
+.cond-btn:hover{border-color:var(--gold);}.cond-btn.sel{border-color:var(--gold);background:rgba(192,154,74,.08);}.cond-btn.sel .cond-name{color:var(--gold);}
+.cond-icon{font-size:1.4rem;}.cond-name{font-size:.82rem;font-weight:600;}
 .comp-toggle{display:flex;justify-content:space-between;align-items:center;padding:.65rem .85rem;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.82rem;margin-bottom:.5rem;transition:all .2s;}
-.comp-toggle:hover{border-color:var(--gold);}
-.comp-toggle.active{border-color:var(--gold);background:rgba(192,154,74,.06);}
+.comp-toggle:hover,.comp-toggle.active{border-color:var(--gold);}
+.comp-toggle.active{background:rgba(192,154,74,.06);}
+.comp-toggle.active .comp-chevron{transform:rotate(90deg);}
 .comp-toggle-label{display:flex;align-items:center;gap:.5rem;}
 .comp-year-wrap{display:none;padding:.6rem .85rem .8rem;border:1.5px solid var(--gold);border-top:none;border-radius:0 0 10px 10px;margin-top:-.5rem;margin-bottom:.5rem;background:rgba(192,154,74,.03);}
 .comp-year-wrap.show{display:block;}
-.comp-toggle.active .comp-chevron{transform:rotate(90deg);}
 .comp-year-display{font-size:1.2rem;font-weight:600;font-family:'Cormorant Garamond',serif;margin-bottom:.2rem;}
-.result-card{display:none;padding:2rem 1.5rem;}
-.result-card.active{display:block;}
+.result-card{display:none;padding:2rem 1.5rem;}.result-card.active{display:block;}
 .result-loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3rem 1rem;gap:1rem;}
 .spinner{width:44px;height:44px;border:3px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;}
 .loading-text{font-size:.85rem;color:var(--muted);}
-.result-hero{text-align:center;margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border);}
+.result-hero{text-align:center;margin-bottom:1.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border);}
 .result-label{font-size:.68rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:.6rem;}
 .result-price{font-family:'Cormorant Garamond',serif;font-size:clamp(2.5rem,8vw,4rem);font-weight:700;color:var(--gold);margin-bottom:.3rem;letter-spacing:-.02em;}
 .result-ppm2{font-size:.88rem;color:var(--muted);margin-bottom:.8rem;}
 .result-range{display:inline-flex;align-items:center;gap:.5rem;background:rgba(192,154,74,.07);border:1.5px solid rgba(192,154,74,.2);border-radius:20px;padding:.45rem 1.1rem;font-size:.82rem;font-weight:500;color:var(--ink);margin-bottom:.6rem;}
 .result-confidence{font-size:.72rem;color:var(--muted);}
-#rContext{font-size:.8rem;color:var(--muted);margin-top:.5rem;font-style:italic;min-height:1.2em;}
+#rContext{font-size:.8rem;color:var(--muted);margin-top:.5rem;font-style:italic;}
 .summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1.5rem;}
 .sum-item{background:var(--paper);border-radius:12px;padding:.85rem 1rem;}
 .sum-label{font-size:.65rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:.25rem;}
@@ -120,9 +100,7 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
 .ref-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem .75rem;}
 .ref-item .ri-label{font-size:.68rem;color:var(--muted);margin-bottom:.1rem;}
 .ref-item .ri-val{font-size:.88rem;font-weight:500;}
-.ref-note{font-size:.72rem;color:var(--muted);margin-top:.6rem;line-height:1.5;}
-.trend-section{margin-bottom:1.5rem;}
-.trend-chart{height:90px;width:100%;margin:.6rem 0 0;}
+.trend-section{margin-bottom:.8rem;}
 .trend-legend{display:flex;gap:1rem;flex-wrap:wrap;margin-top:.3rem;}
 .trend-leg-item{display:flex;align-items:center;gap:.35rem;font-size:.72rem;color:var(--muted);}
 .trend-leg-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0;}
@@ -132,22 +110,29 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
 .etn-table td{padding:.5rem .6rem;border-bottom:1px solid var(--border);color:var(--ink);}
 .etn-table tr:last-child td{border-bottom:none;}
 .etn-table tr:hover td{background:rgba(192,154,74,.04);}
-.etn-ppm2{font-weight:600;}
-.etn-datum{color:var(--muted);}
 .etn-note{font-size:.7rem;color:var(--muted);margin-top:.5rem;font-style:italic;}
 .etn-card{padding:.6rem 0;border-bottom:1px solid var(--border);display:none;}
 .etn-card:last-child{border-bottom:none;}
 .etn-card-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:.2rem;}
-.etn-card-addr{font-size:.82rem;font-weight:500;}
-.etn-card-price{font-size:.88rem;font-weight:700;}
-.etn-card-meta{font-size:.72rem;color:var(--muted);}
+.etn-card-addr{font-size:.82rem;font-weight:500;}.etn-card-price{font-size:.88rem;font-weight:700;}.etn-card-meta{font-size:.72rem;color:var(--muted);}
 @media(max-width:500px){.etn-table{display:none;}.etn-card{display:block;}}
-.lao-label{font-size:.72rem;font-weight:600;letter-spacing:.05em;color:var(--muted);margin-bottom:.4rem;}
 #editMenu{display:none;background:var(--paper);border:1.5px solid var(--border);border-radius:12px;padding:.75rem;margin-bottom:.75rem;}
-.btn-back-edit{display:block;width:100%;background:var(--ink);border:none;border-radius:12px;padding:.85rem;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:500;color:var(--white);cursor:pointer;transition:all .2s;letter-spacing:.02em;}
+.btn-back-edit{display:block;width:100%;background:var(--ink);border:none;border-radius:12px;padding:.85rem;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:500;color:var(--white);cursor:pointer;transition:all .2s;}
 .btn-back-edit:hover{background:var(--gold);}
 .btn-restart{display:block;width:100%;margin-top:.6rem;background:none;border:1.5px solid var(--border);border-radius:12px;padding:.75rem;font-family:'DM Sans',sans-serif;font-size:.83rem;color:var(--muted);cursor:pointer;transition:all .2s;}
 .btn-restart:hover{border-color:var(--gold);color:var(--gold);}
+.accordion-content{display:none;margin-top:1rem;}
+.accordion-content.open{display:block;animation:rise .3s ease both;}
+.accordion-btn{background:none;border:none;font-family:'DM Sans',sans-serif;font-size:.78rem;font-weight:600;color:var(--gold);cursor:pointer;padding:0;display:inline-flex;align-items:center;gap:.35rem;margin-top:.6rem;}
+.accordion-btn .acc-chevron{display:inline-block;transition:transform .25s;font-style:normal;}
+.accordion-btn.open .acc-chevron{transform:rotate(90deg);}
+@media(max-width:480px){
+  .cta-grid,.prodaja-grid{grid-template-columns:1fr!important;}
+  .summary-grid,.ref-grid{grid-template-columns:1fr!important;}
+  .result-price{font-size:2.8rem!important;}
+  .wrapper{padding:.5rem .75rem 3rem!important;}
+  .step{padding:1.4rem 1rem!important;}
+}
 @keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 @keyframes slideR{from{opacity:0;transform:translateX(8px)}to{opacity:1;transform:none}}
 @keyframes spin{to{transform:rotate(360deg)}}
@@ -163,72 +148,42 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
     </div>
     <div class="badge">Brezpla&#269;na ocena vrednosti v manj kot 2 minutah</div>
     <h1>Koliko je vredna<br>va&#353;a nepremi&#269;nina?</h1>
-    <p>V 5 enostavnih korakih do ocene vrednosti nepremi&#269;nine.</p>
+    <p>V 4 enostavnih korakih do brezpla&#269;ne ocene vrednosti nepremi&#269;nine.</p>
   </div>
 
   <div class="progress-wrap">
     <div class="progress-meta"><span id="stepLabel">Korak 1 od 4</span><span id="stepPct">0 %</span></div>
     <div class="progress-track"><div class="progress-fill" id="progFill"></div></div>
-    <div class="step-dots" id="stepDots">
-      <div class="step-dot active" id="sdot1">
-        <div class="step-dot-circle active" id="sdotc1"><span class="step-dot-icon">&#127968;</span></div>
-        <span class="step-dot-label">Vrsta</span>
-      </div>
+    <div class="step-dots">
+      <div class="step-dot active" id="sdot1"><div class="step-dot-circle active" id="sdotc1"><span class="step-dot-icon">&#127968;</span></div><span class="step-dot-label">Vrsta</span></div>
       <div class="step-connector" id="scon1"></div>
-      <div class="step-dot" id="sdot2">
-        <div class="step-dot-circle" id="sdotc2"><span class="step-dot-icon">&#128205;</span></div>
-        <span class="step-dot-label">Lokacija</span>
-      </div>
+      <div class="step-dot" id="sdot2"><div class="step-dot-circle" id="sdotc2"><span class="step-dot-icon">&#128205;</span></div><span class="step-dot-label">Lokacija</span></div>
       <div class="step-connector" id="scon2"></div>
-      <div class="step-dot" id="sdot3">
-        <div class="step-dot-circle" id="sdotc3"><span class="step-dot-icon">&#128208;</span></div>
-        <span class="step-dot-label">Povr&#353;ina</span>
-      </div>
+      <div class="step-dot" id="sdot3"><div class="step-dot-circle" id="sdotc3"><span class="step-dot-icon">&#128208;</span></div><span class="step-dot-label">Povr&#353;ina</span></div>
       <div class="step-connector" id="scon3"></div>
-      <div class="step-dot" id="sdot4">
-        <div class="step-dot-circle" id="sdotc4"><span class="step-dot-icon">&#127959;</span></div>
-        <span class="step-dot-label">Stanje</span>
-      </div>
+      <div class="step-dot" id="sdot4"><div class="step-dot-circle" id="sdotc4"><span class="step-dot-icon">&#127959;</span></div><span class="step-dot-label">Stanje</span></div>
       <div class="step-connector" id="scon4"></div>
-      <div class="step-dot" id="sdot5">
-        <div class="step-dot-circle" id="sdotc5"><span class="step-dot-icon">&#11088;</span></div>
-        <span class="step-dot-label">Rezultat</span>
-      </div>
+      <div class="step-dot" id="sdot5"><div class="step-dot-circle" id="sdotc5"><span class="step-dot-icon">&#11088;</span></div><span class="step-dot-label">Rezultat</span></div>
     </div>
   </div>
 
   <div class="card" id="quizCard">
-
-    <!-- S1 -->
     <div class="step active" id="s1">
       <div class="step-icon">&#127968;</div>
       <div class="step-title">Vrsta nepremi&#269;nine</div>
       <div class="step-sub">Izberite katero nepremi&#269;nino &#382;elite oceniti.</div>
       <div class="type-grid">
-        <button class="type-card" onclick="selType(this,'stanovanje')">
-          <div class="tc-icon">&#127970;</div><div class="tc-name">Stanovanje</div>
-          <div class="tc-desc">V ve&#269;stanovanjski stavbi</div>
-        </button>
-        <button class="type-card" onclick="selType(this,'hisa')">
-          <div class="tc-icon">&#127968;</div><div class="tc-name">Hi&#353;a</div>
-          <div class="tc-desc">Samostojna, vrstna, dvojček</div>
-        </button>
+        <button class="type-card" onclick="selType(this,'stanovanje')"><div class="tc-icon">&#127970;</div><div class="tc-name">Stanovanje</div><div class="tc-desc">V ve&#269;stanovanjski stavbi</div></button>
+        <button class="type-card" onclick="selType(this,'hisa')"><div class="tc-icon">&#127968;</div><div class="tc-name">Hi&#353;a</div><div class="tc-desc">Samostojna, vrstna, dvojček</div></button>
       </div>
-      <div class="btn-row" style="justify-content:flex-end">
-        <button class="btn-next" id="btn1" onclick="go(2)" disabled>Naprej &#8594;</button>
-      </div>
+      <div class="btn-row" style="justify-content:flex-end"><button class="btn-next" id="btn1" onclick="go(2)" disabled>Naprej &#8594;</button></div>
     </div>
 
-    <!-- S2 -->
     <div class="step" id="s2">
       <div class="step-icon">&#128205;</div>
       <div class="step-title">Lokacija</div>
       <div class="step-sub">Vtipkajte kraj ali &#269;etrt, kjer se nahaja nepremi&#269;nina.</div>
-      <div class="loc-selected" id="locPill">
-        <span class="ls-pin">&#128204;</span>
-        <div class="ls-body"><div class="ls-kraj" id="pillKraj"></div><div class="ls-tao" id="pillTao"></div></div>
-        <span class="ls-price" id="pillPrice"></span>
-      </div>
+      <div class="loc-selected" id="locPill"><span class="ls-pin">&#128204;</span><div class="ls-body"><div class="ls-kraj" id="pillKraj"></div><div class="ls-tao" id="pillTao"></div></div><span class="ls-price" id="pillPrice"></span></div>
       <div id="searchWrap">
         <div class="search-wrap">
           <div class="search-input-row">
@@ -245,17 +200,13 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
       </div>
     </div>
 
-    <!-- S3 -->
     <div class="step" id="s3">
       <div class="step-icon">&#128208;</div>
       <div class="step-title" id="s3title">Povr&#353;ina stanovanja</div>
       <div class="step-sub" id="s3sub">Vnesite uporabno povr&#353;ino v m&#178;.</div>
       <span class="field-label">Povr&#353;ina</span>
       <div class="slider-section">
-        <div class="slider-input-row">
-          <input type="number" inputmode="numeric" class="slider-manual" id="sizeManual" value="70" min="20" max="600" oninput="onSizeManual(this.value)">
-          <span class="slider-unit-label">m&#178;</span>
-        </div>
+        <div class="slider-input-row"><input type="number" inputmode="numeric" class="slider-manual" id="sizeManual" value="70" min="20" max="600" oninput="onSizeManual(this.value)"><span class="slider-unit-label">m&#178;</span></div>
         <input type="range" id="sizeSlider" min="20" max="300" value="70" step="1" oninput="onSize(this.value)">
         <div class="slider-range"><span id="sizeMin">20 m&#178;</span><span id="sizeMax">300 m&#178;</span></div>
       </div>
@@ -283,18 +234,12 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
       <div id="atrijWrap" style="display:none;margin-bottom:1.4rem">
         <span class="field-label">&#127807; Atrij / vrtna terasa</span>
         <button class="type-card" id="atrijToggleBtn" onclick="toggleAtrij(this)" style="padding:.75rem 1.25rem;text-align:left;width:100%;margin-bottom:.75rem">
-          <div style="display:flex;align-items:center;gap:.75rem">
-            <span style="font-size:1.4rem">&#127807;</span>
-            <div><div class="tc-name">Vklju&#269;en atrij / zasebni vrt</div><div class="tc-desc">Klikni za ozna&#269;itev &#8212; doda vrednost</div></div>
-          </div>
+          <div style="display:flex;align-items:center;gap:.75rem"><span style="font-size:1.4rem">&#127807;</span><div><div class="tc-name">Vklju&#269;en atrij / zasebni vrt</div><div class="tc-desc">Klikni za ozna&#269;itev &#8212; doda vrednost</div></div></div>
         </button>
         <div id="atrijSliderWrap" style="display:none">
           <span class="field-label">Povr&#353;ina atrija</span>
           <div class="slider-section">
-            <div class="slider-input-row">
-              <input type="number" inputmode="numeric" class="slider-manual" id="atrijManual" value="30" min="1" max="1000" oninput="onAtrijManual(this.value)">
-              <span class="slider-unit-label">m&#178;</span>
-            </div>
+            <div class="slider-input-row"><input type="number" inputmode="numeric" class="slider-manual" id="atrijManual" value="30" min="1" max="1000" oninput="onAtrijManual(this.value)"><span class="slider-unit-label">m&#178;</span></div>
             <input type="range" id="atrijSlider" min="10" max="500" value="30" step="1" oninput="onAtrij(this.value)">
             <div class="slider-range"><span>10 m&#178;</span><span id="atrijNum" style="display:none"></span><span>500 m&#178;</span></div>
           </div>
@@ -302,23 +247,14 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
       </div>
       <span class="field-label" style="margin-top:.5rem">Kakovost izvedbe</span>
       <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-bottom:1.4rem;margin-top:.6rem">
-        <button class="cond-btn" id="kval-standard" onclick="selKakovost('standard',1.0)">
-          <span class="cond-icon">&#127968;</span><span class="cond-name">Standard</span>
-        </button>
-        <button class="cond-btn" id="kval-nadstandard" onclick="selKakovost('nadstandard',1.12)">
-          <span class="cond-icon">&#11088;</span><span class="cond-name">Nadstandard</span>
-        </button>
-        <button class="cond-btn" id="kval-luksuz" onclick="selKakovost('luksuz',1.25)">
-          <span class="cond-icon">&#128142;</span><span class="cond-name">Luksuz</span>
-        </button>
+        <button class="cond-btn" id="kval-standard" onclick="selKakovost('standard',1.0)"><span class="cond-icon">&#127968;</span><span class="cond-name">Standard</span></button>
+        <button class="cond-btn" id="kval-nadstandard" onclick="selKakovost('nadstandard',1.12)"><span class="cond-icon">&#11088;</span><span class="cond-name">Nadstandard</span></button>
+        <button class="cond-btn" id="kval-luksuz" onclick="selKakovost('luksuz',1.25)"><span class="cond-icon">&#128142;</span><span class="cond-name">Luksuz</span></button>
       </div>
       <div id="parcelaWrap" style="display:none">
         <span class="field-label">Povr&#353;ina parcele</span>
         <div class="slider-section">
-          <div class="slider-input-row">
-            <input type="number" inputmode="numeric" class="slider-manual" id="parcelaManual" value="500" min="100" max="10000" oninput="onParcelaManual(this.value)">
-            <span class="slider-unit-label">m&#178;</span>
-          </div>
+          <div class="slider-input-row"><input type="number" inputmode="numeric" class="slider-manual" id="parcelaManual" value="500" min="100" max="10000" oninput="onParcelaManual(this.value)"><span class="slider-unit-label">m&#178;</span></div>
           <input type="range" id="parcelaSlider" min="100" max="5000" value="500" step="1" oninput="onParcela(this.value)">
           <div class="slider-range"><span>100 m&#178;</span><span id="parcelaNum" style="display:none"></span><span>5.000 m&#178;</span></div>
         </div>
@@ -329,16 +265,13 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
       </div>
     </div>
 
-    <!-- S4 -->
     <div class="step" id="s4">
       <div class="step-icon">&#127959;</div>
       <div class="step-title">Starost in stanje</div>
       <div class="step-sub">Leto gradnje in stanje posameznih komponent.</div>
       <span class="field-label">Leto izgradnje</span>
       <div class="slider-section">
-        <div class="slider-input-row">
-          <input type="number" inputmode="numeric" class="slider-manual" id="yearManual" value="1980" min="1900" max="2026" oninput="onYearManual(this.value)">
-        </div>
+        <div class="slider-input-row"><input type="number" inputmode="numeric" class="slider-manual" id="yearManual" value="1980" min="1900" max="2026" oninput="onYearManual(this.value)"></div>
         <input type="range" id="yearSlider" min="1945" max="2025" value="1980" step="1" oninput="onYear(this.value)">
         <div class="slider-range"><span>1945</span><span>2025</span></div>
       </div>
@@ -351,72 +284,84 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
       </div>
       <span class="field-label">Obnove komponent (neobvezno)</span>
       <div id="compWrap" style="margin-bottom:1rem">
-        <div class="comp-toggle" id="tog-fasada" onclick="toggleComp('fasada')"><span class="comp-toggle-label">&#127968; Fasada</span><span style="margin-left:auto;color:var(--muted);font-size:.9rem;transition:transform .2s" class="comp-chevron">›</span><span style="font-size:.75rem;color:var(--muted)">Ni obnovljeno</span></div>
-        <div class="comp-year-wrap" id="wrap-fasada">
-          <div class="comp-year-display" id="disp-fasada">2000</div>
-          <div class="slider-input-row"><input type="number" inputmode="numeric" class="slider-manual" id="manual-fasada" value="2000" min="1945" max="2026" oninput="onCompManual('fasada',this.value)"></div>
-          <div class="comp-slider-inner"><input type="range" id="sl-fasada" min="1945" max="2025" value="2000" step="1" oninput="onComp('fasada',this.value)"></div>
-        </div>
-        <div class="comp-toggle" id="tog-okna" onclick="toggleComp('okna')"><span class="comp-toggle-label">&#129695; Okna</span><span style="margin-left:auto;color:var(--muted);font-size:.9rem;transition:transform .2s" class="comp-chevron">›</span><span style="font-size:.75rem;color:var(--muted)">Ni obnovljeno</span></div>
-        <div class="comp-year-wrap" id="wrap-okna">
-          <div class="comp-year-display" id="disp-okna">2000</div>
-          <div class="slider-input-row"><input type="number" inputmode="numeric" class="slider-manual" id="manual-okna" value="2000" min="1945" max="2026" oninput="onCompManual('okna',this.value)"></div>
-          <div class="comp-slider-inner"><input type="range" id="sl-okna" min="1945" max="2025" value="2000" step="1" oninput="onComp('okna',this.value)"></div>
-        </div>
-        <div class="comp-toggle" id="tog-inst" onclick="toggleComp('inst')"><span class="comp-toggle-label">&#9889; In&#353;talacije</span><span style="margin-left:auto;color:var(--muted);font-size:.9rem;transition:transform .2s" class="comp-chevron">›</span><span style="font-size:.75rem;color:var(--muted)">Ni obnovljeno</span></div>
-        <div class="comp-year-wrap" id="wrap-inst">
-          <div class="comp-year-display" id="disp-inst">2000</div>
-          <div class="slider-input-row"><input type="number" inputmode="numeric" class="slider-manual" id="manual-inst" value="2000" min="1945" max="2026" oninput="onCompManual('inst',this.value)"></div>
-          <div class="comp-slider-inner"><input type="range" id="sl-inst" min="1945" max="2025" value="2000" step="1" oninput="onComp('inst',this.value)"></div>
-        </div>
-        <div class="comp-toggle" id="tog-streha" onclick="toggleComp('streha')"><span class="comp-toggle-label">&#127959; Streha</span><span style="margin-left:auto;color:var(--muted);font-size:.9rem;transition:transform .2s" class="comp-chevron">›</span><span style="font-size:.75rem;color:var(--muted)">Ni obnovljeno</span></div>
-        <div class="comp-year-wrap" id="wrap-streha">
-          <div class="comp-year-display" id="disp-streha">2000</div>
-          <div class="slider-input-row"><input type="number" inputmode="numeric" class="slider-manual" id="manual-streha" value="2000" min="1945" max="2026" oninput="onCompManual('streha',this.value)"></div>
-          <div class="comp-slider-inner"><input type="range" id="sl-streha" min="1945" max="2025" value="2000" step="1" oninput="onComp('streha',this.value)"></div>
-        </div>
+        <div class="comp-toggle" id="tog-fasada" onclick="toggleComp('fasada')"><span class="comp-toggle-label">&#127968; Fasada</span><span class="comp-chevron" style="margin-left:auto;color:var(--muted);font-size:.9rem;transition:transform .2s">&#8250;</span><span style="font-size:.75rem;color:var(--muted)">Ni obnovljeno</span></div>
+        <div class="comp-year-wrap" id="wrap-fasada"><div class="comp-year-display" id="disp-fasada">2000</div><div class="slider-input-row"><input type="number" inputmode="numeric" class="slider-manual" id="manual-fasada" value="2000" min="1945" max="2026" oninput="onCompManual('fasada',this.value)"></div><div class="comp-slider-inner"><input type="range" id="sl-fasada" min="1945" max="2025" value="2000" step="1" oninput="onComp('fasada',this.value)"></div></div>
+        <div class="comp-toggle" id="tog-okna" onclick="toggleComp('okna')"><span class="comp-toggle-label">&#129695; Okna</span><span class="comp-chevron" style="margin-left:auto;color:var(--muted);font-size:.9rem;transition:transform .2s">&#8250;</span><span style="font-size:.75rem;color:var(--muted)">Ni obnovljeno</span></div>
+        <div class="comp-year-wrap" id="wrap-okna"><div class="comp-year-display" id="disp-okna">2000</div><div class="slider-input-row"><input type="number" inputmode="numeric" class="slider-manual" id="manual-okna" value="2000" min="1945" max="2026" oninput="onCompManual('okna',this.value)"></div><div class="comp-slider-inner"><input type="range" id="sl-okna" min="1945" max="2025" value="2000" step="1" oninput="onComp('okna',this.value)"></div></div>
+        <div class="comp-toggle" id="tog-inst" onclick="toggleComp('inst')"><span class="comp-toggle-label">&#9889; In&#353;talacije</span><span class="comp-chevron" style="margin-left:auto;color:var(--muted);font-size:.9rem;transition:transform .2s">&#8250;</span><span style="font-size:.75rem;color:var(--muted)">Ni obnovljeno</span></div>
+        <div class="comp-year-wrap" id="wrap-inst"><div class="comp-year-display" id="disp-inst">2000</div><div class="slider-input-row"><input type="number" inputmode="numeric" class="slider-manual" id="manual-inst" value="2000" min="1945" max="2026" oninput="onCompManual('inst',this.value)"></div><div class="comp-slider-inner"><input type="range" id="sl-inst" min="1945" max="2025" value="2000" step="1" oninput="onComp('inst',this.value)"></div></div>
+        <div class="comp-toggle" id="tog-streha" onclick="toggleComp('streha')"><span class="comp-toggle-label">&#127959; Streha</span><span class="comp-chevron" style="margin-left:auto;color:var(--muted);font-size:.9rem;transition:transform .2s">&#8250;</span><span style="font-size:.75rem;color:var(--muted)">Ni obnovljeno</span></div>
+        <div class="comp-year-wrap" id="wrap-streha"><div class="comp-year-display" id="disp-streha">2000</div><div class="slider-input-row"><input type="number" inputmode="numeric" class="slider-manual" id="manual-streha" value="2000" min="1945" max="2026" oninput="onCompManual('streha',this.value)"></div><div class="comp-slider-inner"><input type="range" id="sl-streha" min="1945" max="2025" value="2000" step="1" oninput="onComp('streha',this.value)"></div></div>
       </div>
       <div class="btn-row">
         <button class="btn-back" onclick="go(3)">&#8592; Nazaj</button>
         <button class="btn-next" id="btn4" onclick="showResult()">Izra&#269;unaj oceno &#10022;</button>
       </div>
     </div>
+  </div>
 
-  </div><!-- /quizCard -->
-
-  <!-- RESULT CARD -->
   <div class="card result-card" id="resultCard">
-    <div id="loadingWrap">
-      <div class="result-loading"><div class="spinner"></div><p class="loading-text">Primerjamo s podatki GURS&#8230;</p></div>
-    </div>
+    <div id="loadingWrap"><div class="result-loading"><div class="spinner"></div><p class="loading-text">Primerjamo s podatki GURS&#8230;</p></div></div>
     <div id="resultBody" style="display:none;padding:1.5rem">
-      <div style="margin-bottom:1rem">
-        <button onclick="goBackStep(4)" style="background:none;border:none;font-family:'DM Sans',sans-serif;font-size:.82rem;color:var(--muted);cursor:pointer;padding:.3rem 0;display:flex;align-items:center;gap:.3rem">&#8592; Nazaj na vprašanja</button>
-      </div>
+
+      <div style="margin-bottom:1rem"><button onclick="goBackStep(4)" style="background:none;border:none;font-family:'DM Sans',sans-serif;font-size:.82rem;color:var(--muted);cursor:pointer;padding:.3rem 0;display:flex;align-items:center;gap:.3rem">&#8592; Nazaj na vpra&#353;anja</button></div>
+
       <div class="result-hero">
         <div class="result-label">OCENJENA TR&#381;NA VREDNOST</div>
         <div class="result-price" id="rMainPrice">&#8212;</div>
         <div class="result-ppm2" id="rPpm2"></div>
-        <div style="display:flex;gap:.5rem;justify-content:center;flex-wrap:wrap;margin-bottom:.6rem">
-          <div class="result-range"><span id="rLow"></span> &#8211; <span id="rHigh"></span></div>
-        </div>
+        <div style="display:flex;gap:.5rem;justify-content:center;flex-wrap:wrap;margin-bottom:.6rem"><div class="result-range"><span id="rLow"></span> &#8211; <span id="rHigh"></span></div></div>
         <div class="result-confidence" id="rConfidence"></div>
         <div id="rContext"></div>
-        <div id="rNote" style="display:none;font-size:.72rem;color:var(--muted);margin-top:.4rem;font-style:italic"></div>
+        <div id="rNote" style="display:none"></div>
+        <div style="font-size:.75rem;color:var(--muted);line-height:1.6;text-align:center;padding:.8rem 1rem;margin-top:.5rem;border-top:1px solid var(--border)">
+          Ocena je informativna in temelji na uradnih podatkih GURS ter ETN transakcijah. Pri obmo&#269;jih z manj&#353;im &#353;tevilom transakcij lahko realna vrednost bistveno odstopa od izra&#269;una. Priporo&#269;amo strokovno cenitev.
+          <br><button class="accordion-btn" id="detailsBtn" onclick="toggleDetails()"><i class="acc-chevron">&#8250;</i> Podrobnosti</button>
+        </div>
       </div>
+
+      <!-- Accordion podrobnosti -->
+      <div class="accordion-content" id="detailsContent">
+        <div class="summary-grid">
+          <div class="sum-item"><div class="sum-label">Vrsta</div><div class="sum-value" id="sumType">&#8212;</div></div>
+          <div class="sum-item"><div class="sum-label">Lokacija</div><div class="sum-value" id="sumLoc">&#8212;</div></div>
+          <div class="sum-item"><div class="sum-label">Analiti&#269;no obmo&#269;je</div><div class="sum-value" id="sumTao">&#8212;</div></div>
+          <div class="sum-item"><div class="sum-label">Povr&#353;ina</div><div class="sum-value" id="sumSize">&#8212;</div></div>
+          <div class="sum-item"><div class="sum-label">Leto izgradnje</div><div class="sum-value" id="sumYear">&#8212;</div></div>
+          <div class="sum-item"><div class="sum-label">Stanje</div><div class="sum-value" id="sumCond">&#8212;</div></div>
+        </div>
+        <div class="ref-section">
+          <div class="ref-title">REFEREN&#268;NE VREDNOSTI GURS (MEDIANA, 2025)</div>
+          <div class="ref-grid">
+            <div class="ref-item"><div class="ri-label" id="refPriceLabel">Mediana cene</div><div class="ri-val" id="refPrice">&#8212;</div></div>
+            <div class="ref-item"><div class="ri-label">Ref. leto gradnje</div><div class="ri-val" id="refYear">&#8212;</div></div>
+            <div class="ref-item"><div class="ri-label" id="refSizeLabel">Mediana povr&#353;ine</div><div class="ri-val" id="refSize">&#8212;</div></div>
+            <div class="ref-item"><div class="ri-label">Vzorec transakcij</div><div class="ri-val" id="refN">&#8212;</div></div>
+            <div class="ref-item" id="refZemRow" style="display:none"><div class="ri-label">Mediana parcele</div><div class="ri-val" id="refZemVal">&#8212;</div></div>
+          </div>
+        </div>
+
+        <div class="trend-section" id="rTrend">
+          <div class="ref-title">Gibanje cen 2020&#8211;2025</div>
+          <div id="trendSvg" style="margin:0;line-height:0;font-size:0"></div>
+          <canvas class="trend-chart" id="trendChart" style="display:none"></canvas>
+          <div class="trend-legend" id="trendLegend"></div>
+        </div>
+        <div id="etnSection" style="display:none" class="etn-section"></div>
+      </div><!-- /accordion -->
+
       <!-- CTA cenitev -->
-      <div style="background:#1B1B1B;border-radius:16px;padding:1.4rem 1.2rem;margin-bottom:1.2rem">
+      <div style="background:#1B1B1B;border-radius:16px;padding:1.4rem 1.2rem;margin-bottom:1rem">
         <div style="font-size:.72rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:.5rem">POTREBUJETE URADNO CENITEV?</div>
         <div style="font-size:1rem;font-weight:600;font-family:'Cormorant Garamond',serif;margin-bottom:.3rem;color:#FFFFFF">Pridobite strokovno oceno vrednosti</div>
-        <div style="font-size:.8rem;color:rgba(255,255,255,.65);margin-bottom:.8rem;line-height:1.5">Na&#353;i Poobla&#353;&#269;eni ocenjevalci vrednosti nepremi&#269;nin z veljavnimi licencami vam pripravijo uradno poro&#269;ilo o oceni vrednosti nepremi&#269;nine za vse namene.</div>
-        <div id="ctaForm">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:.6rem">
+        <div style="font-size:.8rem;color:rgba(255,255,255,.65);margin-bottom:1rem;line-height:1.5">Na&#353;i Poobla&#353;&#269;eni ocenjevalci vrednosti nepremi&#269;nin z veljavnimi licencami vam pripravijo uradno poro&#269;ilo o oceni vrednosti nepremi&#269;nine za vse namene.</div>
+        <div id="ctaBtn"><button onclick="showCtaForm()" style="width:100%;background:var(--gold);border:none;border-radius:10px;padding:.85rem;font-family:'DM Sans',sans-serif;font-size:.92rem;font-weight:700;color:#1B1B1B;cursor:pointer;">&#128203; Naro&#269;i cenitev</button></div>
+        <div id="ctaForm" style="display:none">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:.6rem" class="cta-grid">
             <input id="ctaName" type="text" placeholder="Ime in priimek" style="padding:.65rem .85rem;border:1.5px solid rgba(255,255,255,.2);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.85rem;background:rgba(255,255,255,.1);color:#FFFFFF;outline:none;;box-sizing:border-box" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='rgba(255,255,255,.2)'">
             <input id="ctaPhone" type="tel" placeholder="Telefonska &#353;tevilka" style="padding:.65rem .85rem;border:1.5px solid rgba(255,255,255,.2);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.85rem;background:rgba(255,255,255,.1);color:#FFFFFF;outline:none;;box-sizing:border-box" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='rgba(255,255,255,.2)'">
           </div>
-          <div style="margin-bottom:.6rem">
-            <input id="ctaEmail" type="email" placeholder="E-mail naslov" style="width:100%;padding:.65rem .85rem;border:1.5px solid rgba(255,255,255,.2);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.85rem;background:rgba(255,255,255,.1);color:#FFFFFF;outline:none;;box-sizing:border-box" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='rgba(255,255,255,.2)'">
-          </div>
+          <div style="margin-bottom:.6rem"><input id="ctaEmail" type="email" placeholder="E-mail naslov" style="width:100%;padding:.65rem .85rem;border:1.5px solid rgba(255,255,255,.2);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.85rem;background:rgba(255,255,255,.1);color:#FFFFFF;outline:none;;box-sizing:border-box" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='rgba(255,255,255,.2)'"></div>
           <div style="margin-bottom:.6rem">
             <select id="ctaNamen" style="width:100%;padding:.65rem .85rem;border:1.5px solid rgba(255,255,255,.2);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.85rem;background:rgba(255,255,255,.12);color:#FFFFFF;outline:none;box-sizing:border-box;cursor:pointer;-webkit-appearance:none;" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='rgba(255,255,255,.2)'">
               <option value="" style="background:#1B1B1B">Namen cenitve...</option>
@@ -429,10 +374,8 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
               <option value="drugo" style="background:#1B1B1B">Drugo</option>
             </select>
           </div>
-          <div style="margin-bottom:.8rem">
-            <input id="ctaPredmet" type="text" placeholder="Predmet cenitve (npr. stanovanje LJ, 65 m&#178;)" style="width:100%;padding:.65rem .85rem;border:1.5px solid rgba(255,255,255,.2);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.85rem;background:rgba(255,255,255,.1);color:#FFFFFF;outline:none;;box-sizing:border-box" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='rgba(255,255,255,.2)'">
-          </div>
-          <button onclick="sendLead()" style="width:100%;background:#FFFFFF;border:none;border-radius:10px;padding:.75rem;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:600;color:#1B1B1B;cursor:pointer;letter-spacing:.02em;">&#128231; Po&#353;ljite povpra&#353;evanje</button>
+          <div style="margin-bottom:.8rem"><input id="ctaPredmet" type="text" placeholder="Predmet cenitve (npr. stanovanje LJ, 65 m&#178;)" style="width:100%;padding:.65rem .85rem;border:1.5px solid rgba(255,255,255,.2);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.85rem;background:rgba(255,255,255,.1);color:#FFFFFF;outline:none;;box-sizing:border-box" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='rgba(255,255,255,.2)'"></div>
+          <button onclick="sendLead()" style="width:100%;background:#FFFFFF;border:none;border-radius:10px;padding:.75rem;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:600;color:#1B1B1B;cursor:pointer;">&#128231; Po&#353;ljite povpra&#353;evanje</button>
         </div>
         <div id="sentBox" style="display:none;text-align:center;padding:.5rem 0;color:#FFFFFF">
           <div style="font-size:1.5rem;margin-bottom:.4rem">&#10003;</div>
@@ -441,7 +384,7 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
       </div>
 
       <!-- Prodaja CTA -->
-      <div id="prodajaBox" style="background:linear-gradient(135deg,var(--gold),var(--gold-lt));border-radius:14px;padding:1.1rem 1.2rem;margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between;gap:1rem">
+      <div id="prodajaBox" style="background:linear-gradient(135deg,var(--gold),var(--gold-lt));border-radius:14px;padding:1.1rem 1.2rem;margin-bottom:1.2rem;display:flex;align-items:center;justify-content:space-between;gap:1rem">
         <div>
           <div style="font-size:.88rem;font-weight:700;color:#1B1B1B">Razmi&#353;ljate o prodaji?</div>
           <div style="font-size:.74rem;color:rgba(27,27,27,.6);margin-top:.2rem">Brezpla&#269;en posvet z na&#353;im svetovalcem.</div>
@@ -451,18 +394,14 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
       <div id="prodajaForm" style="display:none;background:var(--paper);border:1.5px solid var(--border);border-radius:14px;padding:1.1rem 1.2rem;margin-bottom:1rem">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem">
           <div style="font-size:.7rem;font-weight:600;color:var(--muted);letter-spacing:.08em">POVPRA&#352;EVANJE ZA PRODAJO</div>
-          <button onclick="document.getElementById('prodajaForm').style.display='none';document.getElementById('prodajaBox').style.display='flex'" style="background:none;border:none;font-size:1rem;color:var(--muted);cursor:pointer;padding:0;line-height:1">&#10005;</button>
+          <button onclick="document.getElementById('prodajaForm').style.display='none';document.getElementById('prodajaBox').style.display='flex'" style="background:none;border:none;font-size:1rem;color:var(--muted);cursor:pointer;padding:0">&#10005;</button>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.5rem">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.5rem" class="prodaja-grid">
           <input id="prodajaName" type="text" placeholder="Ime in priimek" style="padding:.65rem .75rem;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.82rem;color:var(--ink);background:var(--white);outline:none;box-sizing:border-box" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'">
           <input id="prodajaPhone" type="tel" placeholder="Telefon" style="padding:.65rem .75rem;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.82rem;color:var(--ink);background:var(--white);outline:none;box-sizing:border-box" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'">
         </div>
-        <div style="margin-bottom:.5rem">
-          <input id="prodajaEmail" type="email" placeholder="E-mail" style="width:100%;padding:.65rem .75rem;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.82rem;color:var(--ink);background:var(--white);outline:none;box-sizing:border-box" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'">
-        </div>
-        <div style="margin-bottom:.5rem">
-          <input id="prodajaPredmet" type="text" placeholder="Predmet prodaje (npr. hi&#353;a Ljubljana, 200 m&#178;)" style="width:100%;padding:.65rem .75rem;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.82rem;color:var(--ink);background:var(--white);outline:none;box-sizing:border-box" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'">
-        </div>
+        <div style="margin-bottom:.5rem"><input id="prodajaEmail" type="email" placeholder="E-mail" style="width:100%;padding:.65rem .75rem;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.82rem;color:var(--ink);background:var(--white);outline:none;box-sizing:border-box" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'"></div>
+        <div style="margin-bottom:.5rem"><input id="prodajaPredmet" type="text" placeholder="Predmet prodaje (npr. hi&#353;a Ljubljana, 200 m&#178;)" style="width:100%;padding:.65rem .75rem;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.82rem;color:var(--ink);background:var(--white);outline:none;box-sizing:border-box" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'"></div>
         <button onclick="sendProdaja()" style="width:100%;background:var(--ink);border:none;border-radius:8px;padding:.7rem;font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:600;color:#FFFFFF;cursor:pointer">Po&#353;lji povpra&#353;evanje &#8594;</button>
       </div>
       <div id="prodajaSent" style="display:none;text-align:center;padding:.85rem;background:var(--paper);border:1.5px solid var(--border);border-radius:14px;margin-bottom:1rem">
@@ -470,35 +409,8 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
         <div style="font-size:.88rem;font-weight:600;color:var(--ink)">Hvala! Kontaktirali vas bomo kmalu.</div>
       </div>
 
-      <div class="summary-grid">
-        <div class="sum-item"><div class="sum-label">Vrsta</div><div class="sum-value" id="sumType">&#8212;</div></div>
-        <div class="sum-item"><div class="sum-label">Lokacija</div><div class="sum-value" id="sumLoc">&#8212;</div></div>
-        <div class="sum-item"><div class="sum-label">Analiti&#269;no obmo&#269;je</div><div class="sum-value" id="sumTao">&#8212;</div></div>
-        <div class="sum-item"><div class="sum-label">Povr&#353;ina</div><div class="sum-value" id="sumSize">&#8212;</div></div>
-        <div class="sum-item"><div class="sum-label">Leto izgradnje</div><div class="sum-value" id="sumYear">&#8212;</div></div>
-        <div class="sum-item"><div class="sum-label">Stanje</div><div class="sum-value" id="sumCond">&#8212;</div></div>
-      </div>
-      <div class="ref-section">
-        <div class="ref-title">REFEREN&#268;NE VREDNOSTI GURS (MEDIANA, 2025)</div>
-        <div class="ref-grid">
-          <div class="ref-item"><div class="ri-label" id="refPriceLabel">Mediana cene</div><div class="ri-val" id="refPrice">&#8212;</div></div>
-          <div class="ref-item"><div class="ri-label">Ref. leto gradnje</div><div class="ri-val" id="refYear">&#8212;</div></div>
-          <div class="ref-item"><div class="ri-label" id="refSizeLabel">Mediana povr&#353;ine</div><div class="ri-val" id="refSize">&#8212;</div></div>
-          <div class="ref-item"><div class="ri-label">Vzorec transakcij</div><div class="ri-val" id="refN">&#8212;</div></div>
-          <div class="ref-item" id="refZemRow" style="display:none"><div class="ri-label">Mediana parcele</div><div class="ri-val" id="refZemVal">&#8212;</div></div>
-        </div>
-      </div>
-      <div class="trend-section" id="rTrend" style="margin-bottom:.8rem">
-        <div class="ref-title">Gibanje cen 2020&#8211;2025</div>
-        <div id="trendSvg" style="margin:0;line-height:0;font-size:0"></div>
-        <canvas class="trend-chart" id="trendChart" style="display:none"></canvas>
-        <div class="trend-legend" id="trendLegend"></div>
-      </div>
-      <div id="etnSection" style="display:none" class="etn-section"></div>
 
 
-
-      <!-- Edit menu -->
       <div id="editMenu">
         <div style="font-size:.78rem;font-weight:600;color:var(--muted);margin-bottom:.6rem;letter-spacing:.05em">KAJ HO&#268;E&#352; POPRAVITI?</div>
         <button onclick="goBackStep(1)" style="display:block;width:100%;text-align:left;padding:.55rem .75rem;margin-bottom:.3rem;background:none;border:1px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.85rem;cursor:pointer;color:var(--ink)">&#127968; Vrsta nepremi&#269;nine</button>
@@ -511,8 +423,10 @@ input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;bac
     </div>
   </div>
 
-</div><!-- /wrapper -->
+</div>
 <script>
+
+
 
 //  GURS 2025 \u2014 KOMPLETNI PODATKI
 //  Vir: GURS Letno poročilo za leto 2025
@@ -1104,7 +1018,7 @@ function drawETN(laoKey, isHisa){
     }
     return `<div class="etn-card"><div class="etn-card-top"><span class="etn-card-addr">${t.n}</span><span class="etn-card-price">${t.p.toLocaleString('sl-SI')} €/m²</span></div><div class="etn-card-meta">${t.m} m² · ${t.l>0?t.l:'—'} · ${vs} · ${t.d}</div></div>`;
   }).join('');
-  sec.innerHTML=`<div class="ref-title">Zadnje prodaje${isFallback?' (regija)':' v območju'}</div><table class="etn-table"><thead><tr><th>Naslov</th><th style="text-align:right">${isHisa?'Hiša / parcela':'m²'}</th><th style="text-align:right">Leto</th><th style="text-align:right">${isHisa?'Cena':'€/m²'}</th><th style="text-align:right">vs. avg</th><th style="text-align:right">Datum</th></tr></thead><tbody>${rows}</tbody></table><div class="etn-cards">${cards}</div><div class="etn-note">Vir: ETN (Evidenca trga nepremičnin), 2026</div>`;
+  sec.innerHTML=`<div class="ref-title">Zadnje prodaje${isFallback?' (regija)':' v območju'}</div><table class="etn-table"><thead><tr><th>Naslov</th><th style="text-align:right">${isHisa?'Hiša / parcela':'m²'}</th><th style="text-align:right">Leto</th><th style="text-align:right">${isHisa?'Cena':'€/m²'}</th><th style="text-align:right">vs. avg</th><th style="text-align:right">Datum</th></tr></thead><tbody>${rows}</tbody></table><div class="etn-cards">${cards}</div><div class="etn-note">Vir: ETN (Evidenca trga nepremičnin), jan 2025 – mar 2026</div>`;
 }
 
 
@@ -1142,26 +1056,20 @@ function dispPrice(entry){
 
 function setProgress(n){
   const pct=[0,20,40,60,80,100][n]||0;
-  const fill=document.getElementById('progFill');
-  if(fill) fill.style.width=pct+'%';
-  const lbl=document.getElementById('stepLabel');
-  if(lbl) lbl.textContent=n<=4?'Korak '+n+' od 4':'Korak 5 od 5 – Ocena';
-  const pctEl=document.getElementById('stepPct');
-  if(pctEl) pctEl.textContent=pct+' %';
+  const fill=document.getElementById('progFill');if(fill)fill.style.width=pct+'%';
+  const lbl=document.getElementById('stepLabel');if(lbl)lbl.textContent=n<=4?'Korak '+n+' od 4':'Ocena pripravljena';
+  const pctEl=document.getElementById('stepPct');if(pctEl)pctEl.textContent=pct+' %';
   for(let i=1;i<=5;i++){
-    const dot=document.getElementById('sdot'+i);
-    const circ=document.getElementById('sdotc'+i);
+    const dot=document.getElementById('sdot'+i),circ=document.getElementById('sdotc'+i);
     if(!dot||!circ)continue;
-    dot.classList.remove('active');
-    circ.classList.remove('active','done');
-    if(i<n){circ.classList.add('done');}
+    dot.classList.remove('active');circ.classList.remove('active','done');
+    if(i<n)circ.classList.add('done');
     else if(i===n){dot.classList.add('active');circ.classList.add('active');}
     if(i<5){const con=document.getElementById('scon'+i);if(con)con.classList.toggle('done',i<n);}
   }
 }
 
 function go(n){
-  console.log('go called n='+n+' S.type='+S.type);
   document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
   document.getElementById('s'+n).classList.add('active');
   setProgress(n);
@@ -1196,19 +1104,10 @@ function go(n){
       if(!S.parcelaSet){parSl.value=refZem;S.parcela=refZem;const pnEl=document.getElementById('parcelaNum');if(pnEl)pnEl.textContent=refZem;}
     }
   }
-  // Inicializiraj kakovost gumbe - default Standard
-  if(!S.kakovost||S.kakovost===1.0){
-    selKakovost('standard', 1.0);
-  } else {
-    const kTip=S.kakovost>=1.25?'luksuz':S.kakovost>=1.12?'nadstandard':'standard';
-    selKakovost(kTip, S.kakovost);
-  }
+  // Inicializiraj kakovost gumbe
+  const kTip=S.kakovost>=1.25?'luksuz':S.kakovost>=1.12?'nadstandard':'standard';
+  selKakovost(kTip, S.kakovost||1.0);
   if(n===4){
-    // Nastavi default notranjost na 'Dobro' če ni bila izbrana
-    if(S.ktAge===null){
-      const defKtBtn=document.getElementById('kt-dobro');
-      if(defKtBtn) selKt(defKtBtn,10,'Dobro');
-    }
     // Posodobi default vrednosti sliderjev komponent na leto gradnje
     const defYr=S.year||1980;
     ['fasada','okna','inst','streha'].forEach(id=>{
@@ -1275,14 +1174,10 @@ function renderDD(q){
   _focus=-1;
   if(!_matches.length){dd.classList.remove('open');return;}
   dd.innerHTML=_matches.map((e,i)=>{
-    const key=S.type==='stanovanje'?e.sk:e.hk;
-    const d=getData(S.type,key)||getData(S.type,key.split('|')[0]);
-    const price=d?(S.type==='stanovanje'?fmtM2(d.cena_m2):fmt(d.cena_h)):'';
     return `<div class="dd-item" tabindex="0" onclick="selectLoc(${i})" onkeydown="if(event.key==='Enter')selectLoc(${i})"
-      style="padding:.75rem 1rem;cursor:pointer;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:.88rem"
+      style="padding:.75rem 1rem;cursor:pointer;border-bottom:1px solid var(--border);font-size:.88rem"
       onmouseover="this.style.background='rgba(192,154,74,.06)'" onmouseout="this.style.background=''">
       <span>${highlight(e.k,q)}</span>
-      <span style="color:var(--muted);font-size:.78rem">${price}</span>
     </div>`;
   }).join('');
   dd.classList.add('open');
@@ -1297,7 +1192,7 @@ function selectLoc(i){
   if(!d)return;
   document.getElementById('pillKraj').textContent=e.k;
   document.getElementById('pillTao').textContent=d.label;
-  document.getElementById('pillPrice').textContent=S.type==='stanovanje'?fmtM2(d.cena_m2):fmt(d.cena_h);
+  document.getElementById('pillPrice').textContent='';
   const _pill=document.getElementById('locPill');
   const _sw=document.getElementById('searchWrap');
   if(_pill) _pill.classList.add('show');
@@ -1447,40 +1342,30 @@ function onAtrijManual(v){
   if(sl) sl.value=Math.min(n,parseInt(sl.max));
 }
 
-const COMP_LABELS={
-  fasada:{icon:'🏠',label:'Fasada'},
-  okna:{icon:'🪟',label:'Okna'},
-  inst:{icon:'⚡',label:'Instalacije'},
-  streha:{icon:'🏗️',label:'Streha'}
-};
-function compToggleHTML(id, yearOrNull){
-  const c=COMP_LABELS[id]||{icon:'',label:id};
-  if(yearOrNull===null){
-    return `<span class="comp-toggle-label">${c.icon} ${c.label}</span><span style="font-size:.75rem;color:var(--muted)">Ni obnovljeno</span>`;
-  } else {
-    return `<span class="comp-toggle-label">${c.icon} ${c.label}</span><span style="font-size:.75rem;color:var(--gold);font-weight:600">${yearOrNull}</span>`;
-  }
-}
+const COMP_LABELS={fasada:{icon:'🏠',label:'Fasada'},okna:{icon:'🪟',label:'Okna'},inst:{icon:'⚡',label:'Inštalacije'},streha:{icon:'🏗️',label:'Streha'}};
+function compToggleHTML(id,yearOrNull){const c=COMP_LABELS[id]||{icon:'',label:id};if(yearOrNull===null){return `<span class="comp-toggle-label">${c.icon} ${c.label}</span><span class="comp-chevron" style="margin-left:auto;color:var(--muted);font-size:.9rem;transition:transform .2s">›</span><span style="font-size:.75rem;color:var(--muted)">Ni obnovljeno</span>`;}else{return `<span class="comp-toggle-label">${c.icon} ${c.label}</span><span class="comp-chevron" style="margin-left:auto;color:var(--muted);font-size:.9rem;transition:transform .2s">›</span><span style="font-size:.75rem;color:var(--gold);font-weight:600">${yearOrNull}</span>`;}}
 function toggleComp(id){
   const tog=document.getElementById('tog-'+id);
   const wrap=document.getElementById('wrap-'+id);
   const isActive=tog.classList.contains('active');
   if(isActive){
     tog.classList.remove('active');
-    tog.innerHTML=compToggleHTML(id, null);
+    tog.textContent='Ni obnovljeno';
     wrap.classList.remove('show');
     S[id]=null;
   } else {
     tog.classList.add('active');
+    const yr=parseInt(document.getElementById('sl-'+id).value);
+    tog.textContent=yr+'';
+    wrap.classList.add('show');
+    S[id]=yr;
+    // Set slider default to year of construction if known
     const defYr=Math.max(S.year||1980, 1945);
     document.getElementById('sl-'+id).value=defYr;
+    S[id]=defYr;
+    tog.textContent=defYr+'';
     const mn=document.getElementById('manual-'+id);
     if(mn) mn.value=defYr;
-    const dispEl=document.getElementById('disp-'+id);
-    if(dispEl) dispEl.textContent=defYr;
-    S[id]=defYr;
-    tog.innerHTML=compToggleHTML(id, defYr);
-    wrap.classList.add('show');
   }
 }
 function onComp(id,v){
@@ -1488,10 +1373,8 @@ function onComp(id,v){
   S[id]=n;
   const mn=document.getElementById('manual-'+id);
   if(mn&&parseInt(mn.value)!==n) mn.value=n;
-  const dispEl=document.getElementById('disp-'+id);
-  if(dispEl) dispEl.textContent=n;
-  const togEl=document.getElementById('tog-'+id);
-  if(togEl) togEl.innerHTML=compToggleHTML(id,n);
+  const dispEl=document.getElementById('disp-'+id);if(dispEl)dispEl.textContent=n;
+  const togEl=document.getElementById('tog-'+id);if(togEl)togEl.innerHTML=compToggleHTML(id,n);
 }
 function onCompManual(id,v){
   const n=parseInt(v);
@@ -1499,14 +1382,10 @@ function onCompManual(id,v){
   S[id]=n;
   const sl=document.getElementById('sl-'+id);
   if(sl) sl.value=Math.min(n,parseInt(sl.max));
-  const togEl=document.getElementById('tog-'+id);
-  if(togEl) togEl.innerHTML=compToggleHTML(id,n);
+  document.getElementById('tog-'+id).textContent=n;
 }
-function selKt(btn,age,label){
-  ['kt-novo','kt-dobro','kt-staro','kt-obrab'].forEach(id=>{
-    const b=document.getElementById(id);
-    if(b) b.classList.remove('sel');
-  });
+function selKt(btn,age){
+  document.querySelectorAll('.kt-btn').forEach(b=>b.classList.remove('sel'));
   btn.classList.add('sel');
   S.ktAge=age;
   document.getElementById('btn4').disabled=false;
@@ -1531,24 +1410,15 @@ function calcEffectiveAge(){
 }
 
 
-
-function showProdajaForm(){
-  document.getElementById('prodajaBox').style.display='none';
-  document.getElementById('prodajaForm').style.display='block';
-}
-function sendProdaja(){
-  const n=document.getElementById('prodajaName').value.trim();
-  const p=document.getElementById('prodajaPhone').value.trim();
-  if(!n||!p){alert('Prosimo, vnesite ime in telefon.');return;}
-  document.getElementById('prodajaForm').style.display='none';
-  document.getElementById('prodajaSent').style.display='block';
-}
 function showResult(){
   S.size=parseInt(document.getElementById('sizeSlider').value);
   S.year=parseInt(document.getElementById('yearSlider').value);
   document.getElementById('quizCard').style.display='none';
   document.getElementById('resultCard').classList.add('active');
   setProgress(5);
+  document.getElementById('progFill').style.width='100%';
+  document.getElementById('stepLabel').textContent='Ocena pripravljena';
+  document.getElementById('stepPct').textContent='100 %';
 
   setTimeout(()=>{ try {
     const isS=S.type==='stanovanje';
@@ -1608,10 +1478,12 @@ function showResult(){
     const taoDataH=_taoKey?getData('hisa',_taoKey):null;
 
     let mid,low,high,ppm2,noteStr;
+    let _sr=null,_garazaVal=0,_zunanjeVal=0,_atrijVal=0,_adjHisa=0,_parcelaDiff=0,_sr_hisa=null,_novoFaktor=null,_stanM2=0,_refZem=0,_adjHisaBase=0;
     if(isS){
       const bm=d.cena_m2;
       const rm=d.ref_m2||51;
       const sr=sizeRatio(S.size,rm);
+      _sr=sr;
       const adjM2=bm*sr*ageMult*S.kakovost;
       // Garaža/parkirno mesto: stanM2 \u00D7 4.95 \u00D7 število mest
       // Garaža: stanM2 \u00D7 4.95, zunanje: \u00D7 0.5
@@ -1622,6 +1494,7 @@ function showResult(){
       // Osnova: zunanje parkirno = 0.5 \u00D7 garaža (stanM2\u00D74.95), parking mesto = 12.5m\u00B2
       // \u2192 \u20AC/m\u00B2 atrija = stanM2 \u00D7 2.475/12.5 = stanM2 \u00D7 0.198
       const atrijVal=S.atrij>0?Math.round(d.cena_m2*0.198*Math.pow(S.atrij,0.7)/500)*500:0;
+      _garazaVal=garazaVal;_zunanjeVal=zunanjeVal;_atrijVal=atrijVal;
       ppm2=Math.round(adjM2*korekcija2026);
       mid=Math.round((adjM2*S.size+garazaVal+zunanjeVal+atrijVal)*korekcija2026/1000)*1000;
       low=Math.round((adjM2*S.size*(1-band)+garazaVal+zunanjeVal+atrijVal)*korekcija2026/1000)*1000;
@@ -1662,11 +1535,14 @@ function showResult(){
         pk:3500,ha:3500};
       // Za novogradnje (2013+): stroškovni pristop z regionalnim capom
       // Za starejše hiše: percentilna interpolacija
+      _sr_hisa=sr; _stanM2=stanM2; _refZem=refZem;
       let adjHisa;
       if(S.year>=2013){
         const cap=NOVO_CAP[taoKey]||1800;
         const novoFaktor=stanM2<2000?Math.max(1400,stanM2*0.75)/stanM2:1.05;
+        _novoFaktor=novoFaktor;
         const novoM2=Math.min(stanM2*novoFaktor,cap);
+        _adjHisaBase=novoM2;
         adjHisa=novoM2*S.size*sr;
       } else {
         const baseH=pctBase(effAge,refEffAge,p25h,bh,p75h);
@@ -1674,11 +1550,13 @@ function showResult(){
           return yr>=2010?Math.min(0.05,(yr-2010)/3*0.05):0;
         }
         adjHisa=baseH*sr*(1+novogrPremium(S.year));
+        _adjHisaBase=baseH;
       }
       // Parcela: 0.03 \u00D7 stan mediana + sub-linearna (^0.6) + cap \u00B125%
       const parcelaM2cena=0.03*stanM2;
       const parcelaDiff=Math.max(-adjHisa*0.40,Math.min(adjHisa*0.40,parcelaM2cena*refZem*(Math.pow(S.parcela/refZem,0.6)-1)));
       const adjTotal=adjHisa+parcelaDiff;
+      _adjHisa=adjHisa; _parcelaDiff=parcelaDiff;
       ppm2=Math.round(adjHisa/S.size*korekcija2026);
       mid=Math.round(adjTotal*korekcija2026/1000)*1000;
       low=Math.round(adjTotal*(1-band)*korekcija2026/1000)*1000;
@@ -1721,35 +1599,16 @@ function showResult(){
       else if(adjPpm2 < med*0.88) contextStr='Vaše stanovanje je v spodnjem kvartilu za to območje.';
       else contextStr='Vaše stanovanje je blizu mediane za to območje.';
     }
-    if(!contextStr && !isS){
-      // Za hiše dodaj kontekst glede na razpon
-      if(mid > high*0.9) contextStr='Nepremičnina je v zgornjem vrednostnem razredu za to območje.';
-      else if(mid < low*1.1) contextStr='Nepremičnina je v spodnjem vrednostnem razredu za to območje.';
-      else contextStr='Ocena temelji na mediani prodajnih cen v tem območju.';
-    }
     document.getElementById('rContext').textContent=contextStr;
-    // Animacija cene - counter up efekt
     const priceEl=document.getElementById('rMainPrice');
-    const startVal=Math.round(mid*0.6);
-    const endVal=mid;
-    const duration=800;
-    const startTime=performance.now();
-    function animatePrice(now){
-      const elapsed=now-startTime;
-      const progress=Math.min(elapsed/duration,1);
-      const ease=1-Math.pow(1-progress,3);
-      const current=Math.round(startVal+(endVal-startVal)*ease);
-      priceEl.textContent=fmt(current);
-      if(progress<1) requestAnimationFrame(animatePrice);
-      else priceEl.textContent=fmt(endVal);
-    }
+    const startVal=Math.round(mid*0.6),endVal=mid,duration=900,startTime=performance.now();
+    function animatePrice(now){const elapsed=now-startTime,progress=Math.min(elapsed/duration,1),ease=1-Math.pow(1-progress,3),current=Math.round(startVal+(endVal-startVal)*ease);priceEl.textContent=fmt(current);if(progress<1)requestAnimationFrame(animatePrice);else priceEl.textContent=fmt(endVal);}
     requestAnimationFrame(animatePrice);
     document.getElementById('rPpm2').textContent=fmtM2(ppm2);
     document.getElementById('rLow').textContent=fmt(low);
     document.getElementById('rHigh').textContent=fmt(high);
     document.getElementById('rConfidence').textContent=`\u00B1${Math.round(band*100)} % \u00B7 ${confLabel}`;
-    // noteStr je za debug - ne prikazujemo tehnikalij uporabniku
-    document.getElementById('rNote').style.display='none';
+    document.getElementById('rNote').textContent=noteStr;
     const extras=[];
     if(S.garaza>0) extras.push(S.garaza+'\u00D7 garaža');
     if(S.zunanje>0) extras.push(S.zunanje+'\u00D7 zunanj. parking');
@@ -1762,12 +1621,21 @@ function showResult(){
     // Komponente za prikaz
     const ktLabels={0:'Prenovljeno',10:'Dobro',20:'Staro',40:'Obrabljeno'};
     const compParts=[];
-    if(S.fasada)compParts.push('Fasada '+S.fasada);
-    if(S.okna)compParts.push('Okna '+S.okna);
-    if(S.inst)compParts.push('Inštalacije '+S.inst);
-    if(S.streha)compParts.push('Streha '+S.streha);
-    compParts.push('Notranjost: '+(ktLabels[S.ktAge]||'\u2014'));
-    if(S.kakovost>1.0) compParts.push('Kakovost: '+(S.kakovost>=1.25?'Luksuz':'Nadstandard'));
+    // Notranjost (vedno prikaži)
+    const _ktLabel=S.ktAge!==null?ktLabels[S.ktAge]:'Dobro';
+    compParts.push('Notranjost: '+(_ktLabel||'Dobro'));
+    // Kakovost (samo če ni standard)
+    if(S.kakovost>=1.25) compParts.push('Kakovost: Luksuz');
+    else if(S.kakovost>1.0) compParts.push('Kakovost: Nadstandard');
+    // Obnove (samo če so bile vnesene)
+    if(S.fasada) compParts.push('Fasada obnovljena '+S.fasada);
+    if(S.okna) compParts.push('Okna obnovljena '+S.okna);
+    if(S.inst) compParts.push('Inšt. obnovljene '+S.inst);
+    if(S.streha) compParts.push('Streha obnovljena '+S.streha);
+    // Dodatki za stanovanje
+    if(isS&&S.garaza>0) compParts.push('Garaža '+S.garaza+'×');
+    if(isS&&S.zunanje>0) compParts.push('Parkirno '+S.vanjske+'×');
+    if(isS&&S.atrij>0) compParts.push('Atrij '+S.atrij+' m²');
     document.getElementById('sumCond').textContent=compParts.join(' \u00B7 ');
     if(isS){
       document.getElementById('refPriceLabel').textContent='Mediana \u20AC/m\u00B2 (2025)';
@@ -1789,24 +1657,25 @@ function showResult(){
     document.getElementById('refN').textContent=d.n+' prodaj';
     document.getElementById('loadingWrap').style.display='none';
     document.getElementById('resultBody').style.display='block';
-    // Scroll to result
-    const rc=document.getElementById('resultCard');
-    if(rc) setTimeout(()=>rc.scrollIntoView({behavior:'smooth',block:'start'}),100);
+    setTimeout(()=>{const rc=document.getElementById('resultCard');if(rc)rc.scrollIntoView({behavior:'smooth',block:'start'});},100);
     // Nariši graf gibanja cen in ETN transakcije
     const taoId=getTaoId(S.entry);
     drawTrendChart(taoId||'SI');
     const laoKey=S.type==='stanovanje'?S.entry.sk:S.entry.hk;
     drawETN(laoKey||taoId||'lj', !isS);
+    // Prilagoditve izracuna
+    drawAdjustments(isS, d, _sr, ageMult, ageDiff, effAge, refEffAge, _garazaVal, _zunanjeVal, _atrijVal, mid, ppm2, _adjHisa, _parcelaDiff, _sr_hisa, _stanM2, _refZem, _adjHisaBase, S.year>=2013, _novoFaktor);
   } catch(err){ console.error('showResult error:',err); document.getElementById('resultBody').style.display='block'; }
   },1400);
+}
+function showCtaForm(){
+  const b=document.getElementById('ctaBtn');if(b)b.style.display='none';
+  const f=document.getElementById('ctaForm');if(f)f.style.display='block';
 }
 function sendLead(){
   const n=document.getElementById('ctaName').value.trim();
   const p=document.getElementById('ctaPhone').value.trim();
-  const e=document.getElementById('ctaEmail').value.trim();
-  const nm=document.getElementById('ctaNamen').value;
-  if(!n||!p||!e){alert('Prosimo, vnesite ime, telefonsko številko in e-mail.');return;}
-  if(!e.includes('@')){alert('Vnesite veljaven e-mail naslov.');return;}
+  if(!n||!p){alert('Prosimo, vnesite ime in telefonsko številko.');return;}
   document.getElementById('ctaForm').style.display='none';
   document.getElementById('sentBox').style.display='block';
 }
@@ -1958,14 +1827,152 @@ function drawTrendChart(taoId){
 
   // Legend
   const legItems=[];
-    const regionLabel=S.entry?(S.entry.k):(taoId||'regija');
-  if(showBoth) legItems.push({color:'#C09A4A',label:(isS?'Stanovanja':'Hiše')+' – '+regionLabel});
+  if(showBoth) legItems.push({color:'#C09A4A',label:isS?'Stanovanja \u2013 vaša regija':'Hiše \u2013 vaša regija'});
   if(siVals)   legItems.push({color:'#C8C3BC',label:'Slovenija skupaj'});
   legend.innerHTML=legItems.map(l=>
     `<div class="trend-leg-item"><div class="trend-leg-dot" style="background:${l.color}"></div>${l.label}</div>`
   ).join('');
 }
 
+function drawAdjustments(isS, d, sr, ageMult, ageDiff, effAge, refEffAge,
+    garazaVal, zunanjeVal, atrijVal, mid, ppm2,
+    adjHisa, parcelaDiff, srH, stanM2, refZem, adjBase, isNovo, novoFaktor){
+  const el=document.getElementById('adjContent');
+  if(!el) return;
+
+  const fmtPct=(v)=>(v>=0?'+':'')+Math.round(v*100)+'%';
+  const rows=[];
+
+  if(isS){
+    // IZHODISCE
+    rows.push({type:'header', label:'Izhodišče'});
+    rows.push({label:'Mediana GURS za območje', val:fmtM2(d.cena_m2), note:'GURS 2025, LAO/TAO mediana'});
+
+    // POVRSINA
+    rows.push({type:'header', label:'Prilagoditev površine'});
+    rows.push({label:'Referenčna površina (mediana TAO)', val:(d.ref_m2||51)+' m²'});
+    rows.push({label:'Vaša površina', val:S.size+' m²'});
+    if(sr){
+      const p=Math.round((sr-1)*100);
+      rows.push({
+        label:'Korekcija €/m² glede na velikost',
+        val:(p>=0?'+':'')+p+'%',
+        note:p>0?'Večje od mediane → nižja €/m²':p<0?'Manjše od mediane → višja €/m²':'Enako mediani',
+        highlight:Math.abs(p)>0
+      });
+    }
+
+    // STAROST
+    rows.push({type:'header', label:'Prilagoditev starosti'});
+    rows.push({label:'Efektivna starost vaše nepremičnine', val:Math.round(effAge)+' let',
+      note:'Upošteva leto gradnje in obnove komponent'});
+    rows.push({label:'Referenčna efektivna starost (TAO)', val:Math.round(refEffAge)+' let'});
+    const ap=Math.round((ageMult-1)*100);
+    rows.push({
+      label:'Starostna korekcija',
+      val:(ap>=0?'+':'')+ap+'%',
+      note:ageDiff>2?'Mlajše od povp. TAO → premija':ageDiff<-2?'Starejše od povp. TAO → popust':'Primerljivo s povp. TAO',
+      highlight:true
+    });
+
+    // KAKOVOST
+    const kak=S.kakovost;
+    if(kak>1.0){
+      rows.push({type:'header', label:'Kakovost izvedbe'});
+      rows.push({
+        label:'Kakovost ('+(kak>=1.25?'Luksuz':'Nadstandard')+')',
+        val:'+'+(Math.round((kak-1)*100))+'%',
+        highlight:true
+      });
+    }
+
+    // KOREKCIJA 2026
+    rows.push({type:'header', label:'Tržna korekcija'});
+    rows.push({label:'Indeksacija na 2026 (letna rast)', val:'+3%', note:'GURS podatki so za 2025'});
+
+    // DODATKI
+    const extras=[];
+    if(garazaVal>0) extras.push({label:'Garažno mesto ('+S.garaza+'×)', val:'+'+fmt(garazaVal), note:'Ocena: '+fmtM2(d.cena_m2)+'  × 4,95 × št. mest'});
+    if(zunanjeVal>0) extras.push({label:'Zunanje parkirno ('+S.vanjske+'×)', val:'+'+fmt(zunanjeVal), note:'Ocena: 50% vrednosti garažnega mesta'});
+    if(S.atrij>0) extras.push({label:'Atrij / zasebni vrt ('+S.atrij+' m²)', val:(atrijVal>=0?'+':'')+fmt(atrijVal), note:'Vrednost zemljišča po GURS metodologiji'});
+    if(extras.length){
+      rows.push({type:'header', label:'Dodatki'});
+      extras.forEach(e=>rows.push(e));
+    }
+
+  } else {
+    // HISA
+    rows.push({type:'header', label:'Izhodišče'});
+    if(isNovo){
+      rows.push({label:'Metoda izračuna', val:'Stroškovni pristop', note:'Hiša zgrajena 2013 ali kasneje'});
+      rows.push({label:'Regionalna mediana stanovanja (TAO)', val:fmtM2(stanM2||0), note:'Osnova za stroškovni pristop'});
+      if(novoFaktor) rows.push({label:'Faktor novogradnje', val:Math.round(novoFaktor*100)+'%', note:'Razmerje gradbenih stroškov / mediana stanovanja'});
+      rows.push({label:'Ocenjena vrednost/m² (brez parcele)', val:adjBase?fmtM2(Math.round(adjBase)):'—', highlight:true});
+    } else {
+      rows.push({label:'Metoda izračuna', val:'Percentilna interpolacija', note:'Na podlagi p25/p50/p75 TAO transakcij'});
+      rows.push({label:'Ocenjena vrednost/m² (brez parcele)', val:adjBase?fmtM2(Math.round(adjBase)):'—', highlight:true});
+    }
+    rows.push({label:'Površina hiše', val:S.size+' m²'});
+    if(adjHisa) rows.push({label:'Vrednost hiše (površina × €/m²)', val:fmt(Math.round(adjHisa/1.03)), note:'Pred korekcijo 2026'});
+
+    // REGIONALNI FAKTOR
+    if(srH && Math.abs(srH-1)>0.005){
+      rows.push({type:'header', label:'Regionalni faktor'});
+      const sp=Math.round((srH-1)*100);
+      rows.push({label:'Lokacijska korekcija znotraj TAO', val:(sp>=0?'+':'')+sp+'%', highlight:true,
+        note:'Razlika med LAO in TAO povprečjem'});
+    }
+
+    // PARCELA
+    rows.push({type:'header', label:'Prilagoditev parcele'});
+    rows.push({label:'Referenčna parcela (mediana TAO)', val:(refZem||d.ref_zem||'—')+' m²'});
+    rows.push({label:'Vaša parcela', val:(S.parcela||0)+' m²'});
+    if(parcelaDiff!==undefined && parcelaDiff!==0){
+      const pp=Math.round(parcelaDiff/(adjHisa||1)*100);
+      rows.push({
+        label:'Korekcija vrednosti parcele',
+        val:(parcelaDiff>=0?'+':'')+fmt(Math.round(parcelaDiff/1.03)),
+        note:'Vpliv: '+(pp>=0?'+':'')+pp+'% na skupno vrednost',
+        highlight:true
+      });
+    } else {
+      rows.push({label:'Korekcija parcele', val:'0 €', note:'Vaša parcela je enaka referenčni'});
+    }
+
+    // STAROST
+    rows.push({type:'header', label:'Prilagoditev starosti'});
+    rows.push({label:'Efektivna starost hiše', val:Math.round(effAge)+' let',
+      note:'Upošteva leto gradnje in obnove komponent'});
+    rows.push({label:'Referenčna efektivna starost (TAO)', val:Math.round(refEffAge)+' let'});
+    const ap2=Math.round((ageMult-1)*100);
+    rows.push({
+      label:'Starostna korekcija',
+      val:(ap2>=0?'+':'')+ap2+'%',
+      note:ageDiff>2?'Mlajše od povp. TAO → premija':ageDiff<-2?'Starejše od povp. TAO → popust':'Primerljivo s povp. TAO',
+      highlight:true
+    });
+
+    // KAKOVOST
+    const kak2=S.kakovost;
+    if(kak2>1.0){
+      rows.push({type:'header', label:'Kakovost izvedbe'});
+      rows.push({label:'Kakovost ('+(kak2>=1.25?'Luksuz':'Nadstandard')+')', val:'+'+(Math.round((kak2-1)*100))+'%', highlight:true});
+    }
+
+    // KOREKCIJA 2026
+    rows.push({type:'header', label:'Tržna korekcija'});
+    rows.push({label:'Indeksacija na 2026 (letna rast)', val:'+3%', note:'GURS podatki so za 2025'});
+  }
+
+  // SKUPAJ
+  rows.push({type:'total', label:'OCENJENA VREDNOST', val:fmt(mid)+(isS?' · '+fmtM2(ppm2):'')});
+
+  el.innerHTML = rows.map(r=>{
+    if(r.type==='header') return `<div style="font-size:.65rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--gold);margin:.9rem 0 .3rem;padding-bottom:.2rem;border-bottom:1.5px solid rgba(192,154,74,.2)">${r.label}</div>`;
+    if(r.type==='total') return `<div style="display:flex;justify-content:space-between;align-items:center;padding:.6rem .75rem;margin-top:.6rem;background:var(--paper);border-radius:10px;border:1.5px solid rgba(192,154,74,.3)"><span style="font-size:.82rem;font-weight:700;color:var(--ink)">${r.label}</span><span style="font-size:.95rem;font-weight:700;color:var(--gold)">${r.val}</span></div>`;
+    return `<div style="display:flex;justify-content:space-between;align-items:baseline;padding:.3rem 0;border-bottom:1px solid rgba(0,0,0,.04)"><div><span style="font-size:.78rem;color:var(--muted)">${r.label}</span>${r.note?`<div style="font-size:.68rem;color:var(--muted);opacity:.7;margin-top:.1rem">${r.note}</div>`:''}</div><span style="font-weight:${r.highlight?700:500};font-size:.8rem;color:${r.highlight?'var(--ink)':'var(--muted)'};margin-left:.75rem;white-space:nowrap;${r.highlight?'background:rgba(192,154,74,.12);padding:.1rem .4rem;border-radius:6px':''}">${r.val}</span></div>`;
+  }).join('');
+}
 function goBackToEdit(){
   document.getElementById('editMenu').style.display='block';
 }
@@ -1979,7 +1986,21 @@ function goBackStep(n){
 
 
 
+setProgress(1);
 
+go(1);
+
+
+// Simulacija
+function toggleDetails(){
+  const btn=document.getElementById('detailsBtn');
+  const panel=document.getElementById('detailsContent');
+  if(!btn||!panel)return;
+  const isOpen=panel.classList.contains('open');
+  panel.classList.toggle('open',!isOpen);
+  btn.classList.toggle('open',!isOpen);
+  btn.innerHTML='<i class="acc-chevron">›</i> '+(isOpen?'Podrobnosti':'Skrij podrobnosti');
+}
 
 setProgress(1);
 go(1);
