@@ -1675,9 +1675,23 @@ function showCtaForm(){
 function sendLead(){
   const n=document.getElementById('ctaName').value.trim();
   const p=document.getElementById('ctaPhone').value.trim();
-  if(!n||!p){alert('Prosimo, vnesite ime in telefonsko številko.');return;}
+  const e=document.getElementById('ctaEmail').value.trim();
+  if(!n||!p||!e){alert('Prosimo, vnesite ime, telefon in e-mail.');return;}
   document.getElementById('ctaForm').style.display='none';
   document.getElementById('sentBox').style.display='block';
+}
+function showProdajaForm(){
+  const box=document.getElementById('prodajaBox');
+  const form=document.getElementById('prodajaForm');
+  if(box) box.style.display='none';
+  if(form) form.style.display='block';
+}
+function sendProdaja(){
+  const n=document.getElementById('prodajaName')?.value.trim();
+  const p=document.getElementById('prodajaPhone')?.value.trim();
+  if(!n||!p){alert('Prosimo, vnesite ime in telefon.');return;}
+  document.getElementById('prodajaForm').style.display='none';
+  document.getElementById('prodajaSent').style.display='block';
 }
 
 
