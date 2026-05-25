@@ -3,28 +3,37 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kalkulator vrednosti nepremičnine</title>
+<title>Kalkulator vrednosti nepremi&#269;nine</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-:root {
-  --ink:#18181B;--paper:#F8F5F0;--gold:#C09A4A;--gold-lt:#E8C97A;
-  --muted:#78716C;--border:#E7E2DA;--white:#FFFFFF;--card-bg:#FDFBF8;--accent:#2D4A3E;
-}
+:root{--ink:#1B1B1B;--paper:#F8F5F0;--gold:#C89A4A;--gold-lt:#EBC97A;--muted:#78716C;--border:#E7E2DA;--white:#FFFFFF;--card-bg:#FDFBF8;--accent:#2D4A3E;}
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);min-height:100vh;padding:2rem 1rem 4rem;}
 .wrapper{max-width:700px;margin:0 auto;}
 .header{text-align:center;margin-bottom:2.5rem;animation:rise .7s ease both;}
-.badge{display:inline-flex;align-items:center;gap:.4rem;font-size:.68rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);border:1px solid var(--gold);padding:.35rem 1rem;border-radius:100px;margin-bottom:1.2rem;}
+.badge{display:inline-flex;align-items:center;gap:.4rem;font-size:.68rem;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);border:1px solid var(--gold);padding:.35rem 1rem;border-radius:20px;margin-bottom:1rem;}
 .badge::before{content:'◆';font-size:.5rem;}
 .header h1{font-family:'Cormorant Garamond',serif;font-size:clamp(2rem,6vw,3rem);font-weight:600;line-height:1.15;letter-spacing:-.02em;margin-bottom:.8rem;}
 .header p{color:var(--muted);font-size:.92rem;font-weight:300;line-height:1.65;max-width:460px;margin:0 auto;}
 .progress-wrap{margin-bottom:1.8rem;animation:rise .7s .1s ease both;opacity:0;}
-.progress-meta{display:flex;justify-content:space-between;font-size:.75rem;color:var(--muted);margin-bottom:.5rem;}
-.progress-track{height:2px;background:var(--border);border-radius:2px;overflow:hidden;}
+.progress-meta{display:flex;justify-content:space-between;font-size:.75rem;color:var(--muted);margin-bottom:.8rem;}
+.progress-track{height:2px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:.8rem;}
 .progress-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-lt));border-radius:2px;transition:width .55s cubic-bezier(.4,0,.2,1);width:0%;}
-.card{background:var(--card-bg);border:1px solid var(--border);border-radius:24px;padding:2.5rem;box-shadow:0 2px 24px rgba(0,0,0,.05),0 1px 4px rgba(0,0,0,.03);animation:rise .7s .15s ease both;opacity:0;}
-.step{display:none;}.step.active{display:block;animation:slideR .35s ease both;}
-.step-icon{font-size:1.8rem;margin-bottom:.75rem;}
+.step-dots{display:flex;justify-content:center;gap:.4rem;}
+.step-dot{display:flex;flex-direction:column;align-items:center;gap:.3rem;flex:1;max-width:80px;}
+.step-dot-circle{width:36px;height:36px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.9rem;background:var(--paper);transition:all .3s;position:relative;}
+.step-dot-circle.done{background:var(--gold);border-color:var(--gold);}
+.step-dot-circle.done::after{content:'✓';position:absolute;font-size:.7rem;color:#1B1B1B;font-weight:700;}
+.step-dot-circle.active{border-color:var(--gold);background:var(--white);box-shadow:0 0 0 3px rgba(192,154,74,.15);}
+.step-dot-circle.active .step-dot-icon{opacity:1;}
+.step-dot-icon{font-size:.95rem;opacity:.4;transition:opacity .3s;}
+.step-dot-circle.done .step-dot-icon{display:none;}
+.step-dot-label{font-size:.6rem;color:var(--muted);text-align:center;letter-spacing:.03em;font-weight:500;transition:color .3s;}
+.step-dot.active .step-dot-label{color:var(--gold);font-weight:600;}
+.step-connector{flex:1;height:2px;background:var(--border);margin-top:18px;transition:background .3s;}
+.step-connector.done{background:var(--gold);}
+.card{background:var(--card-bg);border:1px solid var(--border);border-radius:24px;box-shadow:0 2px 24px rgba(0,0,0,.05),0 1px 4px rgba(0,0,0,.03);animation:rise .7s .15s ease both;opacity:0;}
+.step{display:none;padding:1.8rem 1.5rem;}.step.active{display:block;animation:slideR .35s ease both;}
 .step-title{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:600;letter-spacing:-.02em;margin-bottom:.3rem;}
 .step-sub{font-size:.85rem;color:var(--muted);font-weight:300;margin-bottom:1.6rem;line-height:1.55;}
 .type-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1.8rem;}
@@ -32,487 +41,477 @@ body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);m
 .type-card:hover{border-color:var(--gold);transform:translateY(-2px);}
 .type-card.sel{border-color:var(--gold);background:rgba(192,154,74,.06);}
 .type-card.sel .tc-name{color:var(--gold);}
-.tc-icon{font-size:1.6rem;margin-bottom:.5rem;}.tc-name{font-size:.92rem;font-weight:600;}
-.tc-desc{font-size:.75rem;color:var(--muted);margin-top:.2rem;font-weight:300;}
-/* SEARCH */
+.tc-icon{font-size:1.6rem;margin-bottom:.8rem;}
+.tc-name{font-size:.92rem;font-weight:600;}
+.tc-desc{font-size:.75rem;color:var(--muted);margin-top:.15rem;}
 .search-wrap{position:relative;margin-bottom:1.4rem;}
 .search-input-row{position:relative;}
 .search-icon{position:absolute;left:1rem;top:50%;transform:translateY(-50%);font-size:1rem;pointer-events:none;opacity:.4;}
-.loc-input{width:100%;padding:.95rem 2.4rem .95rem 2.7rem;border:1.5px solid var(--border);border-radius:14px;font-family:'DM Sans',sans-serif;font-size:1rem;color:var(--ink);background:var(--white);outline:none;transition:border-color .2s,box-shadow .2s;}
-.loc-input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(192,154,74,.12);}
-.loc-input::placeholder{color:#B5AFA8;}
-.clear-btn{position:absolute;right:.9rem;top:50%;transform:translateY(-50%);background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--muted);display:none;padding:.15rem .3rem;line-height:1;}
+.loc-input{width:100%;padding:.95rem 2.4rem .95rem 2.7rem;border:1.5px solid var(--border);border-radius:14px;font-family:'DM Sans',sans-serif;font-size:1rem;color:var(--ink);background:var(--white);box-shadow:0 0 0 3px rgba(192,154,74,.12);}
+.loc-input:focus{outline:none;border-color:var(--gold);}
+.clear-btn{position:absolute;right:.75rem;top:50%;transform:translateY(-50%);background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--muted);display:none;padding:.15rem .3rem;line-height:1;}
 .clear-btn:hover{color:var(--ink);}
-.dropdown{position:absolute;top:calc(100% + 6px);left:0;right:0;background:var(--white);border:1.5px solid var(--border);border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,.10);z-index:100;max-height:300px;overflow-y:auto;display:none;}
-.dropdown.open{display:block;animation:dropIn .18s ease both;}
-.dd-item{display:flex;align-items:center;justify-content:space-between;padding:.75rem 1.1rem;cursor:pointer;transition:background .15s;border-bottom:1px solid var(--border);gap:.75rem;}
+.dropdown{position:absolute;top:calc(100% + 8px);left:0;right:0;background:var(--white);border:1.5px solid var(--border);border-radius:14px;box-shadow:0 8px 32px rgba(0,0,0,.10);z-index:100;max-height:260px;overflow-y:auto;}
+.dropdown.open{animation:dropIn .18s ease both;}
+.dd-item{display:flex;justify-content:space-between;align-items:center;padding:.75rem 1rem;cursor:pointer;transition:background .15s;gap:.75rem;}
 .dd-item:last-child{border-bottom:none;}
-.dd-item:hover,.dd-item.focused{background:rgba(192,154,74,.06);}
 .dd-left{display:flex;flex-direction:column;flex:1;min-width:0;}
-.dd-kraj{font-size:.9rem;font-weight:500;}
-.dd-kraj mark{background:rgba(192,154,74,.28);color:var(--ink);border-radius:2px;padding:0 1px;font-weight:700;font-style:normal;}
-.dd-tao{font-size:.72rem;color:var(--muted);margin-top:.12rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.dd-price{font-size:.75rem;color:var(--gold);font-weight:600;white-space:nowrap;}
-.dd-empty{padding:1.1rem;text-align:center;font-size:.85rem;color:var(--muted);}
-.loc-selected{display:none;align-items:center;gap:.65rem;background:rgba(192,154,74,.07);border:1.5px solid var(--gold);border-radius:12px;padding:.9rem 1.1rem;margin-bottom:1rem;}
-.loc-selected.show{display:flex;animation:rise .25s ease both;}
-.ls-pin{font-size:1.1rem;}.ls-body{flex:1;min-width:0;}
-.ls-kraj{font-size:.92rem;font-weight:600;}.ls-tao{font-size:.73rem;color:var(--muted);margin-top:.1rem;}
-.ls-price{font-size:.78rem;font-weight:600;color:var(--gold);white-space:nowrap;}
-.ls-change{background:none;border:1px solid var(--border);font-family:'DM Sans',sans-serif;font-size:.75rem;color:var(--muted);cursor:pointer;padding:.3rem .65rem;border-radius:8px;transition:all .15s;white-space:nowrap;}
-.ls-change:hover{color:var(--gold);border-color:var(--gold);}
-/* SLIDERS */
-.slider-section{margin-bottom:1.8rem;}
-.field-label{font-size:.72rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:.6rem;display:block;}
-.slider-display{display:flex;align-items:baseline;gap:.4rem;margin-bottom:1rem;}
-.slider-num{font-family:'Cormorant Garamond',serif;font-size:3rem;font-weight:600;color:var(--gold);line-height:1;}
-.slider-unit{font-size:1rem;color:var(--muted);font-weight:300;}
-input[type=range]{-webkit-appearance:none;width:100%;height:3px;background:var(--border);border-radius:3px;outline:none;cursor:pointer;}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--gold);box-shadow:0 2px 8px rgba(192,154,74,.45);transition:transform .15s;}
-input[type=range]::-webkit-slider-thumb:hover{transform:scale(1.2);}
-.slider-range{display:flex;justify-content:space-between;font-size:.72rem;color:var(--muted);margin-top:.4rem;}
-/* CONDITION */
-.cond-grid{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:1.8rem;}
-.cond-btn{border:1.5px solid var(--border);border-radius:12px;padding:1rem;cursor:pointer;transition:all .2s;background:transparent;font-family:'DM Sans',sans-serif;text-align:center;color:var(--ink);}
-.cond-btn:hover{border-color:var(--gold);}.cond-btn.sel{border-color:var(--gold);background:rgba(192,154,74,.07);}
-.cond-icon{font-size:1.3rem;display:block;margin-bottom:.35rem;}.cond-name{font-size:.82rem;font-weight:500;display:block;}
-.cond-adj{font-size:.7rem;color:var(--muted);display:block;margin-top:.15rem;}.cond-btn.sel .cond-adj{color:var(--gold);}
-/* BUTTONS */
-.btn-row{display:flex;align-items:center;justify-content:space-between;margin-top:.5rem;}
-.btn-back{background:none;border:none;font-family:'DM Sans',sans-serif;font-size:.85rem;color:var(--muted);cursor:pointer;padding:.6rem 0;transition:color .2s;}
-.btn-back:hover{color:var(--ink);}
-.btn-next{background:var(--ink);color:var(--white);border:none;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:500;padding:.85rem 2rem;border-radius:12px;cursor:pointer;transition:all .2s;letter-spacing:.03em;}
-.btn-next:hover{background:var(--gold);transform:translateY(-1px);box-shadow:0 4px 16px rgba(192,154,74,.3);}
-.btn-next:disabled{background:var(--border);color:var(--muted);cursor:default;transform:none;box-shadow:none;}
-/* RESULT */
-.result-card{display:none;}.result-card.active{display:block;animation:rise .5s ease both;}
-.result-loading{text-align:center;padding:3.5rem 1rem;}
-.spinner{width:36px;height:36px;border:2.5px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .75s linear infinite;margin:0 auto 1.2rem;}
-.loading-text{color:var(--muted);font-size:.85rem;font-weight:300;}
-.result-body{display:none;}.result-body.active{display:block;animation:rise .5s ease both;}
-.result-hero{text-align:center;padding-bottom:1.8rem;margin-bottom:1.8rem;border-bottom:1px solid var(--border);}
-.result-eyebrow{font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:.75rem;}
-.result-main-price{font-family:'Cormorant Garamond',serif;font-size:clamp(2.4rem,8vw,3.8rem);font-weight:700;color:var(--gold);line-height:1;margin-bottom:.5rem;}
-.result-ppm2{font-size:.92rem;font-weight:500;color:var(--ink);margin-bottom:.5rem;opacity:.75;}
-.result-range{font-size:.85rem;color:var(--muted);margin-bottom:.5rem;}
-.result-range-band{display:inline-flex;align-items:center;gap:.5rem;background:var(--paper);border:1px solid var(--border);border-radius:100px;padding:.3rem .9rem;font-size:.8rem;color:var(--muted);}
-.result-range-band span{color:var(--ink);font-weight:500;}
-.result-confidence{font-size:.7rem;color:var(--muted);margin-top:.4rem;}
-.result-note{font-size:.78rem;color:var(--muted);line-height:1.55;margin-top:.5rem;}
-.result-source{display:inline-flex;align-items:center;gap:.3rem;font-size:.7rem;color:var(--accent);background:rgba(45,74,62,.07);padding:.3rem .7rem;border-radius:100px;margin-top:.6rem;font-weight:500;}
-.summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:1.8rem;}
-.sum-item{background:var(--paper);border-radius:12px;padding:.85rem 1rem;}
-.sum-label{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.25rem;}
-.sum-value{font-size:.9rem;font-weight:500;}
-.ref-box{background:rgba(45,74,62,.05);border:1px solid rgba(45,74,62,.15);border-radius:14px;padding:1.25rem;margin-bottom:1.8rem;}
-.ref-title{font-size:.72rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:.75rem;}
-.ref-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;}
-.ref-item-label{font-size:.7rem;color:var(--muted);}.ref-item-val{font-size:.88rem;font-weight:500;color:var(--accent);}
-.cta-box{background:var(--ink);border-radius:18px;padding:2rem;color:var(--white);text-align:center;}
-.cta-eyebrow{font-size:.65rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold-lt);margin-bottom:.6rem;}
-.cta-box h3{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:600;margin-bottom:.5rem;line-height:1.3;}
-.cta-box p{font-size:.82rem;color:rgba(255,255,255,.55);font-weight:300;line-height:1.6;margin-bottom:1.5rem;}
-.cta-form{display:flex;flex-direction:column;gap:.55rem;}
-.cta-form input{padding:.8rem 1rem;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.08);color:var(--white);font-family:'DM Sans',sans-serif;font-size:.88rem;outline:none;transition:background .2s,border-color .2s;}
-.cta-form input::placeholder{color:rgba(255,255,255,.35);}
-.cta-form input:focus{background:rgba(255,255,255,.12);border-color:rgba(192,154,74,.5);}
-.btn-cta{background:var(--gold);color:var(--white);border:none;padding:.9rem;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:600;cursor:pointer;transition:all .2s;letter-spacing:.03em;margin-top:.2rem;}
-.btn-cta:hover{background:var(--gold-lt);transform:translateY(-1px);}
-.sent-box{display:none;text-align:center;padding:1rem;background:rgba(45,74,62,.15);border-radius:10px;color:#7ED4A4;font-size:.85rem;font-weight:500;margin-top:.5rem;}
-.privacy{font-size:.68rem;color:rgba(255,255,255,.3);margin-top:.8rem;line-height:1.5;}
-.btn-restart{display:block;width:100%;margin-top:.6rem;background:none;border:1.5px solid var(--border);border-radius:12px;padding:.75rem;font-family:'DM Sans',sans-serif;font-size:.83rem;color:var(--muted);cursor:pointer;transition:all .2s;}
-.btn-restart:hover{border-color:var(--gold);color:var(--gold);}
-.btn-back-edit{display:block;width:100%;margin-top:1rem;background:var(--ink);border:none;border-radius:12px;padding:.85rem;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:500;color:var(--white);cursor:pointer;transition:all .2s;letter-spacing:.02em;}
-.btn-back-edit:hover{background:var(--gold);transform:translateY(-1px);}
-@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
-@keyframes slideR{from{opacity:0;transform:translateX(22px)}to{opacity:1;transform:translateX(0)}}
-@keyframes dropIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
-@keyframes spin{to{transform:rotate(360deg)}}
-@media(max-width:500px){.card{padding:1.5rem;}.summary-grid,.ref-grid{grid-template-columns:1fr;}}
-
-/* ── SLIDER Z ROČNIM VNOSOM ── */
+.dd-kraj{font-size:.9rem;font-weight:600;}
+.dd-tao{font-size:.72rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.dd-price{font-size:.75rem;color:var(--gold);}
+.dd-item:hover,.dd-item.focused{background:rgba(192,154,74,.06);}
+.dd-item mark{background:rgba(192,154,74,.28);border-radius:3px;}
+.loc-selected{display:none;align-items:center;gap:.75rem;padding:.8rem 1rem;border:1.5px solid var(--gold);border-radius:12px;background:rgba(192,154,74,.04);margin-bottom:1rem;cursor:pointer;}
+.loc-selected.show{display:flex;}
+.ls-pin{font-size:1.2rem;}
+.ls-body{flex:1;}
+.ls-kraj{font-size:.92rem;font-weight:600;}
+.ls-tao{font-size:.72rem;color:var(--muted);}
+.ls-price{font-size:.78rem;color:var(--gold);font-weight:500;white-space:nowrap;}
+.field-label{display:block;font-size:.72rem;font-weight:600;letter-spacing:.08em;color:var(--muted);margin-bottom:.6rem;text-transform:uppercase;}
+.slider-section{margin-bottom:1.4rem;}
 .slider-input-row{display:flex;align-items:center;gap:.5rem;margin-bottom:.3rem;}
 .slider-manual{width:72px;padding:.35rem .5rem;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.9rem;text-align:center;background:var(--paper);color:var(--ink);-moz-appearance:textfield;}
 .slider-manual::-webkit-outer-spin-button,.slider-manual::-webkit-inner-spin-button{-webkit-appearance:none;margin:0;}
 .slider-manual:focus{outline:none;border-color:var(--gold);}
 .slider-unit-label{font-size:.82rem;color:var(--muted);}
-
-/* ── KOMPONENTE STAROSTI ── *//* ── KOMPONENTE STAROSTI ── */
-.comp-row{display:flex;align-items:center;gap:.75rem;padding:.7rem 0;border-bottom:1px solid var(--border);}
-.comp-row:last-child{border-bottom:none;}
-.comp-label{font-size:.85rem;font-weight:500;flex:1;min-width:0;}
-.comp-sub{font-size:.72rem;color:var(--muted);display:block;font-weight:300;}
-.comp-toggle{background:var(--paper);border:1.5px solid var(--border);border-radius:8px;padding:.35rem .75rem;font-family:'DM Sans',sans-serif;font-size:.78rem;color:var(--muted);cursor:pointer;white-space:nowrap;transition:all .2s;flex-shrink:0;}
-.comp-toggle.active{background:rgba(192,154,74,.08);border-color:var(--gold);color:var(--gold);font-weight:500;}
-.comp-slider-wrap{display:none;flex-direction:column;gap:.3rem;padding:.6rem .75rem;background:var(--paper);border-radius:10px;margin-top:.4rem;}
-.comp-slider-wrap.show{display:flex;}
-.comp-year-display{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:600;color:var(--gold);line-height:1;}
-.comp-slider-inner{display:flex;align-items:center;gap:.5rem;}
-.comp-slider-inner input[type=range]{flex:1;}
-
-/* Kratkotrajne komponente */
-.kt-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:1.6rem;}
-.kt-btn{border:1.5px solid var(--border);border-radius:12px;padding:.85rem .75rem;cursor:pointer;transition:all .2s;background:transparent;font-family:'DM Sans',sans-serif;text-align:center;color:var(--ink);}
-.kt-btn:hover{border-color:var(--gold);}
-.kt-btn.sel{border-color:var(--gold);background:rgba(192,154,74,.07);}
-.kt-icon{font-size:1.2rem;display:block;margin-bottom:.3rem;}
-.kt-name{font-size:.82rem;font-weight:500;display:block;}
-.kt-desc{font-size:.68rem;color:var(--muted);display:block;margin-top:.15rem;line-height:1.4;}
-.kt-btn.sel .kt-desc{color:var(--gold);}
-
-/* ── GRAF GIBANJA CEN ── */
-.trend-section{margin-bottom:1.8rem;}
-.trend-title{font-size:.72rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:1rem;}
-.trend-chart{width:100%;height:200px;position:relative;}
-.trend-svg{width:100%;height:100%;}
-.trend-legend{display:flex;gap:1.2rem;margin-top:.75rem;flex-wrap:wrap;}
+input[type=range]{width:100%;-webkit-appearance:none;appearance:none;height:4px;border-radius:2px;background:var(--border);outline:none;cursor:pointer;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--gold);cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,.15);}
+input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--gold);cursor:pointer;border:none;}
+.slider-range{display:flex;justify-content:space-between;font-size:.7rem;color:var(--muted);margin-top:.4rem;}
+.btn-row{display:flex;justify-content:space-between;align-items:center;margin-top:1.5rem;}
+.btn-next{background:var(--ink);border:none;border-radius:12px;padding:.85rem 1.8rem;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:500;color:var(--white);cursor:pointer;transition:all .2s;letter-spacing:.02em;}
+.btn-next:hover:not(:disabled){background:var(--gold);transform:translateY(-1px);}
+.btn-next:disabled{opacity:.35;cursor:not-allowed;}
+.btn-back{background:none;border:none;font-family:'DM Sans',sans-serif;font-size:.85rem;color:var(--muted);cursor:pointer;padding:.5rem;}
+.btn-back:hover{color:var(--ink);}
+.cond-btn{background:none;border:1.5px solid var(--border);border-radius:12px;padding:.85rem;font-family:'DM Sans',sans-serif;font-size:.8rem;cursor:pointer;transition:all .2s;text-align:center;display:flex;flex-direction:column;align-items:center;gap:.3rem;}
+.cond-btn:hover{border-color:var(--gold);}
+.cond-btn.sel{border-color:var(--gold);background:rgba(192,154,74,.08);}
+.cond-btn.sel .cond-name{color:var(--gold);}
+.cond-icon{font-size:1.4rem;}
+.cond-name{font-size:.82rem;font-weight:600;}
+.comp-toggle{display:flex;justify-content:space-between;align-items:center;padding:.65rem .85rem;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:.82rem;margin-bottom:.5rem;transition:all .2s;}
+.comp-toggle:hover{border-color:var(--gold);}
+.comp-toggle.active{border-color:var(--gold);background:rgba(192,154,74,.06);}
+.comp-toggle-label{display:flex;align-items:center;gap:.5rem;}
+.comp-year-wrap{display:none;padding:.6rem .85rem .8rem;border:1.5px solid var(--gold);border-top:none;border-radius:0 0 10px 10px;margin-top:-.5rem;margin-bottom:.5rem;background:rgba(192,154,74,.03);}
+.comp-year-wrap.show{display:block;}
+.comp-toggle.active .comp-chevron{transform:rotate(90deg);}
+.comp-year-display{font-size:1.2rem;font-weight:600;font-family:'Cormorant Garamond',serif;margin-bottom:.2rem;}
+.result-card{display:none;padding:2rem 1.5rem;}
+.result-card.active{display:block;}
+.result-loading{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3rem 1rem;gap:1rem;}
+.spinner{width:44px;height:44px;border:3px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;}
+.loading-text{font-size:.85rem;color:var(--muted);}
+.result-hero{text-align:center;margin-bottom:2rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border);}
+.result-label{font-size:.68rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:.6rem;}
+.result-price{font-family:'Cormorant Garamond',serif;font-size:clamp(2.5rem,8vw,4rem);font-weight:700;color:var(--gold);margin-bottom:.3rem;letter-spacing:-.02em;}
+.result-ppm2{font-size:.88rem;color:var(--muted);margin-bottom:.8rem;}
+.result-range{display:inline-flex;align-items:center;gap:.5rem;background:rgba(192,154,74,.07);border:1.5px solid rgba(192,154,74,.2);border-radius:20px;padding:.45rem 1.1rem;font-size:.82rem;font-weight:500;color:var(--ink);margin-bottom:.6rem;}
+.result-confidence{font-size:.72rem;color:var(--muted);}
+#rContext{font-size:.8rem;color:var(--muted);margin-top:.5rem;font-style:italic;min-height:1.2em;}
+.summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1.5rem;}
+.sum-item{background:var(--paper);border-radius:12px;padding:.85rem 1rem;}
+.sum-label{font-size:.65rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:.25rem;}
+.sum-value{font-size:.9rem;font-weight:500;}
+.ref-section{background:var(--paper);border-radius:14px;padding:1.1rem 1.2rem;margin-bottom:1.5rem;}
+.ref-title{font-size:.65rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:.8rem;}
+.ref-grid{display:grid;grid-template-columns:1fr 1fr;gap:.5rem .75rem;}
+.ref-item .ri-label{font-size:.68rem;color:var(--muted);margin-bottom:.1rem;}
+.ref-item .ri-val{font-size:.88rem;font-weight:500;}
+.ref-note{font-size:.72rem;color:var(--muted);margin-top:.6rem;line-height:1.5;}
+.trend-section{margin-bottom:1.5rem;}
+.trend-chart{height:90px;width:100%;margin:.6rem 0 0;}
+.trend-legend{display:flex;gap:1rem;flex-wrap:wrap;margin-top:.3rem;}
 .trend-leg-item{display:flex;align-items:center;gap:.35rem;font-size:.72rem;color:var(--muted);}
-.trend-leg-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
-
-/* ── ETN TRANSAKCIJE ── */
+.trend-leg-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0;}
 .etn-section{margin-bottom:1.8rem;}
 .etn-table{width:100%;border-collapse:collapse;font-size:.78rem;}
 .etn-table th{text-align:left;padding:.4rem .6rem;color:var(--muted);font-weight:500;border-bottom:1.5px solid var(--border);font-size:.72rem;letter-spacing:.05em;}
 .etn-table td{padding:.5rem .6rem;border-bottom:1px solid var(--border);color:var(--ink);}
 .etn-table tr:last-child td{border-bottom:none;}
 .etn-table tr:hover td{background:rgba(192,154,74,.04);}
-.etn-ppm2{font-weight:600;color:var(--ink);}
+.etn-ppm2{font-weight:600;}
 .etn-datum{color:var(--muted);}
 .etn-note{font-size:.7rem;color:var(--muted);margin-top:.5rem;font-style:italic;}
-/* Mobilna ETN kartica */
 .etn-card{padding:.6rem 0;border-bottom:1px solid var(--border);display:none;}
 .etn-card:last-child{border-bottom:none;}
 .etn-card-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:.2rem;}
-.etn-card-addr{font-size:.82rem;font-weight:500;color:var(--ink);}
-.etn-card-price{font-size:.88rem;font-weight:700;color:var(--ink);}
+.etn-card-addr{font-size:.82rem;font-weight:500;}
+.etn-card-price{font-size:.88rem;font-weight:700;}
 .etn-card-meta{font-size:.72rem;color:var(--muted);}
-@media(max-width:500px){
-  .etn-table{display:none;}
-  .etn-card{display:block;}
-}
+@media(max-width:500px){.etn-table{display:none;}.etn-card{display:block;}}
+.lao-label{font-size:.72rem;font-weight:600;letter-spacing:.05em;color:var(--muted);margin-bottom:.4rem;}
+#editMenu{display:none;background:var(--paper);border:1.5px solid var(--border);border-radius:12px;padding:.75rem;margin-bottom:.75rem;}
+.btn-back-edit{display:block;width:100%;background:var(--ink);border:none;border-radius:12px;padding:.85rem;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:500;color:var(--white);cursor:pointer;transition:all .2s;letter-spacing:.02em;}
+.btn-back-edit:hover{background:var(--gold);}
+.btn-restart{display:block;width:100%;margin-top:.6rem;background:none;border:1.5px solid var(--border);border-radius:12px;padding:.75rem;font-family:'DM Sans',sans-serif;font-size:.83rem;color:var(--muted);cursor:pointer;transition:all .2s;}
+.btn-restart:hover{border-color:var(--gold);color:var(--gold);}
+@keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes slideR{from{opacity:0;transform:translateX(8px)}to{opacity:1;transform:none}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes dropIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
 </style>
 </head>
 <body>
 <div class="wrapper">
-<div class="header">
-  <div class="badge">Vir: GURS Letno poročilo 2025</div>
-  <h1>Koliko je vredna<br>vaša nepremičnina?</h1>
-  <p>Ocena temelji na uradnih podatkih Geodetske uprave RS o medianah prodajnih cen za leto 2025.</p>
-</div>
-<div class="progress-wrap">
-  <div class="progress-meta"><span id="stepLabel">Korak 1 od 4</span><span id="stepPct">0 %</span></div>
-  <div class="progress-track"><div class="progress-fill" id="progFill"></div></div>
-</div>
-<div class="card" id="quizCard">
-  <div class="step active" id="s1">
-    <div class="step-icon">🏘️</div>
-    <div class="step-title">Vrsta nepremičnine</div>
-    <div class="step-sub">Kalkulator podpira stanovanja v večstanovanjskih stavbah in stanovanjske hiše.</div>
-    <div class="type-grid">
-      <button class="type-card" onclick="selType(this,'stanovanje')">
-        <div class="tc-icon">🏢</div><div class="tc-name">Stanovanje</div><div class="tc-desc">V večstanovanjski stavbi</div>
-      </button>
-      <button class="type-card" onclick="selType(this,'hisa')">
-        <div class="tc-icon">🏡</div><div class="tc-name">Hiša</div><div class="tc-desc">Samostojna, vrstna, dvojček</div>
-      </button>
+
+  <div class="header">
+    <div style="margin-bottom:1.2rem;display:flex;justify-content:center">
+      <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxOTAiIGhlaWdodD0iNjMiIHZpZXdCb3g9IjAgMCAxOTAgNjMiPgogICAgPGRlZnM+CiAgICAgICAgPGxpbmVhckdyYWRpZW50IGlkPSJubjd3NmxrOTNhIiB4MT0iMCUiIHgyPSIxMDAlIiB5MT0iNTAlIiB5Mj0iNTAlIj4KICAgICAgICAgICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iI0ZCREE5NCIvPgogICAgICAgICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiNBNjgwMUEiLz4KICAgICAgICA8L2xpbmVhckdyYWRpZW50PgogICAgPC9kZWZzPgogICAgPGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj4KICAgICAgICA8Zz4KICAgICAgICAgICAgPGc+CiAgICAgICAgICAgICAgICA8Zz4KICAgICAgICAgICAgICAgICAgICA8Zz4KICAgICAgICAgICAgICAgICAgICAgICAgPHBhdGggZmlsbD0idXJsKCNubjd3NmxrOTNhKSIgZD0iTTQwLjk1OCAxNS41OTFWLjA3MUgyNy45MzZsLS44MTMuMDEzLS40MDYuMDE0LS40MDQuMDIyLS4yMDIuMDEzLS4yMDMuMDEzLS4yMDIuMDE1LS4yNTYuMDItLjA2MS4wMDYtLjA4OC4wMDgtLjIwMy4wMi0uMi4wMjItLjIuMDIyLS4xNjEuMDItLjMwNC4wMzgtLjI1LjAzNC0uMjU0LjAzNy0uMjM4LjAzNi0uMi4wMzMtLjIwMS4wMzQtLjIuMDM2LS4yOTEuMDU1LS40MTYuMDg0LS4yMzUuMDUtLjQ0OC4xMDEtLjI2LjA2Mi0uMjMuMDU4LS4yNDEuMDYyLS4yNS4wNjctLjE5Ny4wNTQtLjE5NS4wNTUtLjE5NC4wNTYtLjIyOC4wNjktLjIzMi4wNzEtLjEyMi4wNC0uMTkyLjA2MS0uMjI4LjA3Ny0uMjIxLjA3Ni0uMjA3LjA3My0uMTk4LjA3LS4yNTYuMDk0LS4zNC4xMy0uMjY1LjEwNS0uMzE2LjEyOC0uMzI3LjEzOS0uMjM0LjEwMi0uNDI0LjE5LS4xODQuMDg2LS4zMTYuMTUxLS40MTIuMjA1LS41NC4yNzktLjM1Ni4xOTQtLjQyLjIzNy0uMjgyLjE2NS0uMzQ5LjIwNy0uMzQ0LjIxMy0uMzM5LjIxOC0uMTcuMTEtLjMzNi4yMjctLjMzMi4yMy0uMjQ3LjE3NS0uMjQ4LjE3Ny0uMjU1LjE5My0uMjkyLjIyNC0uMjU0LjE5OC0uMzE1LjI1NC0uMzEuMjU5LS4zMDcuMjYyLS40NTYuNC0uMjk3LjI3NC0uMjEuMi0uMjI4LjIxOC0uMjg2LjI4NS0uMjE1LjIxNy0uMjguMjktLjIwNi4yMi0uMjcyLjI5OC0uMjY4LjMtLjI2My4zMDUtLjI2LjMxLS4yNTMuMzE0LS4yNTEuMzE3LS4yNDYuMzE5LS4yMzkuMzI0LS4yOS40MDUtLjE3NS4yNTItLjMzOC41MDMtLjIxOS4zMzgtLjIxMi4zNDItLjIxLjM0NS0uMjAzLjM0OC0uMTk4LjM1LS4yMjkuNDItLjE5My4zNjgtLjE3NS4zNS0uMTk1LjQwMS0uMjA0LjQzOC0uMjA4LjQ2Ni0uMTE1LjI3LS4yMjYuNTYtLjIxOC41NjItLjEzNi4zNzgtLjEzMi4zOC0uMTUuNDY0LS4xNTEuNDk1LS4xMTIuMzg3LS4xMDYuMzg4LS4xLjM4OC0uMDkzLjM5MS0uMDkuMzkzLS4wNjguMzE5LS4wNjcuMzQ0LS4wNzMuMzk1LS4wNTYuMzIyLS4wNjMuMzk3LS4wNTUuMzk3LS4wNi40Ny0uMDM2LjMzLS4wNDYuNDc2LS4wMjguMzIyLS4wMjYuNDAzLS4wMjEuNDAxLS4wMTUuNDAyLS4wMS40OTQtLjAwMy41MDguMDA1LjQwMi4wMS40MDIuMDE3LjQwMi4wMjMuNC4wNDcuNjAyLjAzNi40LjA2OC41OTkuMDUyLjM5OC4wNzYuNTEuMDY5LjQxNC4wODMuNDY0LjEyLjU5LjEzMy41OS4xNDYuNTgzLjE1OC41ODIuMTcxLjU3OC4yMTIuNjU2LjIzNS42NzguMzY0LjkzOC4zMTQuNzQuMzM2LjczMi4zNTguNzIyLjI4LjUzNS4zOTUuNzAxLjMwOS41Mi40MjkuNjgxLjU2My44MzUuNTk4LjgxMi42MjMuNzkyLjUyLjYxOC40MDIuNDUyLjY5LjczNS41NzMuNTY5LjQ0LjQxNi40NDguNDA5LjQ2LjM5Ni42MjQuNTEzLjQ3OC4zNzQuNjUuNDgyLjY2MS40NjEuNjc4LjQ0NS41MTcuMzIuNTIzLjMwOS43MDYuMzkyLjkuNDY0LjkxNy40My45MzIuMzk3cy41NjYuMjI0Ljc1NS4yOTRjLjE5LjA3Ljk1Ny4zMzcuOTU3LjMzN2wxLjE2MS4zNTcgMS4xNzcuMzA3IDEuMTkuMjU4IDEuMi4yMDMgMS4yMDcuMTU0IDEuMjEzLjEwMSAxLjIxOC4wNDggMS4wMTUtLjAwMS44MS0uMDI1IDEuMDEyLS4wNjZzLjYwOC0uMDU1LjgxLS4wNzhjLjItLjAyNC44MDQtLjEwMi44MDQtLjEwMmwxLjQtLjIzNC45OTMtLjIxLjk4MS0uMjQ2IDEuMTY5LS4zNC45NjItLjMyMi45NDgtLjM1OCAxLjExOS0uNDcyIDEuMDk4LS41MjEgMS4wNzQtLjU2OC44NzYtLjUwNyAxLjAyNC0uNjUuOTk2LS42OTQgMS4xMi0uODY0LjYyMi0uNTE3LjYwNS0uNTM1Ljg3NS0uODM3LjU2NS0uNTc4LjY4Mi0uNzQ1LjY1My0uNzY4LjYyNC0uNzkyLjQ3OC0uNjQ3LjQ2LS42NjNWNjNoMTUuNjI0di03LjYyNEg3NC4wOTNsLjQwNi0uMDAyLjQwNi0uMDEuNDA2LS4wMTQuNDA0LS4wMjEuNDA2LS4wMjYuNDA2LS4wMy40MDMtLjAzOC40MDQtLjA0Ni40MDEtLjA0OS40MDQtLjA1NS40LS4wNi40LS4wNjcuMzk4LS4wNzMuNTk3LS4xMi41OTUtLjEzMy41OTEtLjE0NXMuMzk0LS4xMDIuNTg5LS4xNThjLjE5NS0uMDU1Ljc3Ni0uMjI5Ljc3Ni0uMjI5bC43NzEtLjI1My43NjItLjI3NC42NDMtLjI1My42NzMtLjI4MS41NTQtLjI0OS43MzEtLjM1Ljg5OS0uNDY2LjcwNi0uMzk2Ljc3Mi0uNDY0LjYwMy0uMzkuNTgzLS4zOTMuNDE1LS4yOTcuMzI2LS4yNC4zMjItLjI0NC4zMTgtLjI0OC4zOTUtLjMyLjMzMS0uMjc2LjM2LS4zMTIuMzAzLS4yNjguMjk2LS4yNzMuMzU3LS4zNDEuMzctLjM2My4zNjgtLjM3Ni4zMzEtLjM1LjI3Mi0uMjk5LjI2OC0uMzAyLjI2NS0uMzA1LjI1Ny0uMzEuMjU2LS4zMTIuMjQ5LS4zMTcuMjQ2LS4zMjEuMjM4LS4zMjQuMjM3LS4zMjYuMjMxLS4zMzEuMjI1LS4zMzMuMjIyLS4zMzguMTY5LS4yNjguMjAxLS4zMjYuMjIzLS4zNjkuMjQtLjQxNS4xOTYtLjM1My4yMjgtLjQyOS4yMzctLjQ2My4yMTUtLjQ0Mi4yMTgtLjQ2Ny4yMS0uNDc0LjE4OS0uNDQ5LjExOC0uMjkxLjEwNy0uMjY4LjE0My0uMzc4LjEzNi0uMzc4LjExLS4zMi4xMjUtLjM3OC4xMTktLjM4LjEtLjMzOC4wOS0uMzEuMTA1LS4zODguMS0uMzg4LjA5NC0uMzkyLjA4OC0uMzkyLjA4My0uMzkyLjA2LS4zMS4wODgtLjQ4MS4wNjYtLjM5Ni4wODgtLjU5Ni4wNjQtLjUyMi4wNDMtLjQuMDI3LS4yNzYuMDMzLS40MDIuMDI3LS40LjAyLS40MDEuMDE4LS40MDMuMDA2LS40MDEuMDA0LS4yOTEtLjAwMS0uNTEzLS4wMDctLjQtLjAxNS0uNDAxLS4wMjEtLjQwMi0uMDI2LS40MDItLjAzOC0uNDczLS4wNTMtLjUyNi0uMDQ1LS4zOTktLjA1My0uMzk5LS4wNDgtLjMyNy0uMDczLS40NjgtLjA3MS0uMzk1LS4wNzYtLjM5NC0uMDgtLjM5NC0uMDg3LS4zOTItLjA5NC0uMzkyLS4xLS4zOS0uMTAzLS4zODktLjExLS4zODYtLjExNi0uMzg1LS4wOC0uMjU4LS4xMDMtLjMxNi0uMTU5LS40NjUtLjE0MS0uMzg4LS4xOC0uNDcxLS4xNDktLjM3NC0uMTk0LS40NjMtLjE2OC0uMzg1LS4yMDEtLjQ0MS0uMTc0LS4zNjQtLjE4LS4zNjItLjE4My0uMzU3LS4xODktLjM1Ny0uMTkzLS4zNTItLjIwMS0uMzUtLjIwNS0uMzQ1LS4yMTEtLjM0NS0uMjE1LS4zNC0uMTc0LS4yNjgtLjIxMy0uMzIyLS4xNzEtLjI1LS4zNS0uNDkyLS4yMzgtLjMyNi0uMjQzLS4zMjEtLjI1MS0uMzE3LS4zODMtLjQ3LS4zMDYtLjM2MS0uMzUtLjQwMy0uMjcyLS4yOTgtLjI3NS0uMjk1LS4yODItLjI5MS0uMjg0LS4yODYtLjI4OS0uMjg0LS4yOTEtLjI3OC0uMjk2LS4yNzUtLjMwMS0uMjY5LS4zMDYtLjI2NS0uMzA4LS4yNjItLjMxLS4yNTYtLjI1Mi0uMi0uMzg2LS4zLS4zMjMtLjI0NC0uMzI3LS4yNC0uMzI5LS4yMy0uMzM0LS4yMy0uMzM3LS4yMjQtLjM0LS4yMi0uMzQzLS4yMTMtLjM0Ny0uMjEtLjM0OC0uMjA0LS4zNTQtLjItLjM1NS0uMTk1LS4zNTktLjE4OS0uMzYtLjE4NC0uNDU1LS4yMjEtLjQ2LS4yMTUtLjM2OS0uMTY2LS4zNzItLjE2LS4zNzYtLjE1My0uMzc2LS4xNS0uMzc4LS4xNDQtLjM4LS4xMzgtLjM4NS0uMTM0LS40NjktLjE1NS0uNDk2LS4xNTMtLjM5LS4xMTQtLjM5MS0uMTA5LS4zOTItLjEwMi0uNDU4LS4xMS0uMzMyLS4wNzYtLjQ2Ni0uMS0uNDIyLS4wODNMNzguOS40ODVsLS40NzUtLjA3Ny0uNDAxLS4wNi0uNDAyLS4wNTMtLjQwNC0uMDQ5LS40MDMtLjA0Mkw3Ni40MS4xN2wtLjQ3NS0uMDM1LS40NDctLjAyNi0uMjkzLS4wMTMtLjQwNS0uMDEzLS40MDctLjAwNy0uNDA2LS4wMDEtLjQwNi4wMDQtLjQwNS4wMS0uMzIxLjAxMy0uMjg5LjAxNC0uNDAzLjAyNC0uNDA2LjAzLS40MDQuMDM4LS4zLjAzMi0uMzA1LjAzNC0uNDAzLjA1MS0uNC4wNTctLjMyMi4wNS0uMzQ3LjA1Ny0uMzMyLjA2LS41LjA5OC0uNDk0LjEwNi0uNTkyLjEzOC0uMzk0LjEtLjM5MS4xMDYtLjM5LjExLS40NzUuMTQ0LS4zLjA5Ni0uNDYuMTU0LS40OTguMTc3LS4zODIuMTQtLjU2NC4yMjQtLjQ3MS4xOTUtLjI3Ny4xMi0uNDc5LjIxNi0uMzI3LjE1NS0uNDc2LjIzMi0uNTQuMjc4LS41MzUuMjktLjM1Mi4yLS40NS4yNjYtLjQ5MS4zMDItLjQzNy4yOC0uMzM3LjIyNC0uNDk4LjM0NS0uMzMuMjM3LS40MDIuMy0uMzQzLjI2Ny0uMzc0LjI5OC0uMzg2LjMxOS0uMzg4LjMzLS4zNzcuMzQtLjM3LjM0LS4zNDguMzMzLS4zNzYuMzctLjI4Mi4yOTEtLjI3Ny4yOTQtLjQwOC40NDYtLjQuNDU2LS4yNi4zMDgtLjMyLjM5NS0uMjYyLjMzMy0uMjQzLjMxOC0uMTY4LjIyNi0uMjM2LjMyNi0uMTgyLjI1Ny0uMjI4LjMzNC0uMTYuMjQtLjIyLjMzOC0uMjEzLjM0LS4yMS4zNDQtLjE0Ni4yNDYtLjE2LjI3Ny0uMjc1LjQ3OC0uMTkzLjM0LS4yMTYuMzc3LS4yOTkuNTI1LS4yNTkuNDUzLS4zNzYuNjU4LS4zMzIuNTg0LS4zMjYuNTcxLS40MDUuNzEtLjMyNi41Ny0uMzcuNjUtLjM1LjYxMi0uMjM3LjQxNy0uNzc4IDEuMzYzLTEuMzg0IDIuNDI2LTEuNDcgMi41NzctLjk5NiAxLjc0NC0xLjM3IDIuNDAyLS42NTggMS4xNTQtLjU1OS45OC0uMjUzLjQyMy0uMjk3LjQ0Ny0uMzE1LjQzMy0uMjQ5LjMxNC0uMTcyLjIwNi0uMTc3LjItLjE4LjE5OC0uMjc3LjI5LS4xOTQuMTg2LS4xOTMuMTg0LS4yLjE4LS4zMDguMjYtLjMxNC4yNS0uMjE1LjE2MS0uNDM5LjMwOC0uMzM5LjIxNy0uMjMuMTQtLjM1LjItLjM1Ni4xODctLjM2My4xNzgtLjM2OC4xNjQtLjM3Mi4xNTItLjM4LjE0LS4zODIuMTI4LS4zODcuMTE0LS4zOTIuMTAzLS41MjUuMTE2LS41My4wOTUtLjUzMy4wNy0uNTM4LjA0OC0uNTM3LjAyMy0uNDA1LjAwMS0uNDAyLS4wMS0uMjctLjAxNC0uNTM3LS4wNDgtLjQtLjA1LS4zOTgtLjA2My0uNTMtLjEwNC0uMzkxLS4wOTQtLjM5LS4xMDUtLjI1OC0uMDc4LS4zMi0uMTA2LS4zMTUtLjExNC0uMzc1LS4xNDYtLjI0OC0uMTA2LS4zNjctLjE2Ny0uMzYxLS4xODEtLjIzNy0uMTI1LS4zNS0uMi0uMjI5LS4xMzktLjM0LS4yMTctLjIyLS4xNTEtLjMyNy0uMjM3LS4yMTMtLjE2My0uMjA5LS4xNjgtLjMwNy0uMjYtLjItLjE3OS0uMjkyLS4yNzYtLjI4NC0uMjg0LS4yNy0uMjk3LS4yNjUtLjMwNC0uMTctLjIwNS0uMjQ0LS4zMTgtLjMxLS40MzUtLjE0OS0uMjIzLS4yODEtLjQ1NS0uMjYyLS40NjUtLjE4Mi0uMzU3LS4xNjktLjM2My0uMTYtLjM2OC0uMTkxLS40OTgtLjEyNy0uMzgtLjExNy0uMzg0LS4xMzYtLjUxNS0uMDgzLS4zOS0uMDk2LS41MjYtLjA1NS0uMzk2LS4wNDMtLjM5Ny0uMDI4LS40LS4wMi0uNTMydi0uMjY2bC4wMDgtLjI2OC4wMi0uMzk4LjAzMi0uMzk4LjAyOS0uMjY1LjA1Ni0uMzk2LjA2OC0uMzk0LjA4My0uMzkyLjA5NC0uMzkuMTA3LS4zODQuMTItLjM4Mi4xMzItLjM3OC4xOTctLjQ5Ny4yMTgtLjQ4Ni4xNzYtLjM2LjE5MS0uMzUyLjIwMS0uMzQ3LjIxNC0uMzQuMjIzLS4zMzQuMTU1LS4yMTguMjQzLS4zMTguMjUxLS4zMTIuMzU0LS40MDUuMzctLjM4NS4zODctLjM3Mi40MDMtLjM1NC40MTgtLjMzNi4zMjQtLjIzOS4zMy0uMjI5LjMzOC0uMjE3LjM0Ni0uMjA4LjU5Mi0uMzE4LjM2My0uMTc2LjQ5Mi0uMjE4LjM3NS0uMTQ2LjI1My0uMDkzLjI1NS0uMDg2LjM4NS0uMTE5LjM5LS4xMDYuMjYxLS4wNjQuMzk1LS4wODYuMzk2LS4wNy40LS4wNi41MzctLjA1OS40MDItLjAyOC40MDMtLjAxNi4zNTUtLjAwNWgxMi45Mzd6bTEyLjExIDI0LjI2NUw3NC45IDM5LjgzbC41MzgtLjA0OC4zNi0uMDQ2LjQ3Ni0uMDc0LjQ5MS0uMDk3LjQ3Ni0uMDUuMzA1LS4xNTEuMzg2LS4xMi4zMi0uMTA5LjM3My0uMTQuMjY4LS4xMDkuNDE2LS4xODQuMzYxLS4xNzYuMzU4LS4xODguMzUtLjE5OS40NTUtLjI4My4zMzQtLjIyNS4zMjctLjIzNy4zMTctLjI0OC40MS0uMzQyLjM5OC0uMzY0LjI4NC0uMjgzLjI3Ny0uMjkyLjM1MS0uNDAyLjI1Mi0uMzEzLjMyMS0uNDI5LjMtLjQ0My4yMTMtLjM0LjI2OC0uNDYzLjE4NC0uMzU1LjIzLS40ODIuMTU3LS4zNjguMTktLjQ5OS4xMy0uMzguMTE1LS4zODMuMTAzLS4zODYuMDktLjM5LjA3Ny0uMzkzLjA2NC0uMzk0LjA2NC0uNTMuMDQtLjUzMS4wMTctLjQuMDAzLS40LS4wMi0uNTMzLS4wNC0uNTMtLjAzLS4yNjctLjAzNy0uMjYyLS4wNC0uMjY1LS4wNDgtLjI2Mi0uMDgyLS4zOS0uMDk1LS4zOS0uMTA3LS4zODYtLjA3OS0uMjU0LS4xNzUtLjUwNC0uMTQ1LS4zNzQtLjE1OC0uMzY3LS4xNjktLjM2NC0uMjQ2LS40NzUtLjItLjM0OS0uMjA2LS4zNC0uMjI0LS4zMzUtLjIzLS4zMy0uMTYtLjIxMy0uMjUtLjMxNC0uMjU4LS4zMDgtLjI3MS0uMjk2LS4yNzktLjI5LS4yODktLjI3OS0uMjk5LS4yNy0uMzA2LS4yNi0uMzE2LS4yNS0uMzI0LS4yMzktLjMzMS0uMjI5LS4zNC0uMjE3LS4zNDUtLjIwNi0uMzUyLS4xOTUtLjM2LS4xODYtLjM2NC0uMTctLjI0OC0uMTA3LS4zNzItLjE1My0uMjUzLS4wOTQtLjI1My0uMDg4LS4zODUtLjEyNC0uMjU5LS4wNzQtLjM5LS4xMDItLjI2My0uMDYxLS4zOTUtLjA4LS4zOTgtLjA2Ny0uMjY3LS4wMzgtLjQwMS0uMDQ2LS40MDItLjAzMi0uNDA1LS4wMTktLjQwNC0uMDA3LS40MDMuMDA3LS41MzguMDMxLS40MDEuMDM4LS40MDEuMDUtLjI2Ny4wNC0uMzk3LjA3My0uMzk0LjA4Ny0uMzkyLjA5OC0uMzkuMTEyLS41MS4xNjYtLjM3OC4xNC0uMjUuMS0uMzcuMTYxLS4zNjQuMTcxLS40NzcuMjQ5LS40NjYuMjY5LS40NTEuMjg4LS4zMzEuMjMyLS4zMjQuMjM5LS4zMTQuMjUtLjQwNy4zNS0uMzkyLjM2Ny0uMzcyLjM4NC0uMjcuMjk5LS4zNDQuNDA5LS4zMjUuNDI1LS4zMDUuNDQtLjM1My41NjgtLjQxLjcxLTIuNzcxIDQuODQ2LTEuNDY4IDIuNTY2LTEuMjQyIDIuMTcyLTEuMDAzIDEuNzUzLS44NDggMS40ODMtLjY5NiAxLjIxNS0uNTMuOTI2LS42MjcgMS4wOTctLjQzOC43NjctLjM5Mi42ODV6IiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMzE1IC0zMikgdHJhbnNsYXRlKDMxNSAxNikgdHJhbnNsYXRlKDAgMTYpIi8+CiAgICAgICAgICAgICAgICAgICAgICAgIDxwYXRoIGZpbGw9IiNBNjgwMUEiIGQ9Ik0xMTAuOTY1IDM2LjUxNmw0LjQ5NCAxMS40MzhoLTIuMDIybC0uNDk4LTEuMjg2aC0zLjk0OWwtLjQ4MSAxLjI4NmgtMi4wMjNsNC40NzktMTEuNDM4em0wIDQuNjg2bC0xLjM2NSAzLjg2MWgyLjcyOWwtMS4zNjQtMy44NnptLS4yMi0xOS4xNGMxLjk0MyAwIDMuNDM1IDEuMzAzIDMuNDY3IDMuMTk0aC0xLjg2MWMtLjAzMi0uOTIxLS43NTUtMS4zMzUtMS42MDUtMS4zMzUtLjg4MyAwLTEuNjM4LjUwOS0xLjYzOCAxLjU0MSAwIC45MjIuODAzIDEuNDE0IDEuNjM4IDEuNDE0LjA4IDAgLjg2NiAwIDEuNjY5LjM2NiAxLjE4OC41NCAxLjgzIDEuNjY4IDEuODMgMi45ODcgMCAyLjEyOC0xLjY4NiAzLjI3NS0zLjUgMy4yNzUtMS45NDItLjA0OC0zLjQ4Mi0xLjE2Mi0zLjUxNS0zLjI0NGgxLjg3OGMuMDMyLjkyMS44MDMgMS4zODMgMS42MzggMS4zODMuODY2IDAgMS42MzctLjU0IDEuNjM3LTEuNDE0IDAtLjkzOC0uODgzLTEuNTI2LTEuNjM3LTEuNTU3LS4wOTcgMC0uODY3IDAtMS42ODYtLjM2Ni0xLjE3Mi0uNTQtMS44My0xLjUyNS0xLjgzLTIuODQ0IDAtMi4xMTMgMS43MDItMy40IDMuNTE2LTMuNHpNMTEyLjg4IDcuNDljMS41NTcgMCAyLjk1NC42MiAzLjk2NSAxLjYzN2wtMS4zMTcgMS4zMDNjLS42NzQtLjY2OC0xLjYyLTEuMDgtMi42NDgtMS4wOC0yLjMxIDAtMy43MjMgMS42Mi0zLjcyMyAzLjg2IDAgMi4zODMgMS42NTMgMy44NiAzLjcyMyAzLjg2IDEuMDI3IDAgMS45NzQtLjQxMyAyLjY0OC0xLjA4bDEuMzE3IDEuMzE5Yy0xLjAxMSAxLTIuNDA4IDEuNjIzLTMuOTY1IDEuNjIzLTMuMDk3IDAtNS42MzMtMi4yMjctNS42MzMtNS43MjIgMC0zLjM1MiAyLjM0My01LjcyIDUuNjMzLTUuNzJ6IiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMzE1IC0zMikgdHJhbnNsYXRlKDMxNSAxNikgdHJhbnNsYXRlKDAgMTYpIi8+CiAgICAgICAgICAgICAgICAgICAgICAgIDxwYXRoIGZpbGw9IiMwMDAiIGQ9Ik0xMjguMTA3IDM2LjgzM2wyLjQ1NSA2LjU2MiAyLjQ3Mi02LjU2MmgyLjAyMmwtNC40OTQgMTEuNDEtNC40NzgtMTEuNDFoMi4wMjN6bTE1Ljg0MS0uMTU5YzEuOTQyIDAgMy40MzUgMS4zMDMgMy40NjggMy4xOTRoLTEuODYzYy0uMDMyLS45MjItLjc1NC0xLjMzNS0xLjYwNS0xLjMzNS0uODgyIDAtMS42MzcuNTA5LTEuNjM3IDEuNTQxIDAgLjkyMi44MDMgMS40MTQgMS42MzcgMS40MTQuMDggMCAuODY4IDAgMS42Ny4zNjYgMS4xODguNTQgMS44MyAxLjY2OCAxLjgzIDIuOTg2IDAgMi4xMy0xLjY4NiAzLjI3Ni0zLjUgMy4yNzYtMS45NDEtLjA0OC0zLjQ4My0xLjE2My0zLjUxNS0zLjI0NGgxLjg3OGMuMDMzLjkyMi44MDMgMS4zODIgMS42MzcgMS4zODIuODY4IDAgMS42MzgtLjU0IDEuNjM4LTEuNDE0IDAtLjkzNy0uODgzLTEuNTI1LTEuNjM4LTEuNTU2LS4wOTYgMC0uODY3IDAtMS42ODUtLjM2Ni0xLjE3Mi0uNTQtMS44My0xLjUyNS0xLjgzLTIuODQ0IDAtMi4xMTMgMS43MDItMy40IDMuNTE1LTMuNHptMTAuNzA2LjAxNmM3LjM2OCAwIDcuMzg0IDExLjQxIDAgMTEuNDEtNy40MTggMC03LjQwMi0xMS40MSAwLTExLjQxem0xOC41MzkuMTQzbDIuODczIDMuOTcyIDIuODU3LTMuOTcyaDIuMjk1bC00LjIyMSA1Ljg2M3Y1LjI1OGgtMS44Nzh2LTUuMjU4bC00LjIyMi01Ljg2M2gyLjI5NnptLTcuMDg3IDBjLjE3OC4wMDIgMy43NDguMDgxIDMuNzQ4IDMuMjQxIDAgMS45Ny0xLjM4IDIuNzQ4LTIuNDcxIDMuMDVsMy4wNDkgNC44M2gtMi4xOTlsLTIuOTItNC42MzloLTEuMDc3djQuNjRoLTEuODc3di02LjQ4M2gxLjc4bC0xLjc4LTIuNzh2LTEuODU5em0tMjcuODQgMHYxMS4xMjFoLTEuODc4di0xMS4xMmgxLjg3OHptLTE5LjY2MSAwYzIuNzI4IDAgNi41NjQuNjIgNi41NjQgNS41NjEgMCA0Ljc1LTMuNzcyIDUuNTYtNi41NjQgNS41NmgtMS44Nzh2LTExLjEyem0zNi4wNSAxLjY2OGMtNC44NDggMC00Ljg2NCA3LjgwMSAwIDcuODAxIDQuODYzIDAgNC44NjMtNy44IDAtNy44em0tMzEuMzggMy44OTNjMC00LjQ0OS00LjY3LTMuNzUtNC42Ny0zLjc1djcuNXM0LjY3LjYzNSA0LjY3LTMuNzV6bTQyLjgzMy0zLjcwMmgtMS41MThsMS43NSAyLjc2NGMuNDk3LS4wNDcgMS42MzYtLjI4NiAxLjYzNi0xLjM4MiAwLTEuMzgyLTEuODc3LTEuMzgyLTEuODc3LTEuMzgyem0tMjcuODI3LTE2LjQ3djcuNTYyYy4wOTYgMS4yODcgMS4xNCAxLjg1OSAyLjMyNyAxLjg1OSAxLjE3MiAwIDIuMzQ0LS42MiAyLjM0NC0xLjg2di03LjU2MmgxLjg3OHY3LjU2M2MwIDIuMzY3LTEuODMgMy43Mi00LjIyMiAzLjcyLTIuMzExIDAtNC4yMDUtMS40MzMtNC4yMDUtMy43MlYyMi4yMmgxLjg3OHptNDcuODUtLjE2YzEuOTQyIDAgMy40MzUgMS4zMDMgMy40NjcgMy4xOTRoLTEuODYyYy0uMDMyLS45MjEtLjc1NC0xLjMzNS0xLjYwNS0xLjMzNS0uODgzIDAtMS42MzcuNTA5LTEuNjM3IDEuNTQxIDAgLjkyMi44MDIgMS40MTQgMS42MzcgMS40MTQuMDggMCAuODY3IDAgMS42Ny4zNjYgMS4xODcuNTQgMS44MyAxLjY2OCAxLjgzIDIuOTg3IDAgMi4xMjgtMS42ODYgMy4yNzUtMy41IDMuMjc1LTEuOTQyLS4wNDgtMy40ODMtMS4xNjItMy41MTUtMy4yNDRoMS44NzhjLjAzMi45MjEuODAyIDEuMzgzIDEuNjM3IDEuMzgzLjg2NyAwIDEuNjM4LS41NCAxLjYzOC0xLjQxNCAwLS45MzgtLjg4NC0xLjUyNi0xLjYzOC0xLjU1Ny0uMDk2IDAtLjg2NyAwLTEuNjg1LS4zNjYtMS4xNzItLjU0LTEuODMtMS41MjUtMS44My0yLjg0NCAwLTIuMTEzIDEuNzAxLTMuNCAzLjUxNS0zLjR6bS02NC44MjcuMDE2YzcuMzY3IDAgNy4zODQgMTEuNDEgMCAxMS40MS03LjQxOCAwLTcuNDAyLTExLjQxIDAtMTEuNDF6bTQyLjQxIDBjNy4zNjcgMCA3LjM4MyAxMS40MSAwIDExLjQxLTcuNDE4IDAtNy40MDItMTEuNDEgMC0xMS40MXptOS40MzUuMTQzbDUuNjAxIDcuOTEydi03LjkxMmgxLjg2MnYxMS4xMjFoLTEuODk0bC01LjU4NS03LjkxMXY3LjkxMWgtMS44Nzh2LTExLjEyaDEuODk0em0tMjAuMjk3IDB2MS43aC0yLjM2djkuNDIxaC0xLjg2MXYtOS40MmgtMi4zNnYtMS43aDYuNTgxem0zLjMzNiAwdjExLjEyMWgtMS44Nzh2LTExLjEyaDEuODc4em0tMjUuNDY0IDB2OS4yNjNoNC4xNTZ2MS44NThoLTYuMDM0di0xMS4xMmgxLjg3OHptLTkuNDIgMS42NjhjLTQuODQ3IDAtNC44NjMgNy44MDEgMCA3LjgwMSA0Ljg2NCAwIDQuODY0LTcuOCAwLTcuOHptNDIuNDEgMGMtNC44NDggMC00Ljg2NCA3LjgwMSAwIDcuODAxIDQuODYzIDAgNC44NjMtNy44IDAtNy44em0xMi4xNjUtMTYuNGMxLjU1NyAwIDIuOTU0LjYyIDMuOTY1IDEuNjM3bC0xLjMxNiAxLjMwMmMtLjY3NS0uNjY3LTEuNjIyLTEuMDgtMi42NDktMS4wOC0yLjA3IDAtMy43NCAxLjQzLTMuNzQgMy44NiAwIDIuNzE4IDEuNjcgMy44NjEgMy43NCAzLjg2MSAxLjEyMyAwIDIuMTItLjQ3NiAyLjgxLTEuMjU1VjE0LjIxaC0xLjg3OXYtMS43NjRoMy43NTZ2Ni4zNzNoLTEuNjM4bC0uMDk1LTEuMDVjLS45MTYuODQxLTEuODYzIDEuMTYyLTMuMTk1IDEuMTYyLTMuMDE3IDAtNS4zNzctMi4wODQtNS4zNzctNS43MjIgMC0zLjMwNSAyLjUyLTUuNzIgNS42MTgtNS43MnptLTM5Ljc5LjE2djEuODU4aC01LjYxN3YyLjc4aDQuNjd2MS44NDNoLTQuNjd2Mi43OGg1LjYxOHYxLjg2MmgtNy40OTZWNy42NDhoNy40OTZ6bS0xMy41MzUgMGMuMzQuMDA3IDMuNzI4LjE2IDMuNzI4IDMuMjQgMCAxLjk3LTEuMzggMi43NDgtMi40NzEgMy4wNWwzLjA1IDQuODNoLTIuMmwtMi45Mi00LjYzOWgtMS4wNzZ2NC42NGgtMS44Nzh2LTYuNDgzaDEuNzgxbC0xLjc4MS0yLjc4di0xLjg2em0xOC42ODgtLjMxOGw0LjQ5NCAxMS40MzloLTIuMDIybC0uNDk4LTEuMjg4aC0zLjk0OWwtLjQ4IDEuMjg4aC0yLjAyM2w0LjQ3OC0xMS40NHptMTEuMzk2LjMxN3YxLjdoLTIuMzZ2OS40MjFoLTEuODYyVjkuMzVoLTIuMzZ2LTEuN2g2LjU4MnptMy40ODIgMHYxMS4xMjFoLTEuODc3VjcuNjQ4aDEuODc3em00LjQ2MyAwbDUuNjAxIDcuOTEyVjcuNjQ4aDEuODYydjExLjEyMWgtMS44OTRsLTUuNTg1LTcuOTExdjcuOTExaC0xLjg3OVY3LjY0OGgxLjg5NXptLTE5LjM0MSA0LjM3bC0xLjM2NCAzLjg2aDIuNzI4bC0xLjM2NC0zLjg2em0tMTguNzA2LTIuNTFsLTEuNTE4LS4wMDEgMS43NSAyLjc2NWMuNDk3LS4wNDggMS42MzYtLjI4NyAxLjYzNi0xLjM4MyAwLTEuMzgyLTEuODc3LTEuMzgyLTEuODc3LTEuMzgyeiIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTMxNSAtMzIpIHRyYW5zbGF0ZSgzMTUgMTYpIHRyYW5zbGF0ZSgwIDE2KSIvPgogICAgICAgICAgICAgICAgICAgIDwvZz4KICAgICAgICAgICAgICAgIDwvZz4KICAgICAgICAgICAgPC9nPgogICAgICAgIDwvZz4KICAgIDwvZz4KPC9zdmc+Cg==" style="height:48px;width:auto" alt="Logo">
     </div>
-    <div class="btn-row"><span></span><button class="btn-next" id="btn1" onclick="go(2)" disabled>Naprej →</button></div>
+    <div class="badge">Brezpla&#269;na ocena vrednosti v manj kot 2 minutah</div>
+    <h1>Koliko je vredna<br>va&#353;a nepremi&#269;nina?</h1>
+    <p>V 5 enostavnih korakih do ocene vrednosti nepremi&#269;nine.</p>
   </div>
-  <div class="step" id="s2">
-    <div class="step-icon">📍</div>
-    <div class="step-title">Lokacija</div>
-    <div class="step-sub">Vtipkajte kraj ali četrt, kjer se nahaja nepremičnina.</div>
-    <div class="loc-selected" id="locPill">
-      <span class="ls-pin">📌</span>
-      <div class="ls-body"><div class="ls-kraj" id="pillKraj"></div><div class="ls-tao" id="pillTao"></div></div>
-      <span class="ls-price" id="pillPrice"></span>
-    </div>
-    <div id="searchWrap">
-      <input type="text" id="locInput" placeholder="npr. Ljubljana – Bežigrad" autocomplete="off"
-        oninput="renderDD(this.value)"
-        style="width:100%;padding:.85rem 1rem;border:1.5px solid var(--border);border-radius:12px;font-family:'DM Sans',sans-serif;font-size:.95rem;background:var(--paper);color:var(--ink);outline:none;box-sizing:border-box">
-      <div id="locDD" style="background:var(--paper);border:1.5px solid var(--border);border-radius:12px;margin-top:.4rem;overflow:hidden;display:none;max-height:260px;overflow-y:auto"></div>
-    </div>
-    <div class="btn-row" style="margin-top:1.2rem">
-      <button class="btn-back" onclick="go(1)">← Nazaj</button>
-      <button class="btn-next" id="btn2" onclick="go(3)" disabled>Naprej →</button>
+
+  <div class="progress-wrap">
+    <div class="progress-meta"><span id="stepLabel">Korak 1 od 4</span><span id="stepPct">0 %</span></div>
+    <div class="progress-track"><div class="progress-fill" id="progFill"></div></div>
+    <div class="step-dots" id="stepDots">
+      <div class="step-dot active" id="sdot1">
+        <div class="step-dot-circle active" id="sdotc1"><span class="step-dot-icon">&#127968;</span></div>
+        <span class="step-dot-label">Vrsta</span>
+      </div>
+      <div class="step-connector" id="scon1"></div>
+      <div class="step-dot" id="sdot2">
+        <div class="step-dot-circle" id="sdotc2"><span class="step-dot-icon">&#128205;</span></div>
+        <span class="step-dot-label">Lokacija</span>
+      </div>
+      <div class="step-connector" id="scon2"></div>
+      <div class="step-dot" id="sdot3">
+        <div class="step-dot-circle" id="sdotc3"><span class="step-dot-icon">&#128208;</span></div>
+        <span class="step-dot-label">Povr&#353;ina</span>
+      </div>
+      <div class="step-connector" id="scon3"></div>
+      <div class="step-dot" id="sdot4">
+        <div class="step-dot-circle" id="sdotc4"><span class="step-dot-icon">&#127959;</span></div>
+        <span class="step-dot-label">Stanje</span>
+      </div>
+      <div class="step-connector" id="scon4"></div>
+      <div class="step-dot" id="sdot5">
+        <div class="step-dot-circle" id="sdotc5"><span class="step-dot-icon">&#11088;</span></div>
+        <span class="step-dot-label">Rezultat</span>
+      </div>
     </div>
   </div>
-  <div class="step" id="s3">
-    <div class="step-icon">📐</div>
-    <div class="step-title" id="s3title">Površina</div>
-    <div class="step-sub" id="s3sub">Vnesite uporabno površino v kvadratnih metrih.</div>
-    <div class="slider-section">
-      <div class="slider-input-row">
-        <input type="number" class="slider-manual" id="sizeManual" value="70" min="20" max="600" oninput="onSizeManual(this.value)">
-        <span class="slider-unit-label">m²</span>
-      </div>
-      <input type="range" id="sizeSlider" min="20" max="300" value="70" step="1" oninput="onSize(this.value)">
-      <div class="slider-range"><span id="sizeMin">20 m²</span><span id="sizeMax">300 m²</span></div>
-    </div>
-    <!-- Garaža/parkirno mesto — samo za stanovanja -->
-    <div id="garazaWrap" style="display:none;margin-bottom:1.4rem">
-      <span class="field-label">🚗 Parkirno mesto / garaža</span>
-      <!-- Garažna mesta -->
-      <div style="margin-bottom:.6rem">
-        <div style="font-size:.78rem;font-weight:500;margin-bottom:.4rem">🏠 Garažno mesto (zaprto):</div>
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem">
-          <button class="cond-btn sel" id="garaza-0" onclick="selGaraza(0)"><span class="cond-icon">🚫</span><span class="cond-name">Brez</span></button>
-          <button class="cond-btn" id="garaza-1" onclick="selGaraza(1)"><span class="cond-icon">1×</span><span class="cond-name">1 mesto</span></button>
-          <button class="cond-btn" id="garaza-2" onclick="selGaraza(2)"><span class="cond-icon">2×</span><span class="cond-name">2 mesti</span></button>
-          <button class="cond-btn" id="garaza-3" onclick="selGaraza(3)"><span class="cond-icon">3×</span><span class="cond-name">3 mesta</span></button>
-        </div>
-      </div>
-      <!-- Zunanja mesta -->
-      <div>
-        <div style="font-size:.78rem;font-weight:500;margin-bottom:.4rem">🅿️ Zunanje parkirno (lastniško):</div>
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem">
-          <button class="cond-btn sel" id="zunanje-0" onclick="selZunanje(0)"><span class="cond-icon">🚫</span><span class="cond-name">Brez</span></button>
-          <button class="cond-btn" id="vanjske-1" onclick="selZunanje(1)"><span class="cond-icon">1×</span><span class="cond-name">1 mesto</span></button>
-          <button class="cond-btn" id="zunanje-2" onclick="selZunanje(2)"><span class="cond-icon">2×</span><span class="cond-name">2 mesti</span></button>
-          <button class="cond-btn" id="zunanje-3" onclick="selZunanje(3)"><span class="cond-icon">3×</span><span class="cond-name">3 mesta</span></button>
-        </div>
-      </div>div>
-    </div>
-    <!-- Atrij — samo za stanovanja -->
-    <div id="atrijWrap" style="display:none;margin-bottom:1.4rem">
-      <span class="field-label">🌿 Atrij / vrtna terasa</span>
-      <div style="margin-top:.5rem">
-        <button class="type-card" id="atrijToggleBtn" onclick="toggleAtrij(this)"
-          style="padding:.75rem 1.25rem;text-align:left;width:100%;margin-bottom:.75rem">
-          <div style="display:flex;align-items:center;gap:.75rem">
-            <span style="font-size:1.4rem">🌿</span>
-            <div>
-              <div class="tc-name">Vključen atrij / zasebni vrt</div>
-              <div class="tc-desc">Klikni za označitev — doda vrednost zemljišča</div>
-            </div>
-          </div>
+
+  <div class="card" id="quizCard">
+
+    <!-- S1 -->
+    <div class="step active" id="s1">
+      <div class="step-icon">&#127968;</div>
+      <div class="step-title">Vrsta nepremi&#269;nine</div>
+      <div class="step-sub">Izberite katero nepremi&#269;nino &#382;elite oceniti.</div>
+      <div class="type-grid">
+        <button class="type-card" onclick="selType(this,'stanovanje')">
+          <div class="tc-icon">&#127970;</div><div class="tc-name">Stanovanje</div>
+          <div class="tc-desc">V ve&#269;stanovanjski stavbi</div>
+        </button>
+        <button class="type-card" onclick="selType(this,'hisa')">
+          <div class="tc-icon">&#127968;</div><div class="tc-name">Hi&#353;a</div>
+          <div class="tc-desc">Samostojna, vrstna, dvojček</div>
         </button>
       </div>
-      <div id="atrijSliderWrap" style="display:none">
-        <span class="field-label">Površina atrija</span>
-        <div class="slider-section">
-          <div class="slider-input-row">
-            <input type="number" class="slider-manual" id="atrijManual" value="30" min="1" max="1000" oninput="onAtrijManual(this.value)">
-            <span class="slider-unit-label">m²</span>
-          </div>
-          <input type="range" id="atrijSlider" min="10" max="500" value="30" step="1" oninput="onAtrij(this.value)">
-          <div class="slider-range"><span>10 m²</span><span>500 m²</span></div>
-        </div>
+      <div class="btn-row" style="justify-content:flex-end">
+        <button class="btn-next" id="btn1" onclick="go(2)" disabled>Naprej &#8594;</button>
       </div>
     </div>
-    <!-- Parcela — samo za hiše -->
-    <div id="parcelaWrap" style="display:none">
-      <span class="field-label" style="margin-top:.5rem">Površina parcele</span>
+
+    <!-- S2 -->
+    <div class="step" id="s2">
+      <div class="step-icon">&#128205;</div>
+      <div class="step-title">Lokacija</div>
+      <div class="step-sub">Vtipkajte kraj ali &#269;etrt, kjer se nahaja nepremi&#269;nina.</div>
+      <div class="loc-selected" id="locPill">
+        <span class="ls-pin">&#128204;</span>
+        <div class="ls-body"><div class="ls-kraj" id="pillKraj"></div><div class="ls-tao" id="pillTao"></div></div>
+        <span class="ls-price" id="pillPrice"></span>
+      </div>
+      <div id="searchWrap">
+        <div class="search-wrap">
+          <div class="search-input-row">
+            <span class="search-icon">&#128269;</span>
+            <input class="loc-input" type="text" id="locInput" placeholder="npr. Ljubljana &#8211; Be&#382;igrad" autocomplete="off">
+            <button class="clear-btn" id="clearBtn" onclick="clearInput()">&#10005;</button>
+          </div>
+          <div class="dropdown" id="dropdown"></div>
+        </div>
+      </div>
+      <div class="btn-row" style="margin-top:1.2rem">
+        <button class="btn-back" onclick="go(1)">&#8592; Nazaj</button>
+        <button class="btn-next" id="btn2" onclick="go(3)" disabled>Naprej &#8594;</button>
+      </div>
+    </div>
+
+    <!-- S3 -->
+    <div class="step" id="s3">
+      <div class="step-icon">&#128208;</div>
+      <div class="step-title" id="s3title">Povr&#353;ina stanovanja</div>
+      <div class="step-sub" id="s3sub">Vnesite uporabno povr&#353;ino v m&#178;.</div>
+      <span class="field-label">Povr&#353;ina</span>
       <div class="slider-section">
         <div class="slider-input-row">
-          <input type="number" class="slider-manual" id="parcelaManual" value="500" min="100" max="10000" oninput="onParcelaManual(this.value)">
-          <span class="slider-unit-label">m²</span>
+          <input type="number" inputmode="numeric" class="slider-manual" id="sizeManual" value="70" min="20" max="600" oninput="onSizeManual(this.value)">
+          <span class="slider-unit-label">m&#178;</span>
         </div>
-        <input type="range" id="parcelaSlider" min="100" max="5000" value="500" step="1" oninput="onParcela(this.value)">
-        <div class="slider-range"><span>100 m²</span><span>5.000 m²</span></div>
+        <input type="range" id="sizeSlider" min="20" max="300" value="70" step="1" oninput="onSize(this.value)">
+        <div class="slider-range"><span id="sizeMin">20 m&#178;</span><span id="sizeMax">300 m&#178;</span></div>
+      </div>
+      <div id="garazaWrap" style="display:none;margin-bottom:1.4rem">
+        <span class="field-label">Parkirna mesta</span>
+        <div style="margin-bottom:.8rem">
+          <div style="font-size:.78rem;font-weight:500;margin-bottom:.4rem">&#127968; Gara&#382;no mesto (lastni&#353;ko):</div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem">
+            <button class="cond-btn sel" id="garaza-0" onclick="selGaraza(0)"><span class="cond-name">&#128683;</span></button>
+            <button class="cond-btn" id="garaza-1" onclick="selGaraza(1)"><span class="cond-name">1&#215;</span></button>
+            <button class="cond-btn" id="garaza-2" onclick="selGaraza(2)"><span class="cond-name">2&#215;</span></button>
+            <button class="cond-btn" id="garaza-3" onclick="selGaraza(3)"><span class="cond-name">3&#215;</span></button>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:.78rem;font-weight:500;margin-bottom:.4rem">&#127359; Zunanje parkirno (lastni&#353;ko):</div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem">
+            <button class="cond-btn sel" id="zunanje-0" onclick="selZunanje(0)"><span class="cond-name">&#128683;</span></button>
+            <button class="cond-btn" id="zunanje-1" onclick="selZunanje(1)"><span class="cond-name">1&#215;</span></button>
+            <button class="cond-btn" id="zunanje-2" onclick="selZunanje(2)"><span class="cond-name">2&#215;</span></button>
+            <button class="cond-btn" id="zunanje-3" onclick="selZunanje(3)"><span class="cond-name">3&#215;</span></button>
+          </div>
+        </div>
+      </div>
+      <div id="atrijWrap" style="display:none;margin-bottom:1.4rem">
+        <span class="field-label">&#127807; Atrij / vrtna terasa</span>
+        <button class="type-card" id="atrijToggleBtn" onclick="toggleAtrij(this)" style="padding:.75rem 1.25rem;text-align:left;width:100%;margin-bottom:.75rem">
+          <div style="display:flex;align-items:center;gap:.75rem">
+            <span style="font-size:1.4rem">&#127807;</span>
+            <div><div class="tc-name">Vklju&#269;en atrij / zasebni vrt</div><div class="tc-desc">Klikni za ozna&#269;itev &#8212; doda vrednost</div></div>
+          </div>
+        </button>
+        <div id="atrijSliderWrap" style="display:none">
+          <span class="field-label">Povr&#353;ina atrija</span>
+          <div class="slider-section">
+            <div class="slider-input-row">
+              <input type="number" inputmode="numeric" class="slider-manual" id="atrijManual" value="30" min="1" max="1000" oninput="onAtrijManual(this.value)">
+              <span class="slider-unit-label">m&#178;</span>
+            </div>
+            <input type="range" id="atrijSlider" min="10" max="500" value="30" step="1" oninput="onAtrij(this.value)">
+            <div class="slider-range"><span>10 m&#178;</span><span id="atrijNum" style="display:none"></span><span>500 m&#178;</span></div>
+          </div>
+        </div>
+      </div>
+      <span class="field-label" style="margin-top:.5rem">Kakovost izvedbe</span>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-bottom:1.4rem;margin-top:.6rem">
+        <button class="cond-btn" id="kval-standard" onclick="selKakovost('standard',1.0)">
+          <span class="cond-icon">&#127968;</span><span class="cond-name">Standard</span>
+        </button>
+        <button class="cond-btn" id="kval-nadstandard" onclick="selKakovost('nadstandard',1.12)">
+          <span class="cond-icon">&#11088;</span><span class="cond-name">Nadstandard</span>
+        </button>
+        <button class="cond-btn" id="kval-luksuz" onclick="selKakovost('luksuz',1.25)">
+          <span class="cond-icon">&#128142;</span><span class="cond-name">Luksuz</span>
+        </button>
+      </div>
+      <div id="parcelaWrap" style="display:none">
+        <span class="field-label">Povr&#353;ina parcele</span>
+        <div class="slider-section">
+          <div class="slider-input-row">
+            <input type="number" inputmode="numeric" class="slider-manual" id="parcelaManual" value="500" min="100" max="10000" oninput="onParcelaManual(this.value)">
+            <span class="slider-unit-label">m&#178;</span>
+          </div>
+          <input type="range" id="parcelaSlider" min="100" max="5000" value="500" step="1" oninput="onParcela(this.value)">
+          <div class="slider-range"><span>100 m&#178;</span><span id="parcelaNum" style="display:none"></span><span>5.000 m&#178;</span></div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-back" onclick="go(2)">&#8592; Nazaj</button>
+        <button class="btn-next" onclick="go(4)">Naprej &#8594;</button>
       </div>
     </div>
-    <!-- Kakovost izvedbe -->
-    <span class="field-label" style="margin-top:.5rem">Kakovost izvedbe</span>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-bottom:1.4rem;margin-top:.6rem">
-      <button class="cond-btn" id="kval-standard" onclick="selKakovost('standard',1.0)">
-        <span class="cond-icon">🏠</span>
-        <span class="cond-name">Standard</span>
-      </button>
-      <button class="cond-btn" id="kval-nadstandard" onclick="selKakovost('nadstandard',1.12)">
-        <span class="cond-icon">⭐</span>
-        <span class="cond-name">Nadstandard</span>
-      </button>
-      <button class="cond-btn" id="kval-luksuz" onclick="selKakovost('luksuz',1.25)">
-        <span class="cond-icon">💎</span>
-        <span class="cond-name">Luksuz</span>
-      </button>
+
+    <!-- S4 -->
+    <div class="step" id="s4">
+      <div class="step-icon">&#127959;</div>
+      <div class="step-title">Starost in stanje</div>
+      <div class="step-sub">Leto gradnje in stanje posameznih komponent.</div>
+      <span class="field-label">Leto izgradnje</span>
+      <div class="slider-section">
+        <div class="slider-input-row">
+          <input type="number" inputmode="numeric" class="slider-manual" id="yearManual" value="1980" min="1900" max="2026" oninput="onYearManual(this.value)">
+        </div>
+        <input type="range" id="yearSlider" min="1945" max="2025" value="1980" step="1" oninput="onYear(this.value)">
+        <div class="slider-range"><span>1945</span><span>2025</span></div>
+      </div>
+      <span class="field-label" style="margin-bottom:.8rem">Notranjost / kratkotrajne komponente</span>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:1.4rem">
+        <button class="cond-btn" id="kt-novo" onclick="selKt(this,0,'Prenovljeno')"><span class="cond-icon">&#11088;</span><span class="cond-name">Prenovljeno</span></button>
+        <button class="cond-btn" id="kt-dobro" onclick="selKt(this,10,'Dobro')"><span class="cond-icon">&#9989;</span><span class="cond-name">Dobro</span></button>
+        <button class="cond-btn" id="kt-staro" onclick="selKt(this,20,'Staro')"><span class="cond-icon">&#128296;</span><span class="cond-name">Staro</span></button>
+        <button class="cond-btn" id="kt-obrab" onclick="selKt(this,40,'Obrabljeno')"><span class="cond-icon">&#128679;</span><span class="cond-name">Obrabljeno</span></button>
+      </div>
+      <span class="field-label">Obnove komponent (neobvezno)</span>
+      <div id="compWrap" style="margin-bottom:1rem">
+        <div class="comp-toggle" id="tog-fasada" onclick="toggleComp('fasada')"><span class="comp-toggle-label">&#127968; Fasada</span><span style="margin-left:auto;color:var(--muted);font-size:.9rem;transition:transform .2s" class="comp-chevron">›</span><span style="font-size:.75rem;color:var(--muted)">Ni obnovljeno</span></div>
+        <div class="comp-year-wrap" id="wrap-fasada">
+          <div class="comp-year-display" id="disp-fasada">2000</div>
+          <div class="slider-input-row"><input type="number" inputmode="numeric" class="slider-manual" id="manual-fasada" value="2000" min="1945" max="2026" oninput="onCompManual('fasada',this.value)"></div>
+          <div class="comp-slider-inner"><input type="range" id="sl-fasada" min="1945" max="2025" value="2000" step="1" oninput="onComp('fasada',this.value)"></div>
+        </div>
+        <div class="comp-toggle" id="tog-okna" onclick="toggleComp('okna')"><span class="comp-toggle-label">&#129695; Okna</span><span style="margin-left:auto;color:var(--muted);font-size:.9rem;transition:transform .2s" class="comp-chevron">›</span><span style="font-size:.75rem;color:var(--muted)">Ni obnovljeno</span></div>
+        <div class="comp-year-wrap" id="wrap-okna">
+          <div class="comp-year-display" id="disp-okna">2000</div>
+          <div class="slider-input-row"><input type="number" inputmode="numeric" class="slider-manual" id="manual-okna" value="2000" min="1945" max="2026" oninput="onCompManual('okna',this.value)"></div>
+          <div class="comp-slider-inner"><input type="range" id="sl-okna" min="1945" max="2025" value="2000" step="1" oninput="onComp('okna',this.value)"></div>
+        </div>
+        <div class="comp-toggle" id="tog-inst" onclick="toggleComp('inst')"><span class="comp-toggle-label">&#9889; In&#353;talacije</span><span style="margin-left:auto;color:var(--muted);font-size:.9rem;transition:transform .2s" class="comp-chevron">›</span><span style="font-size:.75rem;color:var(--muted)">Ni obnovljeno</span></div>
+        <div class="comp-year-wrap" id="wrap-inst">
+          <div class="comp-year-display" id="disp-inst">2000</div>
+          <div class="slider-input-row"><input type="number" inputmode="numeric" class="slider-manual" id="manual-inst" value="2000" min="1945" max="2026" oninput="onCompManual('inst',this.value)"></div>
+          <div class="comp-slider-inner"><input type="range" id="sl-inst" min="1945" max="2025" value="2000" step="1" oninput="onComp('inst',this.value)"></div>
+        </div>
+        <div class="comp-toggle" id="tog-streha" onclick="toggleComp('streha')"><span class="comp-toggle-label">&#127959; Streha</span><span style="margin-left:auto;color:var(--muted);font-size:.9rem;transition:transform .2s" class="comp-chevron">›</span><span style="font-size:.75rem;color:var(--muted)">Ni obnovljeno</span></div>
+        <div class="comp-year-wrap" id="wrap-streha">
+          <div class="comp-year-display" id="disp-streha">2000</div>
+          <div class="slider-input-row"><input type="number" inputmode="numeric" class="slider-manual" id="manual-streha" value="2000" min="1945" max="2026" oninput="onCompManual('streha',this.value)"></div>
+          <div class="comp-slider-inner"><input type="range" id="sl-streha" min="1945" max="2025" value="2000" step="1" oninput="onComp('streha',this.value)"></div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-back" onclick="go(3)">&#8592; Nazaj</button>
+        <button class="btn-next" id="btn4" onclick="showResult()">Izra&#269;unaj oceno &#10022;</button>
+      </div>
     </div>
-    <div class="btn-row">
-      <button class="btn-back" onclick="go(2)">← Nazaj</button>
-      <button class="btn-next" onclick="go(4)">Naprej →</button>
+
+  </div><!-- /quizCard -->
+
+  <!-- RESULT CARD -->
+  <div class="card result-card" id="resultCard">
+    <div id="loadingWrap">
+      <div class="result-loading"><div class="spinner"></div><p class="loading-text">Primerjamo s podatki GURS&#8230;</p></div>
+    </div>
+    <div id="resultBody" style="display:none;padding:1.5rem">
+      <div style="margin-bottom:1rem">
+        <button onclick="goBackStep(4)" style="background:none;border:none;font-family:'DM Sans',sans-serif;font-size:.82rem;color:var(--muted);cursor:pointer;padding:.3rem 0;display:flex;align-items:center;gap:.3rem">&#8592; Nazaj na vprašanja</button>
+      </div>
+      <div class="result-hero">
+        <div class="result-label">OCENJENA TR&#381;NA VREDNOST</div>
+        <div class="result-price" id="rMainPrice">&#8212;</div>
+        <div class="result-ppm2" id="rPpm2"></div>
+        <div style="display:flex;gap:.5rem;justify-content:center;flex-wrap:wrap;margin-bottom:.6rem">
+          <div class="result-range"><span id="rLow"></span> &#8211; <span id="rHigh"></span></div>
+        </div>
+        <div class="result-confidence" id="rConfidence"></div>
+        <div id="rContext"></div>
+        <div id="rNote" style="display:none;font-size:.72rem;color:var(--muted);margin-top:.4rem;font-style:italic"></div>
+      </div>
+      <!-- CTA cenitev -->
+      <div style="background:#1B1B1B;border-radius:16px;padding:1.4rem 1.2rem;margin-bottom:1.2rem">
+        <div style="font-size:.72rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:.5rem">POTREBUJETE URADNO CENITEV?</div>
+        <div style="font-size:1rem;font-weight:600;font-family:'Cormorant Garamond',serif;margin-bottom:.3rem;color:#FFFFFF">Pridobite strokovno oceno vrednosti</div>
+        <div style="font-size:.8rem;color:rgba(255,255,255,.65);margin-bottom:.8rem;line-height:1.5">Na&#353;i Poobla&#353;&#269;eni ocenjevalci vrednosti nepremi&#269;nin z veljavnimi licencami vam pripravijo uradno poro&#269;ilo o oceni vrednosti nepremi&#269;nine za vse namene.</div>
+        <div id="ctaForm">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:.6rem">
+            <input id="ctaName" type="text" placeholder="Ime in priimek" style="padding:.65rem .85rem;border:1.5px solid rgba(255,255,255,.2);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.85rem;background:rgba(255,255,255,.1);color:#FFFFFF;outline:none;;box-sizing:border-box" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='rgba(255,255,255,.2)'">
+            <input id="ctaPhone" type="tel" placeholder="Telefonska &#353;tevilka" style="padding:.65rem .85rem;border:1.5px solid rgba(255,255,255,.2);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.85rem;background:rgba(255,255,255,.1);color:#FFFFFF;outline:none;;box-sizing:border-box" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='rgba(255,255,255,.2)'">
+          </div>
+          <div style="margin-bottom:.6rem">
+            <input id="ctaEmail" type="email" placeholder="E-mail naslov" style="width:100%;padding:.65rem .85rem;border:1.5px solid rgba(255,255,255,.2);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.85rem;background:rgba(255,255,255,.1);color:#FFFFFF;outline:none;;box-sizing:border-box" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='rgba(255,255,255,.2)'">
+          </div>
+          <div style="margin-bottom:.6rem">
+            <select id="ctaNamen" style="width:100%;padding:.65rem .85rem;border:1.5px solid rgba(255,255,255,.2);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.85rem;background:rgba(255,255,255,.12);color:#FFFFFF;outline:none;box-sizing:border-box;cursor:pointer;-webkit-appearance:none;" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='rgba(255,255,255,.2)'">
+              <option value="" style="background:#1B1B1B">Namen cenitve...</option>
+              <option value="prodaja" style="background:#1B1B1B">Prodaja nepremi&#269;nine</option>
+              <option value="nakup" style="background:#1B1B1B">Nakup nepremi&#269;nine</option>
+              <option value="dedovanje" style="background:#1B1B1B">Dedovanje / darovanje</option>
+              <option value="kredit" style="background:#1B1B1B">Zavarovano posojanje (kredit)</option>
+              <option value="racunovodstvo" style="background:#1B1B1B">Ra&#269;unovodsko poro&#269;anje</option>
+              <option value="davcni" style="background:#1B1B1B">Dav&#269;ni namen</option>
+              <option value="drugo" style="background:#1B1B1B">Drugo</option>
+            </select>
+          </div>
+          <div style="margin-bottom:.8rem">
+            <input id="ctaPredmet" type="text" placeholder="Predmet cenitve (npr. stanovanje LJ, 65 m&#178;)" style="width:100%;padding:.65rem .85rem;border:1.5px solid rgba(255,255,255,.2);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.85rem;background:rgba(255,255,255,.1);color:#FFFFFF;outline:none;;box-sizing:border-box" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='rgba(255,255,255,.2)'">
+          </div>
+          <button onclick="sendLead()" style="width:100%;background:#FFFFFF;border:none;border-radius:10px;padding:.75rem;font-family:'DM Sans',sans-serif;font-size:.88rem;font-weight:600;color:#1B1B1B;cursor:pointer;letter-spacing:.02em;">&#128231; Po&#353;ljite povpra&#353;evanje</button>
+        </div>
+        <div id="sentBox" style="display:none;text-align:center;padding:.5rem 0;color:#FFFFFF">
+          <div style="font-size:1.5rem;margin-bottom:.4rem">&#10003;</div>
+          <div style="font-size:.9rem;font-weight:600">Hvala! Kontaktirali vas bomo kmalu.</div>
+        </div>
+      </div>
+
+      <!-- Prodaja CTA -->
+      <div id="prodajaBox" style="background:linear-gradient(135deg,var(--gold),var(--gold-lt));border-radius:14px;padding:1.1rem 1.2rem;margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between;gap:1rem">
+        <div>
+          <div style="font-size:.88rem;font-weight:700;color:#1B1B1B">Razmi&#353;ljate o prodaji?</div>
+          <div style="font-size:.74rem;color:rgba(27,27,27,.6);margin-top:.2rem">Brezpla&#269;en posvet z na&#353;im svetovalcem.</div>
+        </div>
+        <button onclick="showProdajaForm()" style="background:#1B1B1B;border:none;border-radius:10px;padding:.6rem 1.1rem;font-family:'DM Sans',sans-serif;font-size:.82rem;font-weight:600;color:#FFFFFF;cursor:pointer;white-space:nowrap;flex-shrink:0">Zanima me &#8594;</button>
+      </div>
+      <div id="prodajaForm" style="display:none;background:var(--paper);border:1.5px solid var(--border);border-radius:14px;padding:1.1rem 1.2rem;margin-bottom:1rem">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem">
+          <div style="font-size:.7rem;font-weight:600;color:var(--muted);letter-spacing:.08em">POVPRA&#352;EVANJE ZA PRODAJO</div>
+          <button onclick="document.getElementById('prodajaForm').style.display='none';document.getElementById('prodajaBox').style.display='flex'" style="background:none;border:none;font-size:1rem;color:var(--muted);cursor:pointer;padding:0;line-height:1">&#10005;</button>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:.5rem">
+          <input id="prodajaName" type="text" placeholder="Ime in priimek" style="padding:.65rem .75rem;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.82rem;color:var(--ink);background:var(--white);outline:none;box-sizing:border-box" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'">
+          <input id="prodajaPhone" type="tel" placeholder="Telefon" style="padding:.65rem .75rem;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.82rem;color:var(--ink);background:var(--white);outline:none;box-sizing:border-box" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'">
+        </div>
+        <div style="margin-bottom:.5rem">
+          <input id="prodajaEmail" type="email" placeholder="E-mail" style="width:100%;padding:.65rem .75rem;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.82rem;color:var(--ink);background:var(--white);outline:none;box-sizing:border-box" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'">
+        </div>
+        <div style="margin-bottom:.5rem">
+          <input id="prodajaPredmet" type="text" placeholder="Predmet prodaje (npr. hi&#353;a Ljubljana, 200 m&#178;)" style="width:100%;padding:.65rem .75rem;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.82rem;color:var(--ink);background:var(--white);outline:none;box-sizing:border-box" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'">
+        </div>
+        <button onclick="sendProdaja()" style="width:100%;background:var(--ink);border:none;border-radius:8px;padding:.7rem;font-family:'DM Sans',sans-serif;font-size:.85rem;font-weight:600;color:#FFFFFF;cursor:pointer">Po&#353;lji povpra&#353;evanje &#8594;</button>
+      </div>
+      <div id="prodajaSent" style="display:none;text-align:center;padding:.85rem;background:var(--paper);border:1.5px solid var(--border);border-radius:14px;margin-bottom:1rem">
+        <div style="font-size:1.5rem;color:var(--gold);margin-bottom:.3rem">&#10003;</div>
+        <div style="font-size:.88rem;font-weight:600;color:var(--ink)">Hvala! Kontaktirali vas bomo kmalu.</div>
+      </div>
+
+      <div class="summary-grid">
+        <div class="sum-item"><div class="sum-label">Vrsta</div><div class="sum-value" id="sumType">&#8212;</div></div>
+        <div class="sum-item"><div class="sum-label">Lokacija</div><div class="sum-value" id="sumLoc">&#8212;</div></div>
+        <div class="sum-item"><div class="sum-label">Analiti&#269;no obmo&#269;je</div><div class="sum-value" id="sumTao">&#8212;</div></div>
+        <div class="sum-item"><div class="sum-label">Povr&#353;ina</div><div class="sum-value" id="sumSize">&#8212;</div></div>
+        <div class="sum-item"><div class="sum-label">Leto izgradnje</div><div class="sum-value" id="sumYear">&#8212;</div></div>
+        <div class="sum-item"><div class="sum-label">Stanje</div><div class="sum-value" id="sumCond">&#8212;</div></div>
+      </div>
+      <div class="ref-section">
+        <div class="ref-title">REFEREN&#268;NE VREDNOSTI GURS (MEDIANA, 2025)</div>
+        <div class="ref-grid">
+          <div class="ref-item"><div class="ri-label" id="refPriceLabel">Mediana cene</div><div class="ri-val" id="refPrice">&#8212;</div></div>
+          <div class="ref-item"><div class="ri-label">Ref. leto gradnje</div><div class="ri-val" id="refYear">&#8212;</div></div>
+          <div class="ref-item"><div class="ri-label" id="refSizeLabel">Mediana povr&#353;ine</div><div class="ri-val" id="refSize">&#8212;</div></div>
+          <div class="ref-item"><div class="ri-label">Vzorec transakcij</div><div class="ri-val" id="refN">&#8212;</div></div>
+          <div class="ref-item" id="refZemRow" style="display:none"><div class="ri-label">Mediana parcele</div><div class="ri-val" id="refZemVal">&#8212;</div></div>
+        </div>
+      </div>
+      <div class="trend-section" id="rTrend" style="margin-bottom:.8rem">
+        <div class="ref-title">Gibanje cen 2020&#8211;2025</div>
+        <div id="trendSvg" style="margin:0;line-height:0;font-size:0"></div>
+        <canvas class="trend-chart" id="trendChart" style="display:none"></canvas>
+        <div class="trend-legend" id="trendLegend"></div>
+      </div>
+      <div id="etnSection" style="display:none" class="etn-section"></div>
+
+
+
+      <!-- Edit menu -->
+      <div id="editMenu">
+        <div style="font-size:.78rem;font-weight:600;color:var(--muted);margin-bottom:.6rem;letter-spacing:.05em">KAJ HO&#268;E&#352; POPRAVITI?</div>
+        <button onclick="goBackStep(1)" style="display:block;width:100%;text-align:left;padding:.55rem .75rem;margin-bottom:.3rem;background:none;border:1px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.85rem;cursor:pointer;color:var(--ink)">&#127968; Vrsta nepremi&#269;nine</button>
+        <button onclick="goBackStep(2)" style="display:block;width:100%;text-align:left;padding:.55rem .75rem;margin-bottom:.3rem;background:none;border:1px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.85rem;cursor:pointer;color:var(--ink)">&#128205; Lokacija</button>
+        <button onclick="goBackStep(3)" style="display:block;width:100%;text-align:left;padding:.55rem .75rem;margin-bottom:.3rem;background:none;border:1px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.85rem;cursor:pointer;color:var(--ink)">&#128208; Povr&#353;ina in dodatki</button>
+        <button onclick="goBackStep(4)" style="display:block;width:100%;text-align:left;padding:.55rem .75rem;background:none;border:1px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.85rem;cursor:pointer;color:var(--ink)">&#127959; Starost in stanje</button>
+      </div>
+      <button class="btn-back-edit" onclick="goBackToEdit()">&#9999;&#65039; Popravi podatke</button>
+      <button class="btn-restart" onclick="location.reload()">&#8617; Za&#269;ni znova</button>
     </div>
   </div>
-  <div class="step" id="s4">
-    <div class="step-icon">🏗️</div>
-    <div class="step-title">Starost in stanje</div>
-    <div class="step-sub">Leto gradnje in obnove posameznih komponent.</div>
 
-    <!-- Leto gradnje -->
-    <span class="field-label">Leto izgradnje</span>
-    <div class="slider-section" style="margin-bottom:1.4rem">
-      <div class="slider-input-row">
-        <input type="number" class="slider-manual" id="yearManual" value="1980" min="1945" max="2026" oninput="onYearManual(this.value)">
-      </div>
-      <input type="range" id="yearSlider" min="1945" max="2025" value="1980" step="1" oninput="onYear(this.value)">
-      <div class="slider-range"><span>1945</span><span>2025</span></div>
-    </div>
-
-    <!-- Komponente obnov -->
-    <span class="field-label" style="margin-bottom:.75rem">Obnove komponent</span>
-    <div style="margin-bottom:1.4rem">
-
-      <!-- Fasada -->
-      <div class="comp-row">
-        <div class="comp-label">🏠 Fasada<span class="comp-sub">Zunanja izolacija in obloga</span></div>
-        <button class="comp-toggle" id="tog-fasada" onclick="toggleComp('fasada')">Ni obnovljeno</button>
-      </div>
-      <div class="comp-slider-wrap" id="wrap-fasada">
-        <div class="slider-input-row">
-          <input type="number" class="slider-manual" id="manual-fasada" value="2000" min="1945" max="2026" oninput="onCompManual('fasada',this.value)">
-        </div>
-        <div class="comp-slider-inner">
-          <input type="range" id="sl-fasada" min="1945" max="2025" value="2000" step="1" oninput="onComp('fasada',this.value)">
-        </div>
-        <div class="slider-range"><span>1945</span><span>2025</span></div>
-      </div>
-
-      <!-- Okna -->
-      <div class="comp-row">
-        <div class="comp-label">🪟 Okna<span class="comp-sub">Stavbno pohištvo</span></div>
-        <button class="comp-toggle" id="tog-okna" onclick="toggleComp('okna')">Ni obnovljeno</button>
-      </div>
-      <div class="comp-slider-wrap" id="wrap-okna">
-        <div class="slider-input-row">
-          <input type="number" class="slider-manual" id="manual-okna" value="2000" min="1945" max="2026" oninput="onCompManual('okna',this.value)">
-        </div>
-        <div class="comp-slider-inner">
-          <input type="range" id="sl-okna" min="1945" max="2025" value="2000" step="1" oninput="onComp('okna',this.value)">
-        </div>
-        <div class="slider-range"><span>1945</span><span>2025</span></div>
-      </div>
-
-      <!-- Streha -->
-      <div class="comp-row">
-        <div class="comp-label">🏠 Streha<span class="comp-sub">Kritina in strešna konstrukcija</span></div>
-        <button class="comp-toggle" id="tog-streha" onclick="toggleComp('streha')">Ni obnovljeno</button>
-      </div>
-      <div class="comp-slider-wrap" id="wrap-streha">
-        <div class="slider-input-row">
-          <input type="number" class="slider-manual" id="manual-streha" value="2000" min="1945" max="2026" oninput="onCompManual('streha',this.value)">
-        </div>
-        <div class="comp-slider-inner">
-          <input type="range" id="sl-streha" min="1945" max="2025" value="2000" step="1" oninput="onComp('streha',this.value)">
-        </div>
-        <div class="slider-range"><span>1945</span><span>2025</span></div>
-      </div>
-
-      <!-- Inštalacije -->
-      <div class="comp-row">
-        <div class="comp-label">⚡ Inštalacije<span class="comp-sub">Elektrika, vodovod, ogrevanje</span></div>
-        <button class="comp-toggle" id="tog-inst" onclick="toggleComp('inst')">Ni obnovljeno</button>
-      </div>
-      <div class="comp-slider-wrap" id="wrap-inst">
-        <div class="slider-input-row">
-          <input type="number" class="slider-manual" id="manual-inst" value="2000" min="1945" max="2026" oninput="onCompManual('inst',this.value)">
-        </div>
-        <div class="comp-slider-inner">
-          <input type="range" id="sl-inst" min="1945" max="2025" value="2000" step="1" oninput="onComp('inst',this.value)">
-        </div>
-        <div class="slider-range"><span>1945</span><span>2025</span></div>
-      </div>
-    </div>
-
-    <!-- Kratkotrajne komponente -->
-    <span class="field-label">Notranje površine</span>
-    <div class="step-sub" style="margin-bottom:.9rem;margin-top:-.2rem">Kopalnica, kuhinja, tlaki, obloge</div>
-    <div class="kt-grid">
-      <button class="kt-btn" onclick="selKt(this,5)">
-        <span class="kt-icon">✨</span>
-        <span class="kt-name">Prenovljeno</span>
-        <span class="kt-desc">Celovita obnova v zadnjih ~10 letih</span>
-      </button>
-      <button class="kt-btn" onclick="selKt(this,15)">
-        <span class="kt-icon">✅</span>
-        <span class="kt-name">Dobro stanje</span>
-        <span class="kt-desc">Vzdrževano, brez večjih pomanjkljivosti</span>
-      </button>
-      <button class="kt-btn" onclick="selKt(this,30)">
-        <span class="kt-icon">🔨</span>
-        <span class="kt-name">Rabljeno</span>
-        <span class="kt-desc">Funkcionalno, a zastarelo</span>
-      </button>
-      <button class="kt-btn" onclick="selKt(this,50)">
-        <span class="kt-icon">🚧</span>
-        <span class="kt-name">Obrabljeno</span>
-        <span class="kt-desc">Potrebna celovita notranja prenova</span>
-      </button>
-    </div>
-
-    <div class="btn-row">
-      <button class="btn-back" onclick="go(3)">← Nazaj</button>
-      <button class="btn-next" id="btn4" onclick="showResult()" disabled>Izračunaj oceno ✦</button>
-    </div>
-  </div>
-</div>
-<div class="card result-card" id="resultCard">
-  <div id="loadingWrap"><div class="result-loading"><div class="spinner"></div><p class="loading-text">Primerjamo s podatki GURS…</p></div></div>
-  <div class="result-body" id="resultBody">
-    <div class="result-hero">
-      <div class="result-eyebrow">Ocenjena tržna vrednost</div>
-      <div class="result-main-price" id="rMainPrice">—</div>
-      <div class="result-ppm2" id="rPpm2">—</div>
-      <div class="result-range-band">
-        <span id="rLow">—</span>
-        <span style="opacity:.4">–</span>
-        <span id="rHigh">—</span>
-      </div>
-      <div class="result-confidence" id="rConfidence">—</div>
-      <div id="rContext" style="font-size:.8rem;color:var(--muted);margin-top:.5rem;font-style:italic;min-height:1.2em"></div>
-      <div class="result-note" id="rNote">—</div>
-      <span class="result-source">◆ Vir: GURS 2025 · +3% korekcija 2026</span>
-    </div>
-    <div class="summary-grid">
-      <div class="sum-item"><div class="sum-label">Vrsta</div><div class="sum-value" id="sumType">—</div></div>
-      <div class="sum-item"><div class="sum-label">Kraj</div><div class="sum-value" id="sumLoc">—</div></div>
-      <div class="sum-item"><div class="sum-label">Analitično območje</div><div class="sum-value" id="sumTao">—</div></div>
-      <div class="sum-item"><div class="sum-label">Površina</div><div class="sum-value" id="sumSize">—</div></div>
-      <div class="sum-item"><div class="sum-label">Leto izgradnje</div><div class="sum-value" id="sumYear">—</div></div>
-      <div class="sum-item"><div class="sum-label">Stanje</div><div class="sum-value" id="sumCond">—</div></div>
-    </div>
-    <div class="ref-box">
-      <div class="ref-title">Referenčne vrednosti GURS (mediana, 2025)</div>
-      <div class="ref-grid">
-        <div><div class="ref-item-label" id="refPriceLabel">Mediana cene</div><div class="ref-item-val" id="refPrice">—</div></div>
-        <div><div class="ref-item-label">Ref. leto gradnje</div><div class="ref-item-val" id="refYear">—</div></div>
-        <div><div class="ref-item-label" id="refSizeLabel">Mediana površine</div><div class="ref-item-val" id="refSize">—</div></div>
-        <div><div class="ref-item-label">Vzorec transakcij</div><div class="ref-item-val" id="refN">—</div></div>
-        <div id="refZemRow" style="display:none"><div class="ref-item-label">Mediana površine parcele</div><div class="ref-item-val" id="refZemVal">—</div></div>
-      </div>
-    </div>
-    <div id="etnSection" style="display:none" class="etn-section"></div>
-    <div class="trend-section">
-      <div class="ref-title">Gibanje cen 2020–2025 (verižni indeks)</div>
-      <div class="trend-chart"><svg class="trend-svg" id="trendSvg" viewBox="0 0 560 185" preserveAspectRatio="none"></svg></div>
-      <div class="trend-legend" id="trendLegend"></div>
-    </div>
-    <div class="cta-box">
-      <div class="cta-eyebrow">Naslednji korak</div>
-      <h3>Pridobite uradno cenilno poročilo</h3>
-      <p>Naši certificirani cenilci opravijo ogled in vam pripravijo uradno oceno vrednosti — za prodajo, nakup, dedovanje ali bančne namene.</p>
-      <div class="cta-form" id="ctaForm">
-        <input type="text" id="ctaName" placeholder="Ime in priimek">
-        <input type="tel" id="ctaPhone" placeholder="Telefonska številka">
-        <input type="email" id="ctaEmail" placeholder="E-naslov">
-        <button class="btn-cta" onclick="sendLead()">Zaprosite za brezplačen posvet →</button>
-      </div>
-      <div class="sent-box" id="sentBox">✓ Hvala! Kontaktirali vas bomo v naslednjih 24 urah.</div>
-      <p class="privacy">Vaši podatki so varni in ne bodo posredovani tretjim osebam.</p>
-    </div>
-    <div id="editMenu" style="display:none;background:var(--paper);border:1.5px solid var(--border);border-radius:12px;padding:.75rem;margin-bottom:.75rem">
-      <div style="font-size:.78rem;font-weight:600;color:var(--muted);margin-bottom:.6rem;letter-spacing:.05em">KAJ HOČEŠ POPRAVITI?</div>
-      <button onclick="goBackStep(1)" style="display:block;width:100%;text-align:left;padding:.55rem .75rem;margin-bottom:.3rem;background:none;border:1px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.85rem;cursor:pointer;color:var(--ink)" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--border)'">🏠 Vrsta nepremičnine</button>
-      <button onclick="goBackStep(2)" style="display:block;width:100%;text-align:left;padding:.55rem .75rem;margin-bottom:.3rem;background:none;border:1px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.85rem;cursor:pointer;color:var(--ink)" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--border)'">📍 Lokacija</button>
-      <button onclick="goBackStep(3)" style="display:block;width:100%;text-align:left;padding:.55rem .75rem;margin-bottom:.3rem;background:none;border:1px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.85rem;cursor:pointer;color:var(--ink)" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--border)'">📐 Površina in dodatki</button>
-      <button onclick="goBackStep(4)" style="display:block;width:100%;text-align:left;padding:.55rem .75rem;background:none;border:1px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.85rem;cursor:pointer;color:var(--ink)" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--border)'">🏗️ Starost in stanje</button>
-    </div>
-    <button class="btn-back-edit" onclick="goBackToEdit()">✏️ Popravi podatke</button>
-    <button class="btn-restart" onclick="location.reload()">↩ Začni znova</button>
-  </div>
-</div>
-</div>
-
+</div><!-- /wrapper -->
 <script>
 
 //  GURS 2025 \u2014 KOMPLETNI PODATKI
@@ -1060,18 +1059,28 @@ function hisaSizeRatio(userM2,refM2){
 
 
 
+
+
+const ETN_TRANS_H={"lj": [{"n": "", "m": 142, "z": 0, "l": 2025, "p": 380000, "v": -14, "d": "mar 26"}, {"n": "Pod Bresti 32, Ljubljana", "m": 112, "z": 328, "l": 1983, "p": 680000, "v": 55, "d": "mar 26"}, {"n": "Sojerjeva Ulica 43, Ljubljana", "m": 165, "z": 520, "l": 1952, "p": 430000, "v": -2, "d": "mar 26"}, {"n": "Obirska Ulica 22, Ljubljana", "m": 78, "z": 314, "l": 1920, "p": 413000, "v": -6, "d": "mar 26"}, {"n": "Uršičev Štradon 34E, Ljubljana", "m": 174, "z": 666, "l": 2010, "p": 544000, "v": 24, "d": "mar 26"}, {"n": "Veliko Trebeljevo 42", "m": 146, "z": 738, "l": 1985, "p": 115000, "v": -74, "d": "mar 26"}], "ob|piran": [{"n": "Ulica Ivana Regenta 34, Piran", "m": 215, "z": 954, "l": 1900, "p": 750000, "v": 103, "d": "mar 26"}, {"n": "Strunjan 134C", "m": 82, "z": 785, "l": 1973, "p": 830000, "v": 124, "d": "feb 26"}, {"n": "", "m": 61, "z": 2675, "l": 1965, "p": 117000, "v": -68, "d": "feb 26"}, {"n": "Kosmačeva Ulica 4, Lucija", "m": 118, "z": 164, "l": 1979, "p": 300000, "v": -19, "d": "jan 26"}, {"n": "Sečovlje 15", "m": 63, "z": 643, "l": 1957, "p": 160000, "v": -57, "d": "dec 25"}, {"n": "Letoviška Pot 37A, Portorož", "m": 285, "z": 452, "l": 1980, "p": 850000, "v": 130, "d": "dec 25"}], "ni": [{"n": "Knežak 12", "m": 120, "z": 308, "l": 0, "p": 40000, "v": -75, "d": "mar 26"}, {"n": "Buje 2", "m": 199, "z": 771, "l": 1915, "p": 195000, "v": 23, "d": "mar 26"}, {"n": "Cankarjeva Ulica 6, Ilirska Bistrica", "m": 85, "z": 336, "l": 1907, "p": 90000, "v": -43, "d": "mar 26"}, {"n": "Planina 128", "m": 263, "z": 674, "l": 1980, "p": 201000, "v": 26, "d": "mar 26"}, {"n": "Ulica 25. Maja 18A, Prestranek", "m": 64, "z": 0, "l": 1926, "p": 187000, "v": 18, "d": "mar 26"}, {"n": "", "m": 121, "z": 479, "l": 1974, "p": 130000, "v": -18, "d": "feb 26"}], "sd": [{"n": "", "m": 77, "z": 194541, "l": 1960, "p": 185000, "v": -6, "d": "mar 26"}, {"n": "Kavče 39D", "m": 168, "z": 1617, "l": 1966, "p": 181000, "v": -8, "d": "feb 26"}, {"n": "Podkraj Pri Velenju 5C", "m": 194, "z": 744, "l": 1972, "p": 190000, "v": -4, "d": "feb 26"}, {"n": "Cesta Iii 19, Velenje", "m": 113, "z": 279, "l": 1978, "p": 185000, "v": -6, "d": "feb 26"}, {"n": "Janškovo Selo 2C", "m": 238, "z": 10806, "l": 2011, "p": 320000, "v": 62, "d": "feb 26"}, {"n": "Splitska Ulica 32, Velenje", "m": 121, "z": 311, "l": 1977, "p": 265000, "v": 35, "d": "feb 26"}], "ng": [{"n": "Idrijska Cesta 11, Ajdovščina", "m": 263, "z": 1484, "l": 1910, "p": 300000, "v": 76, "d": "mar 26"}, {"n": "Slap 3A", "m": 310, "z": 1531, "l": 1968, "p": 230000, "v": 35, "d": "mar 26"}, {"n": "Ozeljan 23A", "m": 139, "z": 596, "l": 2002, "p": 238000, "v": 40, "d": "feb 26"}, {"n": "Skrilje 60", "m": 146, "z": 225, "l": 0, "p": 155000, "v": -9, "d": "feb 26"}, {"n": "Grgar 144", "m": 97, "z": 421, "l": 1900, "p": 50000, "v": -71, "d": "feb 26"}, {"n": "Šmarje 44", "m": 189, "z": 309, "l": 0, "p": 61000, "v": -64, "d": "feb 26"}], "ob|izola": [{"n": "Korte 45B", "m": 46, "z": 1557, "l": 2015, "p": 400000, "v": 14, "d": "feb 26"}, {"n": "Pod Šaletom 2, Jagodje", "m": 180, "z": 673, "l": 1900, "p": 470000, "v": 34, "d": "feb 26"}, {"n": "Jagodje 43B, Jagodje", "m": 134, "z": 1205, "l": 2003, "p": 520000, "v": 48, "d": "jan 26"}, {"n": "Mladinska Ulica 13, Jagodje", "m": 134, "z": 259, "l": 1978, "p": 630000, "v": 79, "d": "nov 25"}, {"n": "Ulica Svobode 34, Izola", "m": 55, "z": 102, "l": 1920, "p": 352000, "v": 0, "d": "okt 25"}, {"n": "Jagodje 73A, Jagodje", "m": 168, "z": 826, "l": 1980, "p": 350000, "v": -1, "d": "okt 25"}], "ko": [{"n": "Omerzova Ulica 2A, Dolga Vas", "m": 262, "z": 809, "l": 1930, "p": 178000, "v": 15, "d": "feb 26"}, {"n": "Trata Xiv 14B, Kočevje", "m": 60, "z": 102, "l": 1959, "p": 154000, "v": 0, "d": "feb 26"}, {"n": "Trata Xiv 14, Kočevje", "m": 72, "z": 116, "l": 1959, "p": 120000, "v": -22, "d": "feb 26"}, {"n": "Gornje Ložine 28", "m": 283, "z": 1305, "l": 1998, "p": 178000, "v": 16, "d": "feb 26"}, {"n": "Klinja Vas 12", "m": 182, "z": 1558, "l": 1979, "p": 150000, "v": -3, "d": "jan 26"}, {"n": "Slovenska Vas 20", "m": 108, "z": 480, "l": 1880, "p": 65000, "v": -58, "d": "jan 26"}], "kp": [{"n": "Kregarjeva Ulica 16, Brežice", "m": 173, "z": 1137, "l": 1938, "p": 175000, "v": 59, "d": "mar 26"}, {"n": "Kobile 4", "m": 69, "z": 2622, "l": 1900, "p": 50000, "v": -55, "d": "mar 26"}, {"n": "Ulica Stare Pravde 16, Brežice", "m": 182, "z": 165, "l": 2003, "p": 260000, "v": 136, "d": "mar 26"}, {"n": "Brezina 7, Brežice", "m": 280, "z": 864, "l": 1940, "p": 115000, "v": 5, "d": "feb 26"}, {"n": "Brezovica V Podbočju 2A", "m": 154, "z": 3699, "l": 1979, "p": 50000, "v": -55, "d": "feb 26"}, {"n": "", "m": 120, "z": 792, "l": 1912, "p": 63000, "v": -43, "d": "jan 26"}], "mb": [{"n": "Tekstilska Ulica 2A, Maribor", "m": 195, "z": 375, "l": 1938, "p": 166000, "v": -21, "d": "mar 26"}, {"n": "Streliška Cesta 53B, Maribor", "m": 122, "z": 310, "l": 2018, "p": 420000, "v": 100, "d": "mar 26"}, {"n": "Betettova Ulica 6, Maribor", "m": 178, "z": 795, "l": 1973, "p": 220000, "v": 5, "d": "mar 26"}, {"n": "Ulica Kurta Kanclerja 10, Pekre", "m": 125, "z": 160, "l": 2025, "p": 203000, "v": -4, "d": "mar 26"}, {"n": "Jenkova Ulica 42A, Maribor", "m": 105, "z": 260, "l": 1967, "p": 175000, "v": -17, "d": "mar 26"}, {"n": "Jocova Ulica 59A, Maribor", "m": 148, "z": 471, "l": 2009, "p": 342000, "v": 63, "d": "mar 26"}], "sh": [{"n": "Strmca 56", "m": 74, "z": 1560, "l": 1907, "p": 165000, "v": 23, "d": "mar 26"}, {"n": "Tratna Pri Grobelnem 4", "m": 309, "z": 1104, "l": 1985, "p": 192000, "v": 44, "d": "mar 26"}, {"n": "", "m": 135, "z": 490, "l": 2025, "p": 175000, "v": 31, "d": "feb 26"}, {"n": "Prešernova Ulica 36, Rogaška Slatina", "m": 304, "z": 993, "l": 1998, "p": 285000, "v": 113, "d": "feb 26"}, {"n": "Goričica 14", "m": 338, "z": 1667, "l": 1954, "p": 225000, "v": 68, "d": "feb 26"}, {"n": "Slivno 7", "m": 254, "z": 14965, "l": 1850, "p": 80000, "v": -40, "d": "feb 26"}], "ju": [{"n": "Temenica 130", "m": 168, "z": 572, "l": 1985, "p": 89000, "v": -65, "d": "mar 26"}, {"n": "Ljubljanska Cesta 5, Ivančna Gorica", "m": 198, "z": 446, "l": 1965, "p": 270000, "v": 6, "d": "mar 26"}, {"n": "", "m": 89, "z": 445, "l": 1999, "p": 49000, "v": -81, "d": "mar 26"}, {"n": "Rakitna 301", "m": 72, "z": 475, "l": 1980, "p": 90000, "v": -65, "d": "mar 26"}, {"n": "Dol Pri Borovnici 65", "m": 268, "z": 1550, "l": 1870, "p": 256000, "v": 1, "d": "mar 26"}, {"n": "Podsvetija 26C, Brezovica Pri Ljubljani", "m": 86, "z": 108, "l": 2008, "p": 310000, "v": 22, "d": "mar 26"}], "pk": [{"n": "Trstenjakova Ulica 4, Murska Sobota", "m": 240, "z": 836, "l": 1964, "p": 86000, "v": -28, "d": "mar 26"}, {"n": "Veščica 62", "m": 235, "z": 1054, "l": 1963, "p": 90000, "v": -25, "d": "mar 26"}, {"n": "Jezera 45, Rakičan", "m": 102, "z": 575, "l": 1945, "p": 35000, "v": -71, "d": "mar 26"}, {"n": "Čopova Ulica 21, Murska Sobota", "m": 85, "z": 466, "l": 1939, "p": 35000, "v": -70, "d": "mar 26"}, {"n": "Lipovci 104", "m": 174, "z": 2039, "l": 1953, "p": 60000, "v": -50, "d": "mar 26"}, {"n": "Murska Ulica 5, Dokležovje", "m": 186, "z": 440, "l": 1967, "p": 63000, "v": -47, "d": "feb 26"}], "ce": [{"n": "Ulica Heroja Lacka 9, Celje", "m": 245, "z": 1175, "l": 1974, "p": 230000, "v": 15, "d": "mar 26"}, {"n": "Cesta Xiv. Divizije 51, Štore", "m": 92, "z": 117, "l": 1990, "p": 48000, "v": -76, "d": "feb 26"}, {"n": "Lopata 50B", "m": 75, "z": 420, "l": 2008, "p": 257000, "v": 29, "d": "feb 26"}, {"n": "Hohkrautova Ulica 8, Celje", "m": 199, "z": 686, "l": 1954, "p": 258000, "v": 29, "d": "feb 26"}, {"n": "Nova Cerkev 31", "m": 175, "z": 460, "l": 1907, "p": 155000, "v": -22, "d": "feb 26"}, {"n": "Male Dole 68A", "m": 52, "z": 1124, "l": 1987, "p": 80000, "v": -60, "d": "feb 26"}], "pi": [{"n": "Črni Vrh 46", "m": 263, "z": 300, "l": 1950, "p": 85000, "v": -26, "d": "mar 26"}, {"n": "Kot 28, Bovec", "m": 169, "z": 114, "l": 1920, "p": 220000, "v": 91, "d": "mar 26"}, {"n": "Zadlaz-Žabče 14", "m": 84, "z": 416, "l": 1900, "p": 158000, "v": 37, "d": "feb 26"}, {"n": "Kneža 11", "m": 211, "z": 1713, "l": 1920, "p": 130000, "v": 13, "d": "feb 26"}, {"n": "Gore 11", "m": 348, "z": 3119, "l": 1981, "p": 180000, "v": 57, "d": "feb 26"}, {"n": "Spodnji Vrsnik 16", "m": 113, "z": 795, "l": 0, "p": 50000, "v": -57, "d": "jan 26"}], "jm": [{"n": "Ob Mlinščici 9, Bistrica Ob Dravi", "m": 140, "z": 485, "l": 1955, "p": 120000, "v": -25, "d": "mar 26"}, {"n": "Jurčičeva Ulica 7, Pragersko", "m": 140, "z": 552, "l": 1953, "p": 80000, "v": -50, "d": "mar 26"}, {"n": "Ulica Bračičeve Brigade 8A, Slovenska Bistrica", "m": 81, "z": 173, "l": 2003, "p": 245000, "v": 53, "d": "mar 26"}, {"n": "Prečna Ulica 2, Radizel", "m": 170, "z": 1023, "l": 1976, "p": 82000, "v": -48, "d": "mar 26"}, {"n": "Ob Gozdu 7C, Zgornja Polskava", "m": 236, "z": 302, "l": 2022, "p": 235000, "v": 47, "d": "feb 26"}, {"n": "Samova Ulica 108, Rogoza", "m": 185, "z": 603, "l": 1980, "p": 154000, "v": -4, "d": "feb 26"}], "se|domžale": [{"n": "Turnše 38", "m": 61, "z": 434, "l": 1972, "p": 120000, "v": -66, "d": "mar 26"}, {"n": "Krakovska Cesta 20, Domžale", "m": 160, "z": 410, "l": 2019, "p": 550000, "v": 57, "d": "mar 26"}, {"n": "Papirniška Cesta 11, Vir", "m": 150, "z": 462, "l": 1960, "p": 75000, "v": -79, "d": "mar 26"}, {"n": "Mačkovci 17, Domžale", "m": 155, "z": 376, "l": 1980, "p": 352000, "v": 1, "d": "mar 26"}, {"n": "Prešernova Ulica 7, Trzin", "m": 152, "z": 131, "l": 1978, "p": 400000, "v": 14, "d": "feb 26"}, {"n": "Bolkova Ulica 7, Homec", "m": 164, "z": 363, "l": 1969, "p": 260000, "v": -26, "d": "feb 26"}], "pt": [{"n": "Šeronova Ulica 6, Ptuj", "m": 237, "z": 588, "l": 1964, "p": 168000, "v": 20, "d": "mar 26"}, {"n": "Ormoška Cesta 83B, Ptuj", "m": 169, "z": 504, "l": 2011, "p": 288000, "v": 106, "d": "mar 26"}, {"n": "Miklavž Pri Ormožu 21", "m": 188, "z": 1109, "l": 1980, "p": 100000, "v": -29, "d": "feb 26"}, {"n": "Ulica Jožefe Lackove 3, Ptuj", "m": 172, "z": 1535, "l": 1977, "p": 215000, "v": 54, "d": "feb 26"}, {"n": "Trubarjeva Ulica 10, Ptuj", "m": 90, "z": 853, "l": 1902, "p": 170000, "v": 21, "d": "feb 26"}, {"n": "Ptujska Cesta 10A, Ormož", "m": 319, "z": 206, "l": 1900, "p": 110000, "v": -21, "d": "feb 26"}], "kr|center": [{"n": "Tominčeva Cesta 24, Kranj", "m": 264, "z": 634, "l": 1936, "p": 202000, "v": -28, "d": "mar 26"}, {"n": "Kurirska Pot 9, Kranj", "m": 114, "z": 442, "l": 0, "p": 275000, "v": -2, "d": "mar 26"}, {"n": "Cesta Talcev 23B, Kranj", "m": 145, "z": 538, "l": 1967, "p": 275000, "v": -2, "d": "mar 26"}, {"n": "Zgornje Bitnje 75", "m": 224, "z": 459, "l": 1887, "p": 190000, "v": -32, "d": "mar 26"}, {"n": "Mavčiče 12A", "m": 133, "z": 309, "l": 1965, "p": 150000, "v": -46, "d": "mar 26"}, {"n": "Nova Vas 88, Zgornja Besnica", "m": 72, "z": 1029, "l": 1990, "p": 245000, "v": -12, "d": "feb 26"}], "go": [{"n": "Begunje Na Gorenjskem 81A", "m": 138, "z": 1455, "l": 1972, "p": 310000, "v": 16, "d": "mar 26"}, {"n": "Kropa 123", "m": 143, "z": 290, "l": 1967, "p": 195000, "v": -27, "d": "mar 26"}, {"n": "Senično 74", "m": 197, "z": 453, "l": 1991, "p": 350000, "v": 31, "d": "mar 26"}, {"n": "Razgledna Pot 20, Jesenice", "m": 320, "z": 637, "l": 1960, "p": 238000, "v": -11, "d": "mar 26"}, {"n": "Zgoša 24B", "m": 271, "z": 622, "l": 1975, "p": 245000, "v": -8, "d": "mar 26"}, {"n": "Dobrška Ulica 8, Lesce", "m": 178, "z": 320, "l": 1960, "p": 168000, "v": -37, "d": "mar 26"}], "ju|vrhnika": [{"n": "Čuža 15, Vrhnika", "m": 157, "z": 565, "l": 1970, "p": 283000, "v": -4, "d": "mar 26"}, {"n": "Hrastje 16, Vrhnika", "m": 116, "z": 369, "l": 2021, "p": 500000, "v": 69, "d": "mar 26"}, {"n": "Brigadirska Cesta 1, Verd", "m": 153, "z": 561, "l": 1973, "p": 300000, "v": 2, "d": "mar 26"}, {"n": "Dobovičnikova Ulica 64, Vrhnika", "m": 112, "z": 226, "l": 1942, "p": 180000, "v": -39, "d": "feb 26"}, {"n": "Tovarniška Cesta 30A, Logatec", "m": 198, "z": 563, "l": 1995, "p": 310000, "v": 5, "d": "feb 26"}, {"n": "Petkovec 29A", "m": 272, "z": 1486, "l": 1977, "p": 235000, "v": -20, "d": "feb 26"}], "ks": [{"n": "Senožeče 33", "m": 318, "z": 496, "l": 0, "p": 115000, "v": -47, "d": "mar 26"}, {"n": "", "m": 161, "z": 542, "l": 2025, "p": 135000, "v": -38, "d": "mar 26"}, {"n": "Ulica Talcev 22A, Sežana", "m": 110, "z": 111, "l": 1900, "p": 199000, "v": -9, "d": "feb 26"}, {"n": "Lokev 89", "m": 50, "z": 100, "l": 1965, "p": 48000, "v": -78, "d": "feb 26"}, {"n": "Krajna Vas 35B", "m": 143, "z": 709, "l": 2007, "p": 265000, "v": 22, "d": "feb 26"}, {"n": "Majcni 11", "m": 164, "z": 2026, "l": 1976, "p": 330000, "v": 52, "d": "jan 26"}], "sg": [{"n": "Pintaričeva Cesta 2, Gornja Radgona", "m": 250, "z": 820, "l": 1960, "p": 141000, "v": -6, "d": "mar 26"}, {"n": "Tovarniška Cesta 19, Ceršak", "m": 253, "z": 1054, "l": 1955, "p": 95000, "v": -37, "d": "mar 26"}, {"n": "Spodnja Ščavnica 94A", "m": 202, "z": 1126, "l": 1997, "p": 200000, "v": 33, "d": "feb 26"}, {"n": "Radehova 37", "m": 270, "z": 1223, "l": 1975, "p": 204000, "v": 36, "d": "feb 26"}, {"n": "Ivanjski Vrh 13B", "m": 90, "z": 533, "l": 1975, "p": 32000, "v": -79, "d": "feb 26"}, {"n": "Moravci V Slov. Goricah 111B", "m": 57, "z": 2057, "l": 1985, "p": 45000, "v": -70, "d": "feb 26"}], "sa": [{"n": "Savinjska Cesta 70, Žalec", "m": 349, "z": 817, "l": 1954, "p": 200000, "v": 11, "d": "mar 26"}, {"n": "Podvin 20", "m": 266, "z": 594, "l": 1976, "p": 315000, "v": 75, "d": "mar 26"}, {"n": "Podvin Pri Polzeli 55", "m": 170, "z": 871, "l": 1860, "p": 90000, "v": -50, "d": "feb 26"}, {"n": "Galicija 19", "m": 176, "z": 467, "l": 1975, "p": 138000, "v": -23, "d": "feb 26"}, {"n": "Hramše 1", "m": 107, "z": 5528, "l": 0, "p": 74000, "v": -59, "d": "feb 26"}, {"n": "Dobrič 93", "m": 179, "z": 1005, "l": 2009, "p": 180000, "v": 0, "d": "feb 26"}], "ko2": [{"n": "Sv. Anton Na Pohorju 128", "m": 140, "z": 828, "l": 1989, "p": 110000, "v": -45, "d": "mar 26"}, {"n": "Kotlje 26", "m": 278, "z": 1437, "l": 1857, "p": 330000, "v": 65, "d": "mar 26"}, {"n": "Tribej 10", "m": 315, "z": 2183, "l": 1974, "p": 235000, "v": 18, "d": "mar 26"}, {"n": "Spodnji Kraj 33, Prevalje", "m": 286, "z": 1416, "l": 1953, "p": 269000, "v": 34, "d": "mar 26"}, {"n": "Preški Vrh 10", "m": 578, "z": 26558, "l": 1937, "p": 200000, "v": 0, "d": "feb 26"}, {"n": "Glavni Trg 39A, Slovenj Gradec", "m": 252, "z": 393, "l": 1900, "p": 220000, "v": 10, "d": "feb 26"}], "bk": [{"n": "Na Bregu 2, Črnomelj", "m": 50, "z": 761, "l": 1890, "p": 57000, "v": -37, "d": "mar 26"}, {"n": "Ulica Sadež 14, Črnomelj", "m": 165, "z": 866, "l": 1965, "p": 153000, "v": 70, "d": "feb 26"}, {"n": "Gradac 7", "m": 263, "z": 1851, "l": 1967, "p": 112000, "v": 24, "d": "feb 26"}, {"n": "", "m": 63, "z": 1126, "l": 1982, "p": 65000, "v": -28, "d": "feb 26"}, {"n": "Kot 63, Semič", "m": 173, "z": 1282, "l": 1997, "p": 75000, "v": -17, "d": "feb 26"}, {"n": "Osojnik 1A", "m": 143, "z": 1872, "l": 1982, "p": 75000, "v": -17, "d": "feb 26"}], "ve": [{"n": "Loška Ulica 4, Litija", "m": 238, "z": 736, "l": 1973, "p": 338000, "v": 99, "d": "mar 26"}, {"n": "Ustje 39A, Šmartno Pri Litiji", "m": 108, "z": 508, "l": 2025, "p": 270000, "v": 59, "d": "mar 26"}, {"n": "Grbinska Cesta 15, Litija", "m": 95, "z": 747, "l": 1905, "p": 130000, "v": -24, "d": "feb 26"}, {"n": "Pečice 18", "m": 75, "z": 960, "l": 1995, "p": 100000, "v": -41, "d": "feb 26"}, {"n": "Slivna 13B", "m": 159, "z": 784, "l": 1970, "p": 120000, "v": -29, "d": "jan 26"}, {"n": "", "m": 94, "z": 569, "l": 2011, "p": 156000, "v": -8, "d": "jan 26"}], "za": [{"n": "Cankarjev Trg 15, Zagorje Ob Savi", "m": 250, "z": 436, "l": 1982, "p": 260000, "v": 100, "d": "mar 26"}, {"n": "Grajska Pot 5, Hrastnik", "m": 205, "z": 1109, "l": 1938, "p": 120000, "v": -8, "d": "feb 26"}, {"n": "Log 31, Hrastnik", "m": 180, "z": 676, "l": 1948, "p": 200000, "v": 54, "d": "jan 26"}, {"n": "Ključevica 14", "m": 147, "z": 627, "l": 0, "p": 115000, "v": -12, "d": "dec 25"}, {"n": "Na Bregu 15, Zagorje Ob Savi", "m": 269, "z": 754, "l": 2002, "p": 270000, "v": 108, "d": "dec 25"}, {"n": "Taborniška Pot 19, Hrastnik", "m": 95, "z": 1785, "l": 1966, "p": 74000, "v": -43, "d": "nov 25"}], "ha": [{"n": "Dravinjski Vrh 16", "m": 103, "z": 2280, "l": 1990, "p": 68000, "v": -24, "d": "mar 26"}, {"n": "Vareja 31", "m": 134, "z": 25777, "l": 1995, "p": 98000, "v": 9, "d": "feb 26"}, {"n": "Dolena 14D", "m": 94, "z": 2321, "l": 1997, "p": 56000, "v": -38, "d": "feb 26"}, {"n": "Sela 10C", "m": 304, "z": 2451, "l": 1965, "p": 179000, "v": 99, "d": "jan 26"}, {"n": "Repišče 36", "m": 81, "z": 10430, "l": 1998, "p": 45000, "v": -50, "d": "dec 25"}, {"n": "Gruškovec 14", "m": 74, "z": 3037, "l": 1919, "p": 38000, "v": -58, "d": "dec 25"}], "ob|koper": [{"n": "Oljčna Pot 59A, Koper", "m": 68, "z": 117, "l": 1970, "p": 210000, "v": -21, "d": "mar 26"}, {"n": "Zgornje Škofije 1E", "m": 144, "z": 488, "l": 2015, "p": 550000, "v": 108, "d": "mar 26"}, {"n": "Oljčna Pot 31G, Koper", "m": 96, "z": 186, "l": 1970, "p": 320000, "v": 21, "d": "mar 26"}, {"n": "Dolinska Cesta 32A, Koper", "m": 56, "z": 117, "l": 1972, "p": 245000, "v": -8, "d": "mar 26"}, {"n": "Ulica Generala Levičnika 48B, Koper", "m": 64, "z": 123, "l": 1970, "p": 307000, "v": 16, "d": "mar 26"}, {"n": "Premančan 5", "m": 147, "z": 404, "l": 1909, "p": 310000, "v": 17, "d": "mar 26"}], "pv": [{"n": "Ulica Milana Majcna 29, Radeče", "m": 343, "z": 724, "l": 1935, "p": 150000, "v": 33, "d": "feb 26"}, {"n": "Rovišče Pri Studencu 21A", "m": 386, "z": 2532, "l": 1999, "p": 187000, "v": 66, "d": "feb 26"}, {"n": "Pot Na Jez 26, Radeče", "m": 266, "z": 613, "l": 1965, "p": 185000, "v": 64, "d": "feb 26"}, {"n": "Poklek Nad Blanco 44", "m": 164, "z": 12298, "l": 1970, "p": 50000, "v": -56, "d": "jan 26"}, {"n": "Log Pri Vrhovem 14E", "m": 220, "z": 910, "l": 1990, "p": 70000, "v": -38, "d": "jan 26"}, {"n": "Kamenško 26", "m": 114, "z": 1973, "l": 2008, "p": 148000, "v": 31, "d": "dec 25"}], "se|kamnik": [{"n": "Dobajeva Ulica 9, Kamnik", "m": 197, "z": 406, "l": 1968, "p": 315000, "v": 2, "d": "feb 26"}, {"n": "Žebljarska Pot 4, Kamnik", "m": 89, "z": 184, "l": 1900, "p": 105000, "v": -66, "d": "feb 26"}, {"n": "Vrhpolje Pri Kamniku 83", "m": 169, "z": 578, "l": 1964, "p": 330000, "v": 7, "d": "feb 26"}, {"n": "Velika Planina 110", "m": 77, "z": 263, "l": 1963, "p": 478000, "v": 55, "d": "feb 26"}, {"n": "Vrhpolje Pri Kamniku 149", "m": 248, "z": 447, "l": 1958, "p": 200000, "v": -35, "d": "jan 26"}, {"n": "Oševek 15E", "m": 205, "z": 11726, "l": 1978, "p": 388000, "v": 26, "d": "jan 26"}], "al|bled": [{"n": "Rečiška Cesta 53, Bled", "m": 223, "z": 949, "l": 1986, "p": 465000, "v": 4, "d": "mar 26"}, {"n": "Ulica Matije Čopa 6A, Bled", "m": 193, "z": 376, "l": 1965, "p": 535000, "v": 20, "d": "feb 26"}, {"n": "Selo Pri Bledu 44", "m": 156, "z": 1250, "l": 1936, "p": 271000, "v": -39, "d": "jan 26"}, {"n": "Levstikova Ulica 20, Bled", "m": 82, "z": 1607, "l": 1965, "p": 630000, "v": 42, "d": "jan 26"}, {"n": "Jelovška Cesta 25, Bled", "m": 117, "z": 805, "l": 1960, "p": 430000, "v": -3, "d": "dec 25"}, {"n": "Rožna Ulica 7A, Bled", "m": 234, "z": 384, "l": 1973, "p": 445000, "v": 0, "d": "okt 25"}], "nm": [{"n": "Preska Pri Dobrniču 20", "m": 131, "z": 2880, "l": 1985, "p": 215000, "v": 23, "d": "mar 26"}, {"n": "Stehanja Vas 1", "m": 66, "z": 845, "l": 1933, "p": 150000, "v": -14, "d": "mar 26"}, {"n": "Veliki Gaber 153", "m": 156, "z": 581, "l": 2016, "p": 390000, "v": 123, "d": "mar 26"}, {"n": "Mestne Njive 17, Novo Mesto", "m": 360, "z": 893, "l": 1974, "p": 380000, "v": 117, "d": "mar 26"}, {"n": "Ločna 11, Novo Mesto", "m": 378, "z": 2583, "l": 1953, "p": 363000, "v": 107, "d": "mar 26"}, {"n": "Ljuben 78, Uršna Sela", "m": 91, "z": 1864, "l": 1900, "p": 51000, "v": -71, "d": "mar 26"}], "se|medvode": [{"n": "Zgornje Pirniče 107", "m": 178, "z": 595, "l": 1990, "p": 190000, "v": -44, "d": "mar 26"}, {"n": "Selo Pri Vodicah 25C", "m": 100, "z": 243, "l": 2002, "p": 320000, "v": -6, "d": "mar 26"}, {"n": "Bizantova Cesta 13, Medvode", "m": 234, "z": 448, "l": 1966, "p": 350000, "v": 3, "d": "feb 26"}, {"n": "Smlednik 3A", "m": 306, "z": 604, "l": 1974, "p": 350000, "v": 3, "d": "feb 26"}, {"n": "Spodnje Pirniče 18C", "m": 147, "z": 559, "l": 1977, "p": 530000, "v": 56, "d": "feb 26"}, {"n": "Zbilje 132", "m": 172, "z": 303, "l": 2010, "p": 490000, "v": 44, "d": "jan 26"}], "kr|okolica": [{"n": "Stiška Vas 42", "m": 184, "z": 573, "l": 1985, "p": 306000, "v": -4, "d": "mar 26"}, {"n": "Spodnji Brnik 20", "m": 323, "z": 462, "l": 1890, "p": 215000, "v": -33, "d": "feb 26"}, {"n": "Spodnje Duplje 24", "m": 169, "z": 740, "l": 1926, "p": 390000, "v": 22, "d": "feb 26"}, {"n": "Apno 78", "m": 185, "z": 1442, "l": 1979, "p": 295000, "v": -8, "d": "jan 26"}, {"n": "Stara Cesta 40, Naklo", "m": 427, "z": 779, "l": 1974, "p": 390000, "v": 22, "d": "jan 26"}, {"n": "Delavska Cesta 8, Šenčur", "m": 199, "z": 644, "l": 1963, "p": 295000, "v": -8, "d": "jan 26"}], "ju|grosuplje": [{"n": "Dolenjska Cesta 293, Lavrica", "m": 92, "z": 205, "l": 1934, "p": 180000, "v": -43, "d": "mar 26"}, {"n": "Dolenjska Cesta 324, Lavrica", "m": 187, "z": 1607, "l": 1956, "p": 650000, "v": 104, "d": "mar 26"}, {"n": "Brinje Cesta I 40, Grosuplje", "m": 220, "z": 807, "l": 1978, "p": 520000, "v": 63, "d": "mar 26"}, {"n": "Albrehtova Ulica 48, Škofljica", "m": 182, "z": 396, "l": 1980, "p": 200000, "v": -37, "d": "mar 26"}, {"n": "Dolenjska Cesta 322, Lavrica", "m": 155, "z": 629, "l": 1958, "p": 335000, "v": 5, "d": "mar 26"}, {"n": "Klanec 58, Škofljica", "m": 167, "z": 2030, "l": 1952, "p": 370000, "v": 16, "d": "feb 26"}], "al|bohinj": [{"n": "Kamnje 25A", "m": 282, "z": 2997, "l": 2005, "p": 394000, "v": -4, "d": "jan 26"}, {"n": "Gorjuše 12", "m": 528, "z": 1518, "l": 1975, "p": 220000, "v": -46, "d": "jan 26"}, {"n": "Polje 136", "m": 187, "z": 721, "l": 1995, "p": 499000, "v": 22, "d": "nov 25"}, {"n": "Rožna Ulica 10, Bohinjska Bistrica", "m": 220, "z": 991, "l": 1956, "p": 425000, "v": 4, "d": "nov 25"}, {"n": "Goreljek 152", "m": 84, "z": 1091, "l": 1953, "p": 350000, "v": -15, "d": "okt 25"}, {"n": "Srednja Vas V Bohinju 197", "m": 43, "z": 358, "l": 1965, "p": 265000, "v": -35, "d": "okt 25"}], "se|komenda": [{"n": "Straža 1B", "m": 178, "z": 659, "l": 2021, "p": 450000, "v": 51, "d": "mar 26"}, {"n": "Mačkova Cesta 16, Lukovica Pri Domžalah", "m": 290, "z": 3221, "l": 1989, "p": 550000, "v": 84, "d": "mar 26"}, {"n": "Suhadole 52", "m": 196, "z": 880, "l": 0, "p": 255000, "v": -15, "d": "jan 26"}, {"n": "Suhadole 64A", "m": 132, "z": 365, "l": 1907, "p": 190000, "v": -36, "d": "dec 25"}, {"n": "", "m": 122, "z": 331, "l": 2025, "p": 250000, "v": -16, "d": "dec 25"}, {"n": "Podmilj 8B", "m": 205, "z": 1624, "l": 1988, "p": 299000, "v": 0, "d": "dec 25"}], "al|kranjska": [{"n": "Zgornja Radovna 63", "m": 44, "z": 465, "l": 1975, "p": 226000, "v": -41, "d": "mar 26"}, {"n": "Zgornja Radovna 63", "m": 44, "z": 465, "l": 1975, "p": 226000, "v": -41, "d": "jan 26"}, {"n": "Galerše 2, Kranjska Gora", "m": 83, "z": 999, "l": 1965, "p": 500000, "v": 32, "d": "nov 25"}, {"n": "Dovje 126A", "m": 96, "z": 258, "l": 1909, "p": 186000, "v": -51, "d": "okt 25"}, {"n": "Borovška Cesta 1, Kranjska Gora", "m": 148, "z": 735, "l": 0, "p": 515000, "v": 36, "d": "okt 25"}, {"n": "Jezerci 10B, Gozd Martuljek", "m": 146, "z": 401, "l": 2018, "p": 350000, "v": -8, "d": "sep 25"}], "ob|ankaran": [{"n": "Oljčna Pot 59A, Koper", "m": 68, "z": 117, "l": 1970, "p": 210000, "v": -26, "d": "mar 26"}, {"n": "Zgornje Škofije 1E", "m": 144, "z": 488, "l": 2015, "p": 550000, "v": 95, "d": "mar 26"}, {"n": "Oljčna Pot 31G, Koper", "m": 96, "z": 186, "l": 1970, "p": 320000, "v": 13, "d": "mar 26"}, {"n": "Dolinska Cesta 32A, Koper", "m": 56, "z": 117, "l": 1972, "p": 245000, "v": -13, "d": "mar 26"}, {"n": "Ulica Generala Levičnika 48B, Koper", "m": 64, "z": 123, "l": 1970, "p": 307000, "v": 9, "d": "mar 26"}, {"n": "Ulica Ivana Regenta 34, Piran", "m": 215, "z": 954, "l": 1900, "p": 750000, "v": 166, "d": "mar 26"}]};
+
 const ETN_TRANS={"mb": [{"n": "Goriška Ulica 2, Maribor", "m": 69, "l": 1972, "p": 2371, "v": -12, "d": "mar 26"}, {"n": "Ulica Staneta Severja 9, Maribor", "m": 40, "l": 1981, "p": 2803, "v": 4, "d": "mar 26"}, {"n": "Ulica Heroja Vojka 17, Maribor", "m": 54, "l": 1917, "p": 2136, "v": -21, "d": "mar 26"}, {"n": "Ferkova Ulica 15, Maribor", "m": 58, "l": 1970, "p": 2829, "v": 5, "d": "mar 26"}, {"n": "Ulica Kneza Koclja 26, Maribor", "m": 53, "l": 1899, "p": 2660, "v": -1, "d": "mar 26"}, {"n": "Štrekljeva Ulica 38, Maribor", "m": 59, "l": 1964, "p": 3057, "v": 14, "d": "mar 26"}], "nm|novo m": [{"n": "Mestne Njive 11, Novo Mesto", "m": 26, "l": 1967, "p": 3977, "v": 30, "d": "mar 26"}, {"n": "Kočevarjeva Ulica 14, Novo Mesto", "m": 73, "l": 1955, "p": 1989, "v": -35, "d": "feb 26"}, {"n": "Ulica Slavka Gruma 32, Novo Mesto", "m": 23, "l": 1984, "p": 4465, "v": 46, "d": "feb 26"}, {"n": "Ulica Slavka Gruma 58, Novo Mesto", "m": 54, "l": 1987, "p": 3337, "v": 9, "d": "feb 26"}, {"n": "Seidlova Cesta 32, Novo Mesto", "m": 47, "l": 1980, "p": 3228, "v": 6, "d": "feb 26"}, {"n": "Mušičeva Ulica 15, Novo Mesto", "m": 43, "l": 1999, "p": 3348, "v": 10, "d": "feb 26"}], "pk": [{"n": "Kocljeva Ulica 6A, Murska Sobota", "m": 62, "l": 1972, "p": 2098, "v": 14, "d": "mar 26"}, {"n": "Ulica Štefana Kovača 13, Murska Sobota", "m": 58, "l": 1960, "p": 2573, "v": 40, "d": "mar 26"}, {"n": "Lendavska Ulica 45B, Murska Sobota", "m": 58, "l": 1986, "p": 1950, "v": 6, "d": "mar 26"}, {"n": "Kranjčeva Ulica 2, Lendava", "m": 102, "l": 1961, "p": 1111, "v": -40, "d": "mar 26"}, {"n": "Lendavska Ulica 15, Murska Sobota", "m": 55, "l": 1950, "p": 1712, "v": -7, "d": "mar 26"}, {"n": "Zvezna Ulica 4, Murska Sobota", "m": 40, "l": 1969, "p": 1784, "v": -3, "d": "feb 26"}], "ob|izola": [{"n": "Ulica Emilia Driolia 3, Izola", "m": 48, "l": 1987, "p": 6125, "v": 33, "d": "mar 26"}, {"n": "Sončno Nabrežje 4, Izola", "m": 34, "l": 1930, "p": 6214, "v": 35, "d": "mar 26"}, {"n": "Prečna Ulica 6, Izola", "m": 52, "l": 1890, "p": 5934, "v": 28, "d": "mar 26"}, {"n": "Kajuhova Ulica 28, Izola", "m": 44, "l": 1998, "p": 5194, "v": 12, "d": "mar 26"}, {"n": "Veliki Trg 14, Izola", "m": 69, "l": 1900, "p": 4196, "v": -9, "d": "feb 26"}, {"n": "Smrekarjeva Ulica 45, Izola", "m": 60, "l": 1850, "p": 3566, "v": -23, "d": "feb 26"}], "kr|center": [{"n": "Jurčičeva Ulica 3, Kranj", "m": 70, "l": 1950, "p": 3519, "v": -1, "d": "mar 26"}, {"n": "Kališka Ulica 22, Kranj", "m": 70, "l": 1989, "p": 4676, "v": 31, "d": "mar 26"}, {"n": "Kidričeva Cesta 20, Kranj", "m": 57, "l": 1954, "p": 2976, "v": -17, "d": "mar 26"}, {"n": "Ulica Franca Rozmana-Staneta 9, Kranj", "m": 53, "l": 1961, "p": 3901, "v": 9, "d": "mar 26"}, {"n": "Tavčarjeva Ulica 31A, Kranj", "m": 29, "l": 1967, "p": 3163, "v": -11, "d": "mar 26"}, {"n": "Tominčeva Cesta 23, Kranj", "m": 99, "l": 1927, "p": 2456, "v": -31, "d": "mar 26"}], "al": [{"n": "Ledine 9, Kranjska Gora", "m": 53, "l": 1967, "p": 5606, "v": 22, "d": "mar 26"}, {"n": "Borovška Cesta 12, Kranjska Gora", "m": 54, "l": 2020, "p": 7332, "v": 60, "d": "feb 26"}, {"n": "Vitranška Ulica 10, Kranjska Gora", "m": 68, "l": 2001, "p": 4000, "v": -13, "d": "feb 26"}, {"n": "Ravne V Bohinju 23", "m": 42, "l": 1991, "p": 4042, "v": -12, "d": "jan 26"}, {"n": "Cesta Svobode 8A, Bled", "m": 26, "l": 1900, "p": 8815, "v": 92, "d": "jan 26"}, {"n": "Alpska Cesta 3, Bled", "m": 53, "l": 1975, "p": 4411, "v": -4, "d": "jan 26"}], "ce|center": [{"n": "Kocbekova Ulica 5, Celje", "m": 31, "l": 1952, "p": 2301, "v": -16, "d": "mar 26"}, {"n": "Brodarjeva Ulica 2, Celje", "m": 35, "l": 1960, "p": 3990, "v": 46, "d": "mar 26"}, {"n": "Malgajeva Ulica 18, Celje", "m": 23, "l": 1962, "p": 3686, "v": 35, "d": "mar 26"}, {"n": "Kraigherjeva Ulica 30, Celje", "m": 57, "l": 1976, "p": 3739, "v": 37, "d": "mar 26"}, {"n": "Drapšinova Ulica 15, Celje", "m": 58, "l": 1962, "p": 2069, "v": -24, "d": "feb 26"}, {"n": "Kraigherjeva Ulica 24, Celje", "m": 41, "l": 1976, "p": 1925, "v": -30, "d": "feb 26"}], "ko2|slovenj": [{"n": "Glavni Trg 4, Slovenj Gradec", "m": 51, "l": 0, "p": 3276, "v": 39, "d": "mar 26"}, {"n": "Glavni Trg 42, Slovenj Gradec", "m": 42, "l": 1880, "p": 1883, "v": -20, "d": "mar 26"}, {"n": "Gubčeva Ulica 5, Slovenj Gradec", "m": 44, "l": 1970, "p": 2487, "v": 6, "d": "feb 26"}, {"n": "Gubčeva Ulica 8, Slovenj Gradec", "m": 33, "l": 1972, "p": 2513, "v": 7, "d": "feb 26"}, {"n": "Tomšičeva Ulica 9, Slovenj Gradec", "m": 77, "l": 1976, "p": 2008, "v": -15, "d": "jan 26"}, {"n": "Celjska Cesta 12, Slovenj Gradec", "m": 56, "l": 2022, "p": 2567, "v": 9, "d": "jan 26"}], "lj|bežigrad": [{"n": "Trubarjeva Cesta 74, Ljubljana", "m": 45, "l": 1863, "p": 5199, "v": 5, "d": "mar 26"}, {"n": "Neubergerjeva Ulica 15, Ljubljana", "m": 78, "l": 2018, "p": 7762, "v": 57, "d": "mar 26"}, {"n": "Herbersteinova Ulica 19, Ljubljana", "m": 66, "l": 1945, "p": 4840, "v": -2, "d": "mar 26"}, {"n": "Prisojna Ulica 5, Ljubljana", "m": 85, "l": 1908, "p": 6847, "v": 39, "d": "mar 26"}, {"n": "Linhartova Cesta 7, Ljubljana", "m": 45, "l": 1974, "p": 4810, "v": -3, "d": "mar 26"}, {"n": "Dunajska Cesta 87, Ljubljana", "m": 44, "l": 1930, "p": 5838, "v": 18, "d": "mar 26"}], "se|domžale": [{"n": "Ulica 7. Avgusta 13, Dob", "m": 28, "l": 1947, "p": 5300, "v": 30, "d": "mar 26"}, {"n": "Slovenska Cesta 87, Mengeš", "m": 64, "l": 1998, "p": 3743, "v": -8, "d": "mar 26"}, {"n": "Kamniška Cesta 11, Domžale", "m": 74, "l": 1966, "p": 3971, "v": -2, "d": "mar 26"}, {"n": "Krtina 114", "m": 41, "l": 2004, "p": 4843, "v": 19, "d": "mar 26"}, {"n": "Šaranovičeva Cesta 34, Vir", "m": 84, "l": 2024, "p": 4626, "v": 14, "d": "mar 26"}, {"n": "Župančičeva Ulica 6, Domžale", "m": 45, "l": 1968, "p": 4503, "v": 11, "d": "mar 26"}], "lj|rožna": [{"n": "Jesenkova Ulica 3, Ljubljana", "m": 77, "l": 1946, "p": 5707, "v": 9, "d": "mar 26"}, {"n": "Dolenjska Cesta 40, Ljubljana", "m": 58, "l": 1967, "p": 5188, "v": -1, "d": "mar 26"}, {"n": "Dolenjska Cesta 40, Ljubljana", "m": 58, "l": 1967, "p": 5439, "v": 4, "d": "mar 26"}, {"n": "Frankopanska Ulica 23, Ljubljana", "m": 39, "l": 1889, "p": 7322, "v": 40, "d": "mar 26"}, {"n": "Poljanska Cesta 17, Ljubljana", "m": 81, "l": 1978, "p": 5382, "v": 3, "d": "mar 26"}, {"n": "Ziherlova Ulica 4, Ljubljana", "m": 34, "l": 1980, "p": 7814, "v": 49, "d": "mar 26"}], "ko2|ravne": [{"n": "Javornik 63, Ravne Na Koroškem", "m": 65, "l": 1987, "p": 2236, "v": 18, "d": "mar 26"}, {"n": "Trg 66, Prevalje", "m": 37, "l": 1976, "p": 1892, "v": 0, "d": "mar 26"}, {"n": "Trg 5, Prevalje", "m": 76, "l": 1968, "p": 2523, "v": 33, "d": "mar 26"}, {"n": "Partizanska Cesta 7, Ravne Na Koroškem", "m": 29, "l": 0, "p": 1787, "v": -6, "d": "mar 26"}, {"n": "Čečovje 11A, Ravne Na Koroškem", "m": 58, "l": 1949, "p": 2083, "v": 10, "d": "feb 26"}, {"n": "Javornik 58, Ravne Na Koroškem", "m": 44, "l": 1981, "p": 1973, "v": 4, "d": "feb 26"}], "ng": [{"n": "Cesta Ix. Korpusa 73, Solkan", "m": 94, "l": 1930, "p": 1553, "v": -46, "d": "mar 26"}, {"n": "Na Livadi 3, Ajdovščina", "m": 75, "l": 1955, "p": 3430, "v": 19, "d": "mar 26"}, {"n": "Beblerjeva Ulica 38, Vipava", "m": 128, "l": 2018, "p": 3313, "v": 15, "d": "mar 26"}, {"n": "Trg Jožeta Srebrniča 6, Solkan", "m": 32, "l": 1924, "p": 2264, "v": -21, "d": "mar 26"}, {"n": "Cesta Iv. Prekomorske 6, Ajdovščina", "m": 51, "l": 1958, "p": 3880, "v": 35, "d": "mar 26"}, {"n": "Gregorčičeva Ulica 13C, Nova Gorica", "m": 58, "l": 1967, "p": 3649, "v": 27, "d": "mar 26"}], "lj|ježica": [{"n": "Ulica Hermana Potočnika 27, Ljubljana", "m": 54, "l": 1975, "p": 4187, "v": -12, "d": "mar 26"}, {"n": "Bratovševa Ploščad 38, Ljubljana", "m": 34, "l": 1978, "p": 7019, "v": 47, "d": "mar 26"}, {"n": "Glinškova Ploščad 3, Ljubljana", "m": 85, "l": 1978, "p": 5104, "v": 7, "d": "mar 26"}, {"n": "Glinškova Ploščad 25, Ljubljana", "m": 42, "l": 1981, "p": 4784, "v": 0, "d": "mar 26"}, {"n": "Kvedrova Cesta 11, Ljubljana", "m": 47, "l": 1972, "p": 4154, "v": -13, "d": "mar 26"}, {"n": "Kvedrova Cesta 15, Ljubljana", "m": 50, "l": 1972, "p": 5438, "v": 14, "d": "mar 26"}], "sd|velenje": [{"n": "Bračičeva Cesta 2, Velenje", "m": 62, "l": 1961, "p": 2311, "v": -8, "d": "mar 26"}, {"n": "Šlandrova Cesta 10, Velenje", "m": 60, "l": 1961, "p": 2788, "v": 11, "d": "mar 26"}, {"n": "Kersnikova Cesta 17, Velenje", "m": 38, "l": 1956, "p": 2365, "v": -6, "d": "mar 26"}, {"n": "Goriška Cesta 42, Velenje", "m": 92, "l": 1980, "p": 2976, "v": 19, "d": "mar 26"}, {"n": "Šaleška Cesta 2A, Velenje", "m": 152, "l": 1973, "p": 1557, "v": -38, "d": "mar 26"}, {"n": "Cesta Talcev 18, Velenje", "m": 60, "l": 1975, "p": 2999, "v": 19, "d": "mar 26"}], "lj|koseze": [{"n": "Brilejeva Ulica 12, Ljubljana", "m": 28, "l": 1983, "p": 5104, "v": 4, "d": "mar 26"}, {"n": "Trg Komandanta Staneta 5, Ljubljana", "m": 29, "l": 1970, "p": 7329, "v": 49, "d": "mar 26"}, {"n": "Zofke Kvedrove Ulica 6, Ljubljana", "m": 75, "l": 1948, "p": 4792, "v": -3, "d": "mar 26"}, {"n": "Smrtnikova Ulica 4, Ljubljana", "m": 72, "l": 1986, "p": 6114, "v": 24, "d": "mar 26"}, {"n": "Vodnikova Cesta 64, Ljubljana", "m": 52, "l": 1890, "p": 4991, "v": 1, "d": "mar 26"}, {"n": "Zofke Kvedrove Ulica 4, Ljubljana", "m": 75, "l": 1948, "p": 4623, "v": -6, "d": "mar 26"}], "ju|grosuplje": [{"n": "Bevkova Cesta 1, Grosuplje", "m": 41, "l": 1990, "p": 4106, "v": 1, "d": "mar 26"}, {"n": "Levstikova Cesta 8, Grosuplje", "m": 52, "l": 1960, "p": 4361, "v": 7, "d": "mar 26"}, {"n": "Kersnikova Cesta 5, Grosuplje", "m": 60, "l": 1980, "p": 3685, "v": -9, "d": "mar 26"}, {"n": "Kamnikarjeva Ulica 19, Lavrica", "m": 60, "l": 1999, "p": 5029, "v": 24, "d": "mar 26"}, {"n": "Partizanska Cesta 2, Grosuplje", "m": 125, "l": 2025, "p": 3956, "v": -3, "d": "feb 26"}, {"n": "Babnogoriška Cesta 31, Lavrica", "m": 95, "l": 1975, "p": 4245, "v": 5, "d": "feb 26"}], "za": [{"n": "Partizanska Ulica 1, Zagorje Ob Savi", "m": 49, "l": 1963, "p": 2286, "v": 22, "d": "mar 26"}, {"n": "Log 28C, Hrastnik", "m": 63, "l": 1977, "p": 2167, "v": 16, "d": "mar 26"}, {"n": "Podkraj 80", "m": 45, "l": 1958, "p": 1991, "v": 6, "d": "mar 26"}, {"n": "Novi Log 7A, Hrastnik", "m": 67, "l": 1981, "p": 1891, "v": 1, "d": "mar 26"}, {"n": "Podkraj 91", "m": 53, "l": 1963, "p": 1654, "v": -12, "d": "mar 26"}, {"n": "Ulica Talcev 38, Zagorje Ob Savi", "m": 41, "l": 1965, "p": 2457, "v": 31, "d": "feb 26"}], "ob|koper": [{"n": "Pristaniška Ulica 5, Koper", "m": 70, "l": 1960, "p": 6622, "v": 45, "d": "mar 26"}, {"n": "Jenkova Ulica 7, Koper", "m": 90, "l": 1956, "p": 3772, "v": -18, "d": "mar 26"}, {"n": "Zlatičeva Ulica 11, Koper", "m": 41, "l": 1900, "p": 3893, "v": -15, "d": "mar 26"}, {"n": "Ulica Osvobodilne Fronte 5, Koper", "m": 34, "l": 0, "p": 5378, "v": 18, "d": "mar 26"}, {"n": "Hrvatini 208D", "m": 181, "l": 1991, "p": 3429, "v": -25, "d": "mar 26"}, {"n": "Rozmanova Ulica 13, Koper", "m": 54, "l": 1956, "p": 4570, "v": 0, "d": "mar 26"}], "go|škofja": [{"n": "Podlubnik 162, Škofja Loka", "m": 62, "l": 1976, "p": 3943, "v": 7, "d": "mar 26"}, {"n": "Frankovo Naselje 160, Škofja Loka", "m": 42, "l": 1986, "p": 4153, "v": 13, "d": "mar 26"}, {"n": "Novi Svet 6, Škofja Loka", "m": 73, "l": 1963, "p": 4357, "v": 19, "d": "mar 26"}, {"n": "Frankovo Naselje 66A, Škofja Loka", "m": 46, "l": 1988, "p": 3581, "v": -2, "d": "feb 26"}, {"n": "Podlubnik 158, Škofja Loka", "m": 53, "l": 1978, "p": 4525, "v": 23, "d": "feb 26"}, {"n": "Frankovo Naselje 53, Škofja Loka", "m": 53, "l": 1959, "p": 4980, "v": 36, "d": "feb 26"}], "sd|šoštanj": [{"n": "Glavni Trg 3, Šoštanj", "m": 77, "l": 2002, "p": 1237, "v": -44, "d": "mar 26"}, {"n": "Topolšica 67", "m": 80, "l": 1919, "p": 1304, "v": -41, "d": "jan 26"}, {"n": "Aškerčeva Cesta 3B, Šoštanj", "m": 18, "l": 1963, "p": 2857, "v": 29, "d": "dec 25"}, {"n": "Glavni Trg 2, Šoštanj", "m": 43, "l": 0, "p": 1740, "v": -22, "d": "nov 25"}, {"n": "Prešernov Trg 10, Šoštanj", "m": 60, "l": 1976, "p": 1735, "v": -22, "d": "nov 25"}, {"n": "Primorska Cesta 3, Šoštanj", "m": 57, "l": 1855, "p": 1880, "v": -15, "d": "nov 25"}], "sh": [{"n": "Na Lipico 1, Šentjur", "m": 40, "l": 1976, "p": 3672, "v": 100, "d": "mar 26"}, {"n": "Ulica Xiv. Divizije 56, Rogaška Slatina", "m": 28, "l": 1965, "p": 1815, "v": -1, "d": "mar 26"}, {"n": "Hotunje 46", "m": 49, "l": 1965, "p": 1602, "v": -13, "d": "mar 26"}, {"n": "Mestna Ulica 8, Laško", "m": 104, "l": 1850, "p": 3048, "v": 66, "d": "feb 26"}, {"n": "Na Lipico 4, Šentjur", "m": 51, "l": 1976, "p": 2801, "v": 53, "d": "feb 26"}, {"n": "Na Lipico 1, Šentjur", "m": 65, "l": 1976, "p": 2671, "v": 46, "d": "jan 26"}], "sa": [{"n": "Stritarjeva Ulica 7A, Žalec", "m": 155, "l": 1982, "p": 1835, "v": -28, "d": "mar 26"}, {"n": "Praprotnikova Ulica 2, Mozirje", "m": 59, "l": 1964, "p": 2532, "v": -1, "d": "mar 26"}, {"n": "Tomšičeva Ulica 1, Žalec", "m": 77, "l": 1983, "p": 3012, "v": 18, "d": "mar 26"}, {"n": "Glavni Trg 49, Polzela", "m": 49, "l": 1966, "p": 2824, "v": 11, "d": "mar 26"}, {"n": "Praprotnikova Ulica 8, Mozirje", "m": 65, "l": 1963, "p": 2738, "v": 7, "d": "feb 26"}, {"n": "Glavni Trg 45, Polzela", "m": 52, "l": 1964, "p": 1300, "v": -49, "d": "feb 26"}], "ce|okolica": [{"n": "Globoče 18", "m": 71, "l": 2001, "p": 1931, "v": -8, "d": "feb 26"}, {"n": "Keršova Ulica 7, Vojnik", "m": 62, "l": 1976, "p": 2805, "v": 33, "d": "feb 26"}, {"n": "Globoče 19", "m": 71, "l": 2002, "p": 2557, "v": 22, "d": "jan 26"}, {"n": "Kovinarska Ulica 2, Štore", "m": 80, "l": 1948, "p": 2203, "v": 5, "d": "jan 26"}, {"n": "Cesta Na Pečovje 4, Štore", "m": 38, "l": 1880, "p": 2125, "v": 1, "d": "sep 25"}, {"n": "Cesta Na Pečovje 4, Štore", "m": 39, "l": 1880, "p": 1514, "v": -28, "d": "jul 25"}], "bk": [{"n": "Ulica Moša Pijade 8, Črnomelj", "m": 60, "l": 1989, "p": 2206, "v": 64, "d": "mar 26"}, {"n": "Naselje Borisa Kidriča 5A, Metlika", "m": 75, "l": 1997, "p": 1360, "v": 1, "d": "mar 26"}, {"n": "Ulica 21. Oktobra 15A, Črnomelj", "m": 36, "l": 1970, "p": 1136, "v": -16, "d": "feb 26"}, {"n": "Taborska Ulica 11, Semič", "m": 29, "l": 1971, "p": 1284, "v": -5, "d": "jan 26"}, {"n": "Ulica Pod Smreko 4, Črnomelj", "m": 54, "l": 1961, "p": 2161, "v": 61, "d": "dec 25"}, {"n": "Župančičeva Cesta 8, Metlika", "m": 66, "l": 1963, "p": 1246, "v": -7, "d": "dec 25"}], "ob|ankaran": [{"n": "Jadranska Cesta 14F, Ankaran", "m": 34, "l": 1989, "p": 6514, "v": 0, "d": "mar 26"}, {"n": "Regentova Ulica 4A, Ankaran", "m": 37, "l": 2000, "p": 7288, "v": 12, "d": "mar 26"}, {"n": "Rožnik 10A, Ankaran", "m": 28, "l": 1991, "p": 6767, "v": 4, "d": "mar 26"}, {"n": "Vlahovičeva Ulica 1, Ankaran", "m": 98, "l": 1976, "p": 4150, "v": -36, "d": "dec 25"}, {"n": "Jadranska Cesta 16C, Ankaran", "m": 28, "l": 1994, "p": 4182, "v": -36, "d": "dec 25"}, {"n": "Jadranska Cesta 14F, Ankaran", "m": 34, "l": 1989, "p": 6680, "v": 3, "d": "nov 25"}], "go|jesenice": [{"n": "Hrušica 71D", "m": 49, "l": 1988, "p": 3345, "v": 20, "d": "mar 26"}, {"n": "Cesta 1. Maja 26B, Jesenice", "m": 69, "l": 1989, "p": 2778, "v": -1, "d": "mar 26"}, {"n": "Cesta Maršala Tita 87, Jesenice", "m": 65, "l": 1959, "p": 3064, "v": 10, "d": "mar 26"}, {"n": "Cesta Maršala Tita 100, Jesenice", "m": 48, "l": 1941, "p": 3330, "v": 19, "d": "mar 26"}, {"n": "Kurirska Pot 2C, Slovenski Javornik", "m": 34, "l": 1962, "p": 2914, "v": 4, "d": "mar 26"}, {"n": "Cesta Cirila Tavčarja 10, Jesenice", "m": 60, "l": 1977, "p": 2588, "v": -7, "d": "mar 26"}], "pi": [{"n": "Rožna Ulica 7A, Idrija", "m": 67, "l": 1958, "p": 1667, "v": -19, "d": "mar 26"}, {"n": "Triglavska Ulica 18, Idrija", "m": 73, "l": 1968, "p": 1783, "v": -13, "d": "mar 26"}, {"n": "Arkova Ulica 16, Idrija", "m": 51, "l": 1967, "p": 1802, "v": -12, "d": "mar 26"}, {"n": "Brunov Drevored 19, Tolmin", "m": 86, "l": 1959, "p": 2280, "v": 11, "d": "mar 26"}, {"n": "Beblerjeva Ulica 10, Idrija", "m": 30, "l": 1974, "p": 1926, "v": -6, "d": "mar 26"}, {"n": "Šolska Ulica 8, Spodnja Idrija", "m": 48, "l": 1966, "p": 1833, "v": -10, "d": "feb 26"}], "lj|štepanj": [{"n": "Bilečanska Ulica 5, Ljubljana", "m": 42, "l": 1978, "p": 5995, "v": 24, "d": "mar 26"}, {"n": "Jakčeva Ulica 43, Ljubljana", "m": 62, "l": 1976, "p": 5743, "v": 18, "d": "mar 26"}, {"n": "Steletova Ulica 6, Ljubljana", "m": 22, "l": 1977, "p": 7517, "v": 55, "d": "mar 26"}, {"n": "Nusdorferjeva Ulica 3, Ljubljana", "m": 83, "l": 1976, "p": 4092, "v": -16, "d": "mar 26"}, {"n": "Jakčeva Ulica 43, Ljubljana", "m": 38, "l": 1976, "p": 4900, "v": 1, "d": "feb 26"}, {"n": "Bilečanska Ulica 5, Ljubljana", "m": 29, "l": 1978, "p": 3313, "v": -32, "d": "feb 26"}], "ni": [{"n": "Zeleni Biser 6, Postojna", "m": 104, "l": 2007, "p": 2540, "v": -7, "d": "mar 26"}, {"n": "Zeleni Biser 4, Postojna", "m": 90, "l": 2007, "p": 2820, "v": 4, "d": "mar 26"}, {"n": "Prešernova Ulica 38, Ilirska Bistrica", "m": 26, "l": 1964, "p": 2541, "v": -7, "d": "mar 26"}, {"n": "Volaričeva Ulica 26, Postojna", "m": 33, "l": 1985, "p": 3233, "v": 19, "d": "mar 26"}, {"n": "Prečna Ulica 4, Pivka", "m": 92, "l": 1946, "p": 1247, "v": -54, "d": "mar 26"}, {"n": "Kidričevo Naselje 14, Postojna", "m": 26, "l": 1961, "p": 3497, "v": 28, "d": "mar 26"}], "nm|trebnje": [{"n": "Cankarjeva Ulica 25, Trebnje", "m": 46, "l": 1977, "p": 2514, "v": -10, "d": "feb 26"}, {"n": "Klemenčičeva Ulica 7, Trebnje", "m": 60, "l": 2009, "p": 3940, "v": 41, "d": "jan 26"}, {"n": "Klemenčičeva Ulica 7, Trebnje", "m": 70, "l": 2009, "p": 3976, "v": 42, "d": "dec 25"}, {"n": "Režunova Ulica 10, Trebnje", "m": 41, "l": 2007, "p": 4160, "v": 49, "d": "sep 25"}, {"n": "", "m": 150, "l": 2024, "p": 1536, "v": -45, "d": "sep 25"}, {"n": "Rimska Cesta 3, Trebnje", "m": 65, "l": 1971, "p": 3258, "v": 16, "d": "jul 25"}], "se|kamnik": [{"n": "Tunjiška Cesta 2C, Kamnik", "m": 40, "l": 1971, "p": 3002, "v": -21, "d": "mar 26"}, {"n": "Ljubljanska Cesta 33, Kamnik", "m": 76, "l": 2000, "p": 5203, "v": 37, "d": "mar 26"}, {"n": "Zikova Ulica 5, Kamnik", "m": 41, "l": 1985, "p": 4072, "v": 7, "d": "feb 26"}, {"n": "Ulica Matije Blejca 6, Kamnik", "m": 56, "l": 1977, "p": 4705, "v": 23, "d": "feb 26"}, {"n": "Jakopičeva Ulica 25, Kamnik", "m": 38, "l": 1963, "p": 5434, "v": 43, "d": "jan 26"}, {"n": "Kranjska Cesta 4B, Kamnik", "m": 85, "l": 1962, "p": 4340, "v": 14, "d": "jan 26"}], "ju|vrhnika": [{"n": "Tržaška Cesta 126, Logatec", "m": 138, "l": 2006, "p": 3227, "v": -13, "d": "mar 26"}, {"n": "Na Zelenici 5C, Vrhnika", "m": 71, "l": 1981, "p": 3564, "v": -4, "d": "mar 26"}, {"n": "Vrtnarija 2A, Vrhnika", "m": 42, "l": 2000, "p": 4196, "v": 13, "d": "mar 26"}, {"n": "Poštna Ulica 3A, Vrhnika", "m": 72, "l": 1976, "p": 3711, "v": 0, "d": "feb 26"}, {"n": "Vrtnarija 8B, Vrhnika", "m": 56, "l": 2003, "p": 4528, "v": 22, "d": "feb 26"}, {"n": "Kopališka Ulica 3B, Vrhnika", "m": 99, "l": 1948, "p": 3646, "v": -2, "d": "feb 26"}], "lj|fužine": [{"n": "Agrokombinatska Cesta 13B, Ljubljana", "m": 83, "l": 1956, "p": 3519, "v": -17, "d": "jan 26"}, {"n": "Agrokombinatska Cesta 5, Ljubljana", "m": 76, "l": 1968, "p": 4897, "v": 15, "d": "jan 26"}, {"n": "Vevška Cesta 50, Ljubljana", "m": 80, "l": 1900, "p": 3516, "v": -17, "d": "jan 26"}, {"n": "Zaloška Cesta 269, Ljubljana", "m": 60, "l": 1995, "p": 3200, "v": -25, "d": "jan 26"}, {"n": "Pot V Zeleni Gaj 18C, Ljubljana", "m": 112, "l": 2024, "p": 3884, "v": -9, "d": "dec 25"}, {"n": "Hladilniška Pot 26A, Ljubljana", "m": 36, "l": 1975, "p": 5256, "v": 24, "d": "dec 25"}], "se|medvode": [{"n": "Kamniška Cesta 66, Vodice", "m": 52, "l": 1963, "p": 2885, "v": -25, "d": "mar 26"}, {"n": "Donova Cesta 2, Medvode", "m": 33, "l": 1998, "p": 4407, "v": 14, "d": "feb 26"}, {"n": "Škofjeloška Cesta 11, Medvode", "m": 76, "l": 1978, "p": 4085, "v": 6, "d": "dec 25"}, {"n": "Valburga 5A", "m": 90, "l": 1954, "p": 2533, "v": -35, "d": "dec 25"}, {"n": "Kržišnikova Ulica 4, Medvode", "m": 52, "l": 1967, "p": 4070, "v": 5, "d": "nov 25"}, {"n": "Ulica K Studencu 8, Medvode", "m": 36, "l": 1960, "p": 3976, "v": 3, "d": "nov 25"}], "lj|šentvid": [{"n": "Prušnikova Ulica 9, Ljubljana", "m": 40, "l": 1965, "p": 7481, "v": 62, "d": "mar 26"}, {"n": "Zvezda 13, Ljubljana", "m": 75, "l": 1954, "p": 3728, "v": -19, "d": "mar 26"}, {"n": "Prušnikova Ulica 5, Ljubljana", "m": 90, "l": 1965, "p": 4425, "v": -4, "d": "mar 26"}, {"n": "Tacenska Cesta 155, Ljubljana", "m": 140, "l": 2021, "p": 6820, "v": 48, "d": "mar 26"}, {"n": "Ulica Pregnancev 13, Ljubljana", "m": 77, "l": 1952, "p": 4189, "v": -9, "d": "mar 26"}, {"n": "Flandrova Ulica 10, Ljubljana", "m": 75, "l": 1951, "p": 3914, "v": -15, "d": "feb 26"}], "lj|center": [{"n": "Salendrova Ulica 6, Ljubljana", "m": 106, "l": 0, "p": 2748, "v": -45, "d": "mar 26"}, {"n": "Gradišče 6, Ljubljana", "m": 136, "l": 1908, "p": 4904, "v": -2, "d": "mar 26"}, {"n": "Bičevje 7, Ljubljana", "m": 40, "l": 1961, "p": 4867, "v": -3, "d": "mar 26"}, {"n": "Cankarjeva Cesta 11, Ljubljana", "m": 160, "l": 1875, "p": 4961, "v": -1, "d": "mar 26"}, {"n": "Štefanova Ulica 8, Ljubljana", "m": 105, "l": 1932, "p": 5794, "v": 15, "d": "mar 26"}, {"n": "Mestni Trg 18, Ljubljana", "m": 65, "l": 1815, "p": 4846, "v": -4, "d": "feb 26"}], "ko": [{"n": "Trg Zbora Odposlancev 43, Kočevje", "m": 115, "l": 1900, "p": 1185, "v": -44, "d": "mar 26"}, {"n": "Knafljev Trg 14, Ribnica", "m": 48, "l": 1979, "p": 2264, "v": 7, "d": "mar 26"}, {"n": "Ulica Heroja Marinclja 11, Kočevje", "m": 36, "l": 1988, "p": 1987, "v": -7, "d": "feb 26"}, {"n": "Kidričeva Ulica 6, Kočevje", "m": 41, "l": 1964, "p": 2541, "v": 20, "d": "feb 26"}, {"n": "Tesarska Ulica 3A, Kočevje", "m": 61, "l": 1976, "p": 2569, "v": 21, "d": "feb 26"}, {"n": "Tesarska Ulica 5B, Kočevje", "m": 79, "l": 1976, "p": 1933, "v": -9, "d": "feb 26"}], "jm": [{"n": "Kolodvorska Ulica 2, Slovenska Bistrica", "m": 129, "l": 1912, "p": 1574, "v": -25, "d": "mar 26"}, {"n": "Kidričeva Ulica 6, Ruše", "m": 46, "l": 1960, "p": 2112, "v": 1, "d": "mar 26"}, {"n": "Ulica Ruške Čete 2A, Ruše", "m": 79, "l": 1979, "p": 2349, "v": 13, "d": "mar 26"}, {"n": "Ulica Pohorskega Bataljona 9, Ruše", "m": 69, "l": 1958, "p": 2352, "v": 13, "d": "mar 26"}, {"n": "Rogla 59B", "m": 21, "l": 1989, "p": 2862, "v": 37, "d": "mar 26"}, {"n": "Ulica Pohorskega Bataljona 4, Ruše", "m": 71, "l": 1967, "p": 2335, "v": 12, "d": "feb 26"}], "lj|viško": [{"n": "Preglov Trg 6, Ljubljana", "m": 38, "l": 1985, "p": 4493, "v": -10, "d": "mar 26"}, {"n": "Tržaška Cesta 49, Ljubljana", "m": 85, "l": 1987, "p": 4250, "v": -15, "d": "mar 26"}, {"n": "Rusjanov Trg 9, Ljubljana", "m": 68, "l": 1987, "p": 5557, "v": 11, "d": "mar 26"}, {"n": "Polje, Cesta Xxii 1", "m": 34, "l": 1932, "p": 5248, "v": 5, "d": "mar 26"}, {"n": "Tržaška Cesta 121, Ljubljana", "m": 68, "l": 1979, "p": 4663, "v": -7, "d": "mar 26"}, {"n": "Jamova Cesta 50, Ljubljana", "m": 61, "l": 1986, "p": 6356, "v": 27, "d": "mar 26"}], "go": [{"n": "Deteljica 9, Bistrica Pri Tržiču", "m": 23, "l": 1975, "p": 2576, "v": -10, "d": "mar 26"}, {"n": "Zali Log 10", "m": 166, "l": 1892, "p": 1103, "v": -62, "d": "mar 26"}, {"n": "Ravne 17A, Tržič", "m": 37, "l": 1984, "p": 3689, "v": 29, "d": "feb 26"}, {"n": "Cankarjeva Cesta 21, Tržič", "m": 51, "l": 1957, "p": 3614, "v": 26, "d": "feb 26"}, {"n": "Trg Svobode 13, Tržič", "m": 56, "l": 1845, "p": 2032, "v": -29, "d": "feb 26"}, {"n": "Za Mošenikom 3, Tržič", "m": 113, "l": 2005, "p": 2129, "v": -26, "d": "feb 26"}], "kp": [{"n": "Cesta Prvih Borcev 19, Brestanica", "m": 45, "l": 1962, "p": 1448, "v": -32, "d": "mar 26"}, {"n": "Delavska Ulica 6, Senovo", "m": 46, "l": 1986, "p": 2139, "v": 0, "d": "mar 26"}, {"n": "Bračičeva Ulica 5, Senovo", "m": 99, "l": 1923, "p": 1012, "v": -53, "d": "mar 26"}, {"n": "Cesta 4. Julija 67, Krško", "m": 75, "l": 1974, "p": 2342, "v": 9, "d": "mar 26"}, {"n": "Cesta Krških Žrtev 49A, Krško", "m": 68, "l": 1988, "p": 2368, "v": 11, "d": "feb 26"}, {"n": "Zdolska Cesta 14, Krško", "m": 91, "l": 1952, "p": 2014, "v": -6, "d": "feb 26"}], "ks": [{"n": "Levstikova Ulica 6, Sežana", "m": 47, "l": 2006, "p": 3218, "v": 3, "d": "mar 26"}, {"n": "Partizanska Cesta 66, Sežana", "m": 60, "l": 1989, "p": 3179, "v": 2, "d": "mar 26"}, {"n": "Cesta Na Lenivec 24, Sežana", "m": 51, "l": 1982, "p": 3597, "v": 16, "d": "feb 26"}, {"n": "Ulica Ivana Turšiča 7, Sežana", "m": 44, "l": 1975, "p": 3284, "v": 6, "d": "jan 26"}, {"n": "Vojkova Ulica 7, Sežana", "m": 63, "l": 1959, "p": 2790, "v": -10, "d": "jan 26"}, {"n": "Partizanska Cesta 1, Sežana", "m": 19, "l": 1806, "p": 2094, "v": -33, "d": "jan 26"}], "sg": [{"n": "Podgradje 27", "m": 32, "l": 1878, "p": 718, "v": -61, "d": "mar 26"}, {"n": "Cmureška Cesta 1, Lenart V Slov. Goricah", "m": 51, "l": 1980, "p": 2571, "v": 41, "d": "mar 26"}, {"n": "Branoslavci 16", "m": 52, "l": 1999, "p": 1558, "v": -15, "d": "mar 26"}, {"n": "Sladki Vrh 8", "m": 44, "l": 1975, "p": 2464, "v": 35, "d": "mar 26"}, {"n": "Gubčeva Ulica 6, Lenart V Slov. Goricah", "m": 65, "l": 1998, "p": 2661, "v": 46, "d": "mar 26"}, {"n": "Ormoška Cesta 11A, Ljutomer", "m": 69, "l": 1968, "p": 2085, "v": 14, "d": "mar 26"}], "ve": [{"n": "Ulica Luke Svetca 7, Litija", "m": 66, "l": 2010, "p": 3288, "v": 7, "d": "mar 26"}, {"n": "Maistrova Ulica 10, Litija", "m": 61, "l": 1985, "p": 3355, "v": 9, "d": "mar 26"}, {"n": "Parmova Ulica 4, Litija", "m": 75, "l": 2025, "p": 4097, "v": 34, "d": "feb 26"}, {"n": "Staretov Trg 24A, Šmartno Pri Litiji", "m": 215, "l": 1988, "p": 2574, "v": -16, "d": "jan 26"}, {"n": "Trg Na Stavbah 2, Litija", "m": 66, "l": 1965, "p": 3163, "v": 3, "d": "jan 26"}, {"n": "Maistrova Ulica 2, Litija", "m": 39, "l": 1983, "p": 3067, "v": 0, "d": "dec 25"}], "pt|ptuj": [{"n": "Ulica 5. Prekomorske 16, Ptuj", "m": 83, "l": 1991, "p": 2250, "v": 3, "d": "mar 26"}, {"n": "Volkmerjeva Cesta 7, Ptuj", "m": 77, "l": 1971, "p": 2090, "v": -5, "d": "mar 26"}, {"n": "Potrčeva Cesta 40, Ptuj", "m": 94, "l": 1960, "p": 1890, "v": -14, "d": "mar 26"}, {"n": "Kraigherjeva Ulica 25, Ptuj", "m": 63, "l": 1980, "p": 2151, "v": -2, "d": "mar 26"}, {"n": "Žnidaričevo Nabrežje 8, Ptuj", "m": 58, "l": 1880, "p": 1478, "v": -32, "d": "feb 26"}, {"n": "Kvedrova Ulica 4, Ptuj", "m": 40, "l": 1974, "p": 3136, "v": 43, "d": "feb 26"}], "ob|piran": [{"n": "Prešernovo Nabrežje 24, Piran", "m": 60, "l": 1970, "p": 7750, "v": 55, "d": "mar 26"}, {"n": "Prvomajski Trg 3, Piran", "m": 102, "l": 0, "p": 5796, "v": 16, "d": "mar 26"}, {"n": "Tomšičeva Ulica 39, Piran", "m": 19, "l": 1911, "p": 4813, "v": -4, "d": "mar 26"}, {"n": "Kriva Ulica 6, Piran", "m": 33, "l": 1900, "p": 5657, "v": 13, "d": "mar 26"}, {"n": "Gregorčičeva Ulica 21, Piran", "m": 78, "l": 0, "p": 5924, "v": 18, "d": "mar 26"}, {"n": "Tomšičeva Ulica 3, Piran", "m": 24, "l": 0, "p": 6444, "v": 29, "d": "mar 26"}], "ko2|mežica": [{"n": "Trg 4. Aprila 6B, Mežica", "m": 75, "l": 1984, "p": 1821, "v": 10, "d": "mar 26"}, {"n": "Leška Cesta 1A, Mežica", "m": 62, "l": 1975, "p": 1691, "v": 2, "d": "mar 26"}, {"n": "Trg 4. Aprila 6B, Mežica", "m": 33, "l": 1984, "p": 1535, "v": -8, "d": "mar 26"}, {"n": "Prežihova Ulica 9, Mežica", "m": 105, "l": 1957, "p": 1815, "v": 9, "d": "jan 26"}, {"n": "Trg 4. Aprila 6A, Mežica", "m": 63, "l": 1984, "p": 1894, "v": 14, "d": "dec 25"}, {"n": "Prežihova Ulica 15, Mežica", "m": 59, "l": 1970, "p": 1773, "v": 7, "d": "nov 25"}], "se|šentjakob": [{"n": "Dolsko 113", "m": 64, "l": 2003, "p": 3636, "v": -2, "d": "maj 25"}, {"n": "Dolsko 113", "m": 83, "l": 2003, "p": 3726, "v": 0, "d": "mar 25"}, {"n": "Dol Pri Ljubljani 32B", "m": 66, "l": 2025, "p": 4367, "v": 17, "d": "mar 25"}], "ko2": [{"n": "Tržna Ulica 1A, Radlje Ob Dravi", "m": 103, "l": 2000, "p": 689, "v": -57, "d": "mar 26"}, {"n": "Robindvor 36, Dravograd", "m": 27, "l": 1977, "p": 1872, "v": 17, "d": "mar 26"}, {"n": "Robindvor 39, Dravograd", "m": 62, "l": 1975, "p": 2272, "v": 42, "d": "mar 26"}, {"n": "Trg 4. Julija 24, Dravograd", "m": 64, "l": 1935, "p": 1410, "v": -12, "d": "mar 26"}, {"n": "Mariborska Cesta 35B, Dravograd", "m": 69, "l": 1975, "p": 1985, "v": 24, "d": "mar 26"}, {"n": "Pod Gradom 124, Dravograd", "m": 59, "l": 1924, "p": 1765, "v": 10, "d": "jan 26"}], "ju": [{"n": "Šentvid Pri Stični 59B", "m": 65, "l": 1975, "p": 3324, "v": -17, "d": "mar 26"}, {"n": "Ljubljanska Cesta 30B, Ivančna Gorica", "m": 38, "l": 1981, "p": 4352, "v": 9, "d": "mar 26"}, {"n": "Ljubljanska Cesta 12, Ivančna Gorica", "m": 92, "l": 1895, "p": 2659, "v": -34, "d": "mar 26"}, {"n": "Ulica 6. Junija 12A, Ivančna Gorica", "m": 42, "l": 2004, "p": 5473, "v": 37, "d": "mar 26"}, {"n": "Ulica 6. Junija 12A, Ivančna Gorica", "m": 44, "l": 2004, "p": 4960, "v": 24, "d": "feb 26"}, {"n": "Gradišnikova Ulica 18, Borovnica", "m": 33, "l": 1981, "p": 4346, "v": 9, "d": "feb 26"}], "se|komenda": [{"n": "Moste 85B", "m": 80, "l": 2012, "p": 3975, "v": 14, "d": "feb 26"}, {"n": "Spodnje Prapreče 21B", "m": 160, "l": 2023, "p": 2497, "v": -28, "d": "feb 26"}, {"n": "Kvederčkova Ulica 3, Prevoje Pri Šentvidu", "m": 41, "l": 2001, "p": 5589, "v": 61, "d": "okt 25"}, {"n": "Krašnja 63", "m": 85, "l": 1980, "p": 2977, "v": -14, "d": "apr 25"}], "pv": [{"n": "Vrhovo 43A", "m": 69, "l": 1990, "p": 1305, "v": -26, "d": "feb 26"}, {"n": "Kolenov Graben 3, Radeče", "m": 60, "l": 1983, "p": 1735, "v": -2, "d": "feb 26"}, {"n": "Ulica Of 2, Radeče", "m": 59, "l": 1990, "p": 2373, "v": 34, "d": "feb 26"}, {"n": "Pod Vrtačo 18, Sevnica", "m": 80, "l": 1981, "p": 2048, "v": 16, "d": "feb 26"}, {"n": "Krmelj 70A", "m": 65, "l": 1988, "p": 1870, "v": 6, "d": "jan 26"}, {"n": "Kolenov Graben 1, Radeče", "m": 63, "l": 2010, "p": 2495, "v": 41, "d": "jan 26"}], "lj|črnuče": [{"n": "Cesta 24. Junija 74, Ljubljana", "m": 68, "l": 1985, "p": 4723, "v": -3, "d": "feb 26"}, {"n": "Suhadolčanova Ulica 38, Ljubljana", "m": 84, "l": 1992, "p": 4680, "v": -4, "d": "dec 25"}, {"n": "Cesta 24. Junija 44, Ljubljana", "m": 68, "l": 1951, "p": 4676, "v": -4, "d": "dec 25"}, {"n": "Pionirska Pot 14, Ljubljana", "m": 85, "l": 2002, "p": 5010, "v": 2, "d": "dec 25"}, {"n": "Cesta 24. Junija 80, Ljubljana", "m": 61, "l": 1987, "p": 4980, "v": 2, "d": "dec 25"}, {"n": "Polanškova Ulica 8, Ljubljana", "m": 63, "l": 1988, "p": 4961, "v": 1, "d": "nov 25"}], "kr|okolica": [{"n": "Trboje 35", "m": 86, "l": 2025, "p": 3952, "v": 5, "d": "mar 26"}, {"n": "Šmartno 75A", "m": 68, "l": 2023, "p": 4570, "v": 22, "d": "mar 26"}, {"n": "Sajovčevo Naselje 1, Šenčur", "m": 77, "l": 2003, "p": 3504, "v": -7, "d": "feb 26"}, {"n": "Pipanova Cesta 45, Šenčur", "m": 69, "l": 1965, "p": 4467, "v": 19, "d": "jan 26"}, {"n": "Kranjska Cesta 4, Šenčur", "m": 80, "l": 1991, "p": 2928, "v": -22, "d": "jan 26"}, {"n": "Trboje 35", "m": 66, "l": 2025, "p": 4447, "v": 19, "d": "jan 26"}], "pt|ormož": [{"n": "Ptujska Cesta 2, Ormož", "m": 62, "l": 1976, "p": 2050, "v": 29, "d": "mar 26"}, {"n": "Kolodvorska Cesta 2, Ormož", "m": 54, "l": 1972, "p": 1252, "v": -21, "d": "feb 26"}, {"n": "Mihovci Pri Vel. Nedelji 10B", "m": 59, "l": 1983, "p": 1837, "v": 16, "d": "feb 26"}, {"n": "Ptujska Cesta 13, Ormož", "m": 59, "l": 1991, "p": 1952, "v": 23, "d": "nov 25"}, {"n": "Mihovci Pri Vel. Nedelji 10B", "m": 72, "l": 1983, "p": 1694, "v": 7, "d": "okt 25"}, {"n": "Skolibrova Ulica 8, Ormož", "m": 36, "l": 1978, "p": 1634, "v": 3, "d": "sep 25"}], "go|radovljica": [{"n": "Finžgarjeva Ulica 8A, Lesce", "m": 27, "l": 1975, "p": 5847, "v": 63, "d": "feb 26"}, {"n": "Cankarjeva Ulica 31A, Radovljica", "m": 39, "l": 1981, "p": 4926, "v": 37, "d": "feb 26"}, {"n": "Gradnikova Cesta 111, Radovljica", "m": 30, "l": 1974, "p": 4486, "v": 25, "d": "feb 26"}, {"n": "Alpska Cesta 42A, Lesce", "m": 76, "l": 1850, "p": 1755, "v": -51, "d": "jan 26"}, {"n": "Alpska Cesta 42A, Lesce", "m": 39, "l": 1850, "p": 2538, "v": -29, "d": "jan 26"}, {"n": "Alpska Cesta 42A, Lesce", "m": 83, "l": 1850, "p": 1806, "v": -50, "d": "jan 26"}], "lj": [{"n": "Sneberska Cesta 99, Ljubljana", "m": 117, "l": 1960, "p": 2512, "v": -30, "d": "feb 26"}, {"n": "Ulica Borca Petra 16, Ljubljana", "m": 94, "l": 1990, "p": 2905, "v": -19, "d": "feb 26"}, {"n": "Ulica Borca Petra 16, Ljubljana", "m": 94, "l": 1990, "p": 3437, "v": -5, "d": "nov 25"}, {"n": "Ulica Borca Petra 16, Ljubljana", "m": 94, "l": 1990, "p": 3437, "v": -5, "d": "nov 25"}, {"n": "Tržaška Cesta 278, Ljubljana", "m": 66, "l": 2022, "p": 4733, "v": 31, "d": "okt 25"}, {"n": "Cesta V Prod 53A, Ljubljana", "m": 31, "l": 1965, "p": 3774, "v": 5, "d": "avg 25"}], "pt|kidričevo": [{"n": "Kajuhova Ulica 11, Kidričevo", "m": 45, "l": 1953, "p": 1700, "v": -2, "d": "jan 26"}, {"n": "Lackova Ulica 3, Kidričevo", "m": 105, "l": 1953, "p": 1623, "v": -6, "d": "dec 25"}, {"n": "Tovarniška Cesta 2, Kidričevo", "m": 92, "l": 1948, "p": 2271, "v": 31, "d": "nov 25"}, {"n": "Lovrenc Na Dravskem Polju 8D", "m": 69, "l": 1960, "p": 1930, "v": 11, "d": "avg 25"}, {"n": "Ulica Borisa Kraigherja 16, Kidričevo", "m": 100, "l": 1949, "p": 2026, "v": 17, "d": "jun 25"}, {"n": "Ulica Borisa Kraigherja 16, Kidričevo", "m": 100, "l": 1949, "p": 1974, "v": 14, "d": "jun 25"}], "lj|rudnik": [{"n": "Krivec 8, Ljubljana", "m": 43, "l": 1991, "p": 6454, "v": 31, "d": "mar 26"}, {"n": "Gornji Rudnik Iv 2, Ljubljana", "m": 72, "l": 1996, "p": 4796, "v": -3, "d": "feb 26"}, {"n": "Dolenjska Cesta 135, Ljubljana", "m": 44, "l": 1939, "p": 4938, "v": 0, "d": "nov 25"}, {"n": "Krivec 3, Ljubljana", "m": 57, "l": 1991, "p": 5274, "v": 7, "d": "nov 25"}, {"n": "Krivec 1, Ljubljana", "m": 43, "l": 1991, "p": 6617, "v": 34, "d": "jun 25"}, {"n": "Krivec 1, Ljubljana", "m": 43, "l": 1991, "p": 4358, "v": -12, "d": "jun 25"}], "ha": [{"n": "Videm Pri Ptuju 31", "m": 64, "l": 1962, "p": 1232, "v": -16, "d": "okt 25"}, {"n": "Zgornji Leskovec 10C", "m": 90, "l": 2008, "p": 1460, "v": -1, "d": "sep 25"}, {"n": "Videm Pri Ptuju 31", "m": 32, "l": 1962, "p": 2661, "v": 81, "d": "jul 25"}, {"n": "Videm Pri Ptuju 51", "m": 104, "l": 2003, "p": 1487, "v": 1, "d": "jun 25"}], "nm|dolenj": [{"n": "Kotarjeva Cesta 4, Šentjernej", "m": 38, "l": 1986, "p": 3118, "v": 24, "d": "mar 26"}, {"n": "Kotarjeva Cesta 8B, Šentjernej", "m": 85, "l": 2009, "p": 2471, "v": -1, "d": "dec 25"}, {"n": "Roje 6, Mirna", "m": 80, "l": 1964, "p": 2197, "v": -12, "d": "dec 25"}, {"n": "Sokolska Ulica 5, Mirna", "m": 85, "l": 2022, "p": 2509, "v": 0, "d": "nov 25"}, {"n": "Sokolska Ulica 5, Mirna", "m": 83, "l": 2022, "p": 2577, "v": 3, "d": "nov 25"}, {"n": "Sokolska Ulica 7, Mirna", "m": 85, "l": 2022, "p": 2317, "v": -8, "d": "okt 25"}]};
 
-function drawETN(laoKey){
+function drawETN(laoKey, isHisa){
   const sec=document.getElementById('etnSection');
   if(!sec) return;
   
+  // Za hiše vzamemo ETN_TRANS_H, za stanovanja ETN_TRANS
+  const dataSource=isHisa?ETN_TRANS_H:ETN_TRANS;
+  
+  // Odstrani _h suffix (hk vrednosti imajo _h, ETN ključi ne)
+  const cleanKey=laoKey?laoKey.replace('_h',''):laoKey;
+  
   // Poskusi LAO, potem TAO fallback
-  let trans=ETN_TRANS[laoKey];
-  let usedKey=laoKey;
+  let trans=dataSource[cleanKey];
+  let usedKey=cleanKey;
   if(!trans||trans.length<3){
-    const tao=laoKey.split('|')[0];
-    trans=ETN_TRANS[tao];
+    const tao=cleanKey.split('|')[0];
+    trans=dataSource[tao];
     usedKey=tao;
   }
   
@@ -1081,41 +1090,27 @@ function drawETN(laoKey){
   const isFallback=usedKey!==laoKey;
   const rows=trans.map(t=>{
     const vs=t.v>=0?`<span style="color:#2D7A4F">+${t.v}%</span>`:`<span style="color:#C0392B">${t.v}%</span>`;
-    return `<tr>
-      <td>${t.n}</td>
-      <td style="text-align:right">${t.m} m\u00B2</td>
-      <td style="text-align:right">${t.l>0?t.l:'\u2014'}</td>
-      <td class="etn-ppm2" style="text-align:right">${t.p.toLocaleString('sl-SI')} \u20AC/m\u00B2</td>
-      <td style="text-align:right;font-size:.75rem">${vs}</td>
-      <td class="etn-datum" style="text-align:right">${t.d}</td>
-    </tr>`;}).join('');
-  
-  // Mobilne kartice
+    if(isHisa){
+      const pStr=t.z>0?` / ${t.z.toLocaleString('sl-SI')} m²`:'';
+      return `<tr><td>${t.n}</td><td style="text-align:right">${t.m} m²${pStr}</td><td style="text-align:right">${t.l>0?t.l:'—'}</td><td class="etn-ppm2" style="text-align:right">${t.p.toLocaleString('sl-SI')} €</td><td style="text-align:right;font-size:.75rem">${vs}</td><td class="etn-datum" style="text-align:right">${t.d}</td></tr>`;
+    }
+    return `<tr><td>${t.n}</td><td style="text-align:right">${t.m} m²</td><td style="text-align:right">${t.l>0?t.l:'—'}</td><td class="etn-ppm2" style="text-align:right">${t.p.toLocaleString('sl-SI')} €/m²</td><td style="text-align:right;font-size:.75rem">${vs}</td><td class="etn-datum" style="text-align:right">${t.d}</td></tr>`;
+  }).join('');
   const cards=trans.map(t=>{
     const vs=t.v>=0?`<span style="color:#2D7A4F">+${t.v}%</span>`:`<span style="color:#C0392B">${t.v}%</span>`;
-    return `<div class="etn-card">
-      <div class="etn-card-top">
-        <span class="etn-card-addr">${t.n}</span>
-        <span class="etn-card-price">${t.p.toLocaleString('sl-SI')} \u20AC/m\u00B2</span>
-      </div>
-      <div class="etn-card-meta">${t.m} m\u00B2 \u00B7 ${t.l>0?t.l:'\u2014'} \u00B7 ${vs} \u00B7 ${t.d}</div>
-    </div>`;}).join('');
-    
-  sec.innerHTML=`
-    <div class="ref-title">Zadnje prodaje${isFallback?' (regija)':' v območju'}</div>
-    <table class="etn-table">
-      <thead><tr>
-        <th>Naslov</th><th style="text-align:right">m\u00B2</th>
-        <th style="text-align:right">Leto</th>
-        <th style="text-align:right">\u20AC/m\u00B2</th>
-        <th style="text-align:right">vs. avg</th>
-        <th style="text-align:right">Datum</th>
-      </tr></thead>
-      <tbody>${rows}</tbody>
-    </table>
-    <div class="etn-cards">${cards}</div>
-    <div class="etn-note">Vir: ETN (Evidenca trga nepremičnin), mar 2025 \u2013 mar 2026</div>`;
+    if(isHisa){
+      const pStr=t.z>0?` · parcela ${t.z.toLocaleString('sl-SI')} m²`:'';
+      return `<div class="etn-card"><div class="etn-card-top"><span class="etn-card-addr">${t.n}</span><span class="etn-card-price">${t.p.toLocaleString('sl-SI')} €</span></div><div class="etn-card-meta">${t.m} m²${pStr} · ${t.l>0?t.l:'—'} · ${vs} · ${t.d}</div></div>`;
+    }
+    return `<div class="etn-card"><div class="etn-card-top"><span class="etn-card-addr">${t.n}</span><span class="etn-card-price">${t.p.toLocaleString('sl-SI')} €/m²</span></div><div class="etn-card-meta">${t.m} m² · ${t.l>0?t.l:'—'} · ${vs} · ${t.d}</div></div>`;
+  }).join('');
+  sec.innerHTML=`<div class="ref-title">Zadnje prodaje${isFallback?' (regija)':' v območju'}</div><table class="etn-table"><thead><tr><th>Naslov</th><th style="text-align:right">${isHisa?'Hiša / parcela':'m²'}</th><th style="text-align:right">Leto</th><th style="text-align:right">${isHisa?'Cena':'€/m²'}</th><th style="text-align:right">vs. avg</th><th style="text-align:right">Datum</th></tr></thead><tbody>${rows}</tbody></table><div class="etn-cards">${cards}</div><div class="etn-note">Vir: ETN (Evidenca trga nepremičnin), 2026</div>`;
 }
+
+
+
+// Trendni faktorji letne rasti cen hiš po TAO (na osnovi GURS porocil)
+
 
 
 const S={
@@ -1145,14 +1140,28 @@ function dispPrice(entry){
   return S.type==='stanovanje'?fmtM2(d.cena_m2):fmt(d.cena_h);
 }
 
-function setProgress(step){
-  const pct=Math.round(((step-1)/4)*100);
-  document.getElementById('progFill').style.width=pct+'%';
-  document.getElementById('stepLabel').textContent=`Korak ${step} od 4`;
-  document.getElementById('stepPct').textContent=pct+' %';
+function setProgress(n){
+  const pct=[0,20,40,60,80,100][n]||0;
+  const fill=document.getElementById('progFill');
+  if(fill) fill.style.width=pct+'%';
+  const lbl=document.getElementById('stepLabel');
+  if(lbl) lbl.textContent=n<=4?'Korak '+n+' od 4':'Korak 5 od 5 – Ocena';
+  const pctEl=document.getElementById('stepPct');
+  if(pctEl) pctEl.textContent=pct+' %';
+  for(let i=1;i<=5;i++){
+    const dot=document.getElementById('sdot'+i);
+    const circ=document.getElementById('sdotc'+i);
+    if(!dot||!circ)continue;
+    dot.classList.remove('active');
+    circ.classList.remove('active','done');
+    if(i<n){circ.classList.add('done');}
+    else if(i===n){dot.classList.add('active');circ.classList.add('active');}
+    if(i<5){const con=document.getElementById('scon'+i);if(con)con.classList.toggle('done',i<n);}
+  }
 }
 
 function go(n){
+  console.log('go called n='+n+' S.type='+S.type);
   document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
   document.getElementById('s'+n).classList.add('active');
   setProgress(n);
@@ -1176,7 +1185,7 @@ function go(n){
       document.getElementById('atrijToggleBtn').classList.add('sel');
       document.getElementById('atrijSliderWrap').style.display='block';
       document.getElementById('atrijSlider').value=S.atrij;
-      document.getElementById('atrijNum').textContent=S.atrij;
+      const anEl=document.getElementById('atrijNum');if(anEl)anEl.textContent=S.atrij;
     }
     if(iH){
       // Nastavi parcela slider na referenčno vrednost iz podatkov če je na voljo
@@ -1184,10 +1193,22 @@ function go(n){
       const d=key?(getData('hisa',key)||getData('hisa',key.split('|')[0])):null;
       const refZem=(d&&d.ref_zem)?d.ref_zem:500;
       const parSl=document.getElementById('parcelaSlider');
-      if(!S.parcelaSet){parSl.value=refZem;S.parcela=refZem;document.getElementById('parcelaNum').textContent=refZem;}
+      if(!S.parcelaSet){parSl.value=refZem;S.parcela=refZem;const pnEl=document.getElementById('parcelaNum');if(pnEl)pnEl.textContent=refZem;}
     }
   }
+  // Inicializiraj kakovost gumbe - default Standard
+  if(!S.kakovost||S.kakovost===1.0){
+    selKakovost('standard', 1.0);
+  } else {
+    const kTip=S.kakovost>=1.25?'luksuz':S.kakovost>=1.12?'nadstandard':'standard';
+    selKakovost(kTip, S.kakovost);
+  }
   if(n===4){
+    // Nastavi default notranjost na 'Dobro' če ni bila izbrana
+    if(S.ktAge===null){
+      const defKtBtn=document.getElementById('kt-dobro');
+      if(defKtBtn) selKt(defKtBtn,10,'Dobro');
+    }
     // Posodobi default vrednosti sliderjev komponent na leto gradnje
     const defYr=S.year||1980;
     ['fasada','okna','inst','streha'].forEach(id=>{
@@ -1217,18 +1238,29 @@ function highlight(text,q){
 document.addEventListener('DOMContentLoaded',()=>{
   const inp=document.getElementById('locInput');
   if(!inp) return;
-  inp.addEventListener('keydown',e=>{
-    const items=document.querySelectorAll('#locDD .dd-item');
-    if(e.key==='ArrowDown'){e.preventDefault();if(items[0])items[0].focus();}
+  inp.addEventListener('input',()=>{
+    const q=inp.value.trim();
+    const cb=document.getElementById('clearBtn');
+    if(cb) cb.style.display=q?'block':'none';
+    if(!q){const dd=document.getElementById('dropdown');if(dd){dd.classList.remove('open');dd.innerHTML='';}return;}
+    renderDD(q);
   });
-  document.getElementById('locInput').addEventListener('focus',()=>{
-    if(document.getElementById('locInput').value) renderDD(document.getElementById('locInput').value);
+  inp.addEventListener('keydown',e=>{
+    const items=document.querySelectorAll('#dropdown .dd-item');
+    if(e.key==='ArrowDown'){e.preventDefault();if(items[0])items[0].focus();}
+    if(e.key==='Escape'){const dd=document.getElementById('dropdown');if(dd)dd.classList.remove('open');}
+  });
+  document.addEventListener('click',e=>{
+    if(!e.target.closest('#searchWrap')){
+      const dd=document.getElementById('dropdown');
+      if(dd)dd.classList.remove('open');
+    }
   });
 });
 function renderDD(q){
-  const dd=document.getElementById('locDD');
+  const dd=document.getElementById('dropdown');
   const nq=norm(q);
-  if(!nq||nq.length<2){dd.style.display='none';dd.innerHTML='';return;}
+  if(!nq||nq.length<2){dd.classList.remove('open');dd.innerHTML='';return;}
   _matches=KRAJI.filter(e=>norm(e.k).includes(nq)||norm(e.tags||'').includes(nq))
     .sort((a,b)=>{
       const ak=norm(a.k),bk=norm(b.k);
@@ -1241,7 +1273,7 @@ function renderDD(q){
     })
     .slice(0,8);
   _focus=-1;
-  if(!_matches.length){dd.style.display='none';return;}
+  if(!_matches.length){dd.classList.remove('open');return;}
   dd.innerHTML=_matches.map((e,i)=>{
     const key=S.type==='stanovanje'?e.sk:e.hk;
     const d=getData(S.type,key)||getData(S.type,key.split('|')[0]);
@@ -1253,7 +1285,7 @@ function renderDD(q){
       <span style="color:var(--muted);font-size:.78rem">${price}</span>
     </div>`;
   }).join('');
-  dd.style.display='block';
+  dd.classList.add('open');
 }
 
 
@@ -1270,7 +1302,7 @@ function selectLoc(i){
   const _sw=document.getElementById('searchWrap');
   if(_pill) _pill.classList.add('show');
   if(_sw) _sw.style.display='none';
-  const _dd=document.getElementById('locDD'); if(_dd) _dd.style.display='none';
+  const _dd=document.getElementById('dropdown'); if(_dd) _dd.classList.remove('open');
   document.getElementById('btn2').disabled=false;
 }
 function resetSearch(){
@@ -1285,7 +1317,7 @@ function resetSearch(){
 }
 function clearInput(){
   document.getElementById('locInput').value='';
-  const _dd=document.getElementById('locDD'); if(_dd) _dd.style.display='none';
+  const _dd=document.getElementById('dropdown'); if(_dd) _dd.classList.remove('open');
   const _cb=document.getElementById('clearBtn'); if(_cb) _cb.style.display='none';
   document.getElementById('locInput').focus();
 }
@@ -1308,12 +1340,12 @@ function toggleAtrij(btn){
     document.getElementById('atrijSliderWrap').style.display='block';
     const val=parseInt(document.getElementById('atrijSlider').value)||30;
     S.atrij=val;
-    document.getElementById('atrijNum').textContent=val;
+    const anEl2=document.getElementById('atrijNum');if(anEl2)anEl2.textContent=val;
   }
 }
 function onAtrij(v){
   S.atrij=parseInt(v);
-  document.getElementById('atrijNum').textContent=v;
+  const anEl3=document.getElementById('atrijNum');if(anEl3)anEl3.textContent=v;
 }
 
 function selParkType(type){
@@ -1415,28 +1447,40 @@ function onAtrijManual(v){
   if(sl) sl.value=Math.min(n,parseInt(sl.max));
 }
 
+const COMP_LABELS={
+  fasada:{icon:'🏠',label:'Fasada'},
+  okna:{icon:'🪟',label:'Okna'},
+  inst:{icon:'⚡',label:'Instalacije'},
+  streha:{icon:'🏗️',label:'Streha'}
+};
+function compToggleHTML(id, yearOrNull){
+  const c=COMP_LABELS[id]||{icon:'',label:id};
+  if(yearOrNull===null){
+    return `<span class="comp-toggle-label">${c.icon} ${c.label}</span><span style="font-size:.75rem;color:var(--muted)">Ni obnovljeno</span>`;
+  } else {
+    return `<span class="comp-toggle-label">${c.icon} ${c.label}</span><span style="font-size:.75rem;color:var(--gold);font-weight:600">${yearOrNull}</span>`;
+  }
+}
 function toggleComp(id){
   const tog=document.getElementById('tog-'+id);
   const wrap=document.getElementById('wrap-'+id);
   const isActive=tog.classList.contains('active');
   if(isActive){
     tog.classList.remove('active');
-    tog.textContent='Ni obnovljeno';
+    tog.innerHTML=compToggleHTML(id, null);
     wrap.classList.remove('show');
     S[id]=null;
   } else {
     tog.classList.add('active');
-    const yr=parseInt(document.getElementById('sl-'+id).value);
-    tog.textContent=yr+'';
-    wrap.classList.add('show');
-    S[id]=yr;
-    // Set slider default to year of construction if known
     const defYr=Math.max(S.year||1980, 1945);
     document.getElementById('sl-'+id).value=defYr;
-    S[id]=defYr;
-    tog.textContent=defYr+'';
     const mn=document.getElementById('manual-'+id);
     if(mn) mn.value=defYr;
+    const dispEl=document.getElementById('disp-'+id);
+    if(dispEl) dispEl.textContent=defYr;
+    S[id]=defYr;
+    tog.innerHTML=compToggleHTML(id, defYr);
+    wrap.classList.add('show');
   }
 }
 function onComp(id,v){
@@ -1444,7 +1488,10 @@ function onComp(id,v){
   S[id]=n;
   const mn=document.getElementById('manual-'+id);
   if(mn&&parseInt(mn.value)!==n) mn.value=n;
-  document.getElementById('tog-'+id).textContent=n;
+  const dispEl=document.getElementById('disp-'+id);
+  if(dispEl) dispEl.textContent=n;
+  const togEl=document.getElementById('tog-'+id);
+  if(togEl) togEl.innerHTML=compToggleHTML(id,n);
 }
 function onCompManual(id,v){
   const n=parseInt(v);
@@ -1452,10 +1499,14 @@ function onCompManual(id,v){
   S[id]=n;
   const sl=document.getElementById('sl-'+id);
   if(sl) sl.value=Math.min(n,parseInt(sl.max));
-  document.getElementById('tog-'+id).textContent=n;
+  const togEl=document.getElementById('tog-'+id);
+  if(togEl) togEl.innerHTML=compToggleHTML(id,n);
 }
-function selKt(btn,age){
-  document.querySelectorAll('.kt-btn').forEach(b=>b.classList.remove('sel'));
+function selKt(btn,age,label){
+  ['kt-novo','kt-dobro','kt-staro','kt-obrab'].forEach(id=>{
+    const b=document.getElementById(id);
+    if(b) b.classList.remove('sel');
+  });
   btn.classList.add('sel');
   S.ktAge=age;
   document.getElementById('btn4').disabled=false;
@@ -1480,19 +1531,31 @@ function calcEffectiveAge(){
 }
 
 
+
+function showProdajaForm(){
+  document.getElementById('prodajaBox').style.display='none';
+  document.getElementById('prodajaForm').style.display='block';
+}
+function sendProdaja(){
+  const n=document.getElementById('prodajaName').value.trim();
+  const p=document.getElementById('prodajaPhone').value.trim();
+  if(!n||!p){alert('Prosimo, vnesite ime in telefon.');return;}
+  document.getElementById('prodajaForm').style.display='none';
+  document.getElementById('prodajaSent').style.display='block';
+}
 function showResult(){
   S.size=parseInt(document.getElementById('sizeSlider').value);
   S.year=parseInt(document.getElementById('yearSlider').value);
   document.getElementById('quizCard').style.display='none';
   document.getElementById('resultCard').classList.add('active');
-  document.getElementById('progFill').style.width='100%';
-  document.getElementById('stepLabel').textContent='Ocena pripravljena';
-  document.getElementById('stepPct').textContent='100 %';
+  setProgress(5);
 
-  setTimeout(()=>{
+  setTimeout(()=>{ try {
     const isS=S.type==='stanovanje';
+    if(!S.entry){console.error('S.entry is null');return;}
     const key=isS?S.entry.sk:S.entry.hk;
     const d=getData(S.type,key)||getData(S.type,key.split('|')[0]);
+    if(!d){console.error('getData returned null for key:',key);return;}
     const refLeto=d.ref_leto;
     // Effective age uporabnikovega stanovanja
     const effAge=calcEffectiveAge();
@@ -1602,7 +1665,8 @@ function showResult(){
       let adjHisa;
       if(S.year>=2013){
         const cap=NOVO_CAP[taoKey]||1800;
-        const novoM2=Math.min(stanM2*1.05,cap);
+        const novoFaktor=stanM2<2000?Math.max(1400,stanM2*0.75)/stanM2:1.05;
+        const novoM2=Math.min(stanM2*novoFaktor,cap);
         adjHisa=novoM2*S.size*sr;
       } else {
         const baseH=pctBase(effAge,refEffAge,p25h,bh,p75h);
@@ -1657,13 +1721,35 @@ function showResult(){
       else if(adjPpm2 < med*0.88) contextStr='Vaše stanovanje je v spodnjem kvartilu za to območje.';
       else contextStr='Vaše stanovanje je blizu mediane za to območje.';
     }
+    if(!contextStr && !isS){
+      // Za hiše dodaj kontekst glede na razpon
+      if(mid > high*0.9) contextStr='Nepremičnina je v zgornjem vrednostnem razredu za to območje.';
+      else if(mid < low*1.1) contextStr='Nepremičnina je v spodnjem vrednostnem razredu za to območje.';
+      else contextStr='Ocena temelji na mediani prodajnih cen v tem območju.';
+    }
     document.getElementById('rContext').textContent=contextStr;
-    document.getElementById('rMainPrice').textContent=fmt(mid);
+    // Animacija cene - counter up efekt
+    const priceEl=document.getElementById('rMainPrice');
+    const startVal=Math.round(mid*0.6);
+    const endVal=mid;
+    const duration=800;
+    const startTime=performance.now();
+    function animatePrice(now){
+      const elapsed=now-startTime;
+      const progress=Math.min(elapsed/duration,1);
+      const ease=1-Math.pow(1-progress,3);
+      const current=Math.round(startVal+(endVal-startVal)*ease);
+      priceEl.textContent=fmt(current);
+      if(progress<1) requestAnimationFrame(animatePrice);
+      else priceEl.textContent=fmt(endVal);
+    }
+    requestAnimationFrame(animatePrice);
     document.getElementById('rPpm2').textContent=fmtM2(ppm2);
     document.getElementById('rLow').textContent=fmt(low);
     document.getElementById('rHigh').textContent=fmt(high);
     document.getElementById('rConfidence').textContent=`\u00B1${Math.round(band*100)} % \u00B7 ${confLabel}`;
-    document.getElementById('rNote').textContent=noteStr;
+    // noteStr je za debug - ne prikazujemo tehnikalij uporabniku
+    document.getElementById('rNote').style.display='none';
     const extras=[];
     if(S.garaza>0) extras.push(S.garaza+'\u00D7 garaža');
     if(S.zunanje>0) extras.push(S.zunanje+'\u00D7 zunanj. parking');
@@ -1674,7 +1760,7 @@ function showResult(){
     document.getElementById('sumSize').textContent=S.size+' m\u00B2'+(S.type==='hisa'?' \u00B7 parcela '+S.parcela.toLocaleString('sl-SI')+' m\u00B2':'');
     document.getElementById('sumYear').textContent=S.year;
     // Komponente za prikaz
-    const ktLabels={5:'Prenovljeno',15:'Dobro stanje',30:'Rabljeno',50:'Obrabljeno'};
+    const ktLabels={0:'Prenovljeno',10:'Dobro',20:'Staro',40:'Obrabljeno'};
     const compParts=[];
     if(S.fasada)compParts.push('Fasada '+S.fasada);
     if(S.okna)compParts.push('Okna '+S.okna);
@@ -1702,18 +1788,25 @@ function showResult(){
     document.getElementById('refYear').textContent=refLeto||'ni podatka';
     document.getElementById('refN').textContent=d.n+' prodaj';
     document.getElementById('loadingWrap').style.display='none';
-    document.getElementById('resultBody').classList.add('active');
+    document.getElementById('resultBody').style.display='block';
+    // Scroll to result
+    const rc=document.getElementById('resultCard');
+    if(rc) setTimeout(()=>rc.scrollIntoView({behavior:'smooth',block:'start'}),100);
     // Nariši graf gibanja cen in ETN transakcije
     const taoId=getTaoId(S.entry);
     drawTrendChart(taoId||'SI');
     const laoKey=S.type==='stanovanje'?S.entry.sk:S.entry.hk;
-    drawETN(laoKey||taoId||'lj');
+    drawETN(laoKey||taoId||'lj', !isS);
+  } catch(err){ console.error('showResult error:',err); document.getElementById('resultBody').style.display='block'; }
   },1400);
 }
 function sendLead(){
   const n=document.getElementById('ctaName').value.trim();
   const p=document.getElementById('ctaPhone').value.trim();
-  if(!n||!p){alert('Prosimo, vnesite ime in telefonsko številko.');return;}
+  const e=document.getElementById('ctaEmail').value.trim();
+  const nm=document.getElementById('ctaNamen').value;
+  if(!n||!p||!e){alert('Prosimo, vnesite ime, telefonsko številko in e-mail.');return;}
+  if(!e.includes('@')){alert('Vnesite veljaven e-mail naslov.');return;}
   document.getElementById('ctaForm').style.display='none';
   document.getElementById('sentBox').style.display='block';
 }
@@ -1861,11 +1954,12 @@ function drawTrendChart(taoId){
     html+=`<text x="${xCenter(i).toFixed(1)}" y="${(H-8).toFixed(1)}" text-anchor="middle" font-size="8.5" fill="#78716C">${p}</text>`;
   });
 
-  svg.innerHTML=html;
+  svg.innerHTML=`<svg viewBox="0 0 560 185" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">${html}</svg>`;
 
   // Legend
   const legItems=[];
-  if(showBoth) legItems.push({color:'#C09A4A',label:isS?'Stanovanja \u2013 vaša regija':'Hiše \u2013 vaša regija'});
+    const regionLabel=S.entry?(S.entry.k):(taoId||'regija');
+  if(showBoth) legItems.push({color:'#C09A4A',label:(isS?'Stanovanja':'Hiše')+' – '+regionLabel});
   if(siVals)   legItems.push({color:'#C8C3BC',label:'Slovenija skupaj'});
   legend.innerHTML=legItems.map(l=>
     `<div class="trend-leg-item"><div class="trend-leg-dot" style="background:${l.color}"></div>${l.label}</div>`
@@ -1885,7 +1979,11 @@ function goBackStep(n){
 
 
 
+
+
 setProgress(1);
+go(1);
+
 </script>
 </body>
 </html>
